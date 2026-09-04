@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.MemberBankCardMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.MemberBankCardEntity">
+        <id column="id" property="id"/>
+
+        <result column="member_id" property="memberId"/>
+        <result column="bank_name" property="bankName"/>
+        <result column="card_no" property="cardNo"/>
+        <result column="holder_name" property="holderName"/>
+        <result column="is_default" property="isDefault"/>
+        <result column="create_time" property="createTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, member_id, bank_name, card_no, holder_name, is_default, create_time, is_deleted
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `member_bank_card`
+        <where>
+            is_deleted = 0
+            <if test="query != null">
+                <if test="query.memberId != null">AND member_id = #{query.memberId}</if>
+                <if test="query.bankName != null">AND bank_name = #{query.bankName}</if>
+                <if test="query.cardNo != null">AND card_no = #{query.cardNo}</if>
+                <if test="query.holderName != null">AND holder_name = #{query.holderName}</if>
+                <if test="query.isDefault != null">AND is_default = #{query.isDefault}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `member_bank_card`
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.MemberBankCardEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `member_bank_card`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="memberId != null">member_id,</if>
+            <if test="bankName != null">bank_name,</if>
+            <if test="cardNo != null">card_no,</if>
+            <if test="holderName != null">holder_name,</if>
+            <if test="isDefault != null">is_default,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="isDeleted != null">is_deleted,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="memberId != null">#{memberId},</if>
+            <if test="bankName != null">#{bankName},</if>
+            <if test="cardNo != null">#{cardNo},</if>
+            <if test="holderName != null">#{holderName},</if>
+            <if test="isDefault != null">#{isDefault},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="isDeleted != null">#{isDeleted},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.MemberBankCardEntity">
+        UPDATE `member_bank_card`
+        <set>
+            <if test="memberId != null">member_id = #{memberId},</if>
+            <if test="bankName != null">bank_name = #{bankName},</if>
+            <if test="cardNo != null">card_no = #{cardNo},</if>
+            <if test="holderName != null">holder_name = #{holderName},</if>
+            <if test="isDefault != null">is_default = #{isDefault},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE `member_bank_card` SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+</mapper>

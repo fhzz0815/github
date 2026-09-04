@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.MemberMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.MemberEntity">
+        <id column="id" property="id"/>
+
+        <result column="openid" property="openid"/>
+        <result column="unionid" property="unionid"/>
+        <result column="nickname" property="nickname"/>
+        <result column="avatar" property="avatar"/>
+        <result column="gender" property="gender"/>
+        <result column="phone" property="phone"/>
+        <result column="real_name" property="realName"/>
+        <result column="id_card" property="idCard"/>
+        <result column="member_no" property="memberNo"/>
+        <result column="member_category_id" property="memberCategoryId"/>
+        <result column="balance" property="balance"/>
+        <result column="total_points" property="totalPoints"/>
+        <result column="available_points" property="availablePoints"/>
+        <result column="pay_password" property="payPassword"/>
+        <result column="register_store_id" property="registerStoreId"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, openid, unionid, nickname, avatar, gender, phone, real_name, id_card, member_no, member_category_id, balance, total_points, available_points, pay_password, register_store_id, status, create_time, update_time, is_deleted
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `member`
+        <where>
+            is_deleted = 0
+            <if test="query != null">
+                <if test="query.openid != null">AND openid = #{query.openid}</if>
+                <if test="query.unionid != null">AND unionid = #{query.unionid}</if>
+                <if test="query.nickname != null">AND nickname = #{query.nickname}</if>
+                <if test="query.avatar != null">AND avatar = #{query.avatar}</if>
+                <if test="query.gender != null">AND gender = #{query.gender}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `member`
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.MemberEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `member`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="openid != null">openid,</if>
+            <if test="unionid != null">unionid,</if>
+            <if test="nickname != null">nickname,</if>
+            <if test="avatar != null">avatar,</if>
+            <if test="gender != null">gender,</if>
+            <if test="phone != null">phone,</if>
+            <if test="realName != null">real_name,</if>
+            <if test="idCard != null">id_card,</if>
+            <if test="memberNo != null">member_no,</if>
+            <if test="memberCategoryId != null">member_category_id,</if>
+            <if test="balance != null">balance,</if>
+            <if test="totalPoints != null">total_points,</if>
+            <if test="availablePoints != null">available_points,</if>
+            <if test="payPassword != null">pay_password,</if>
+            <if test="registerStoreId != null">register_store_id,</if>
+            <if test="status != null">status,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="isDeleted != null">is_deleted,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="openid != null">#{openid},</if>
+            <if test="unionid != null">#{unionid},</if>
+            <if test="nickname != null">#{nickname},</if>
+            <if test="avatar != null">#{avatar},</if>
+            <if test="gender != null">#{gender},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="realName != null">#{realName},</if>
+            <if test="idCard != null">#{idCard},</if>
+            <if test="memberNo != null">#{memberNo},</if>
+            <if test="memberCategoryId != null">#{memberCategoryId},</if>
+            <if test="balance != null">#{balance},</if>
+            <if test="totalPoints != null">#{totalPoints},</if>
+            <if test="availablePoints != null">#{availablePoints},</if>
+            <if test="payPassword != null">#{payPassword},</if>
+            <if test="registerStoreId != null">#{registerStoreId},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="isDeleted != null">#{isDeleted},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.MemberEntity">
+        UPDATE `member`
+        <set>
+            <if test="openid != null">openid = #{openid},</if>
+            <if test="unionid != null">unionid = #{unionid},</if>
+            <if test="nickname != null">nickname = #{nickname},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="realName != null">real_name = #{realName},</if>
+            <if test="idCard != null">id_card = #{idCard},</if>
+            <if test="memberNo != null">member_no = #{memberNo},</if>
+            <if test="memberCategoryId != null">member_category_id = #{memberCategoryId},</if>
+            <if test="balance != null">balance = #{balance},</if>
+            <if test="totalPoints != null">total_points = #{totalPoints},</if>
+            <if test="availablePoints != null">available_points = #{availablePoints},</if>
+            <if test="payPassword != null">pay_password = #{payPassword},</if>
+            <if test="registerStoreId != null">register_store_id = #{registerStoreId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE `member` SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+</mapper>

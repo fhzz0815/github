@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.DishMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.DishEntity">
+        <id column="id" property="id"/>
+
+        <result column="store_id" property="storeId"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="dish_name" property="dishName"/>
+        <result column="dish_no" property="dishNo"/>
+        <result column="image" property="image"/>
+        <result column="description" property="description"/>
+        <result column="price" property="price"/>
+        <result column="origin_price" property="originPrice"/>
+        <result column="unit" property="unit"/>
+        <result column="taste_id" property="tasteId"/>
+        <result column="spec_id" property="specId"/>
+        <result column="is_recommend" property="isRecommend"/>
+        <result column="is_new" property="isNew"/>
+        <result column="is_sold_out" property="isSoldOut"/>
+        <result column="sale_count" property="saleCount"/>
+        <result column="sort" property="sort"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, store_id, category_id, dish_name, dish_no, image, description, price, origin_price, unit, taste_id, spec_id, is_recommend, is_new, is_sold_out, sale_count, sort, status, create_time, update_time, is_deleted
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `dish`
+        <where>
+            is_deleted = 0
+            <if test="query != null">
+                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+                <if test="query.categoryId != null">AND category_id = #{query.categoryId}</if>
+                <if test="query.dishName != null">AND dish_name = #{query.dishName}</if>
+                <if test="query.dishNo != null">AND dish_no = #{query.dishNo}</if>
+                <if test="query.image != null">AND image = #{query.image}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `dish`
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.DishEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `dish`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="storeId != null">store_id,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="dishName != null">dish_name,</if>
+            <if test="dishNo != null">dish_no,</if>
+            <if test="image != null">image,</if>
+            <if test="description != null">description,</if>
+            <if test="price != null">price,</if>
+            <if test="originPrice != null">origin_price,</if>
+            <if test="unit != null">unit,</if>
+            <if test="tasteId != null">taste_id,</if>
+            <if test="specId != null">spec_id,</if>
+            <if test="isRecommend != null">is_recommend,</if>
+            <if test="isNew != null">is_new,</if>
+            <if test="isSoldOut != null">is_sold_out,</if>
+            <if test="saleCount != null">sale_count,</if>
+            <if test="sort != null">sort,</if>
+            <if test="status != null">status,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="isDeleted != null">is_deleted,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="storeId != null">#{storeId},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="dishName != null">#{dishName},</if>
+            <if test="dishNo != null">#{dishNo},</if>
+            <if test="image != null">#{image},</if>
+            <if test="description != null">#{description},</if>
+            <if test="price != null">#{price},</if>
+            <if test="originPrice != null">#{originPrice},</if>
+            <if test="unit != null">#{unit},</if>
+            <if test="tasteId != null">#{tasteId},</if>
+            <if test="specId != null">#{specId},</if>
+            <if test="isRecommend != null">#{isRecommend},</if>
+            <if test="isNew != null">#{isNew},</if>
+            <if test="isSoldOut != null">#{isSoldOut},</if>
+            <if test="saleCount != null">#{saleCount},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="isDeleted != null">#{isDeleted},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.DishEntity">
+        UPDATE `dish`
+        <set>
+            <if test="storeId != null">store_id = #{storeId},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="dishName != null">dish_name = #{dishName},</if>
+            <if test="dishNo != null">dish_no = #{dishNo},</if>
+            <if test="image != null">image = #{image},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="originPrice != null">origin_price = #{originPrice},</if>
+            <if test="unit != null">unit = #{unit},</if>
+            <if test="tasteId != null">taste_id = #{tasteId},</if>
+            <if test="specId != null">spec_id = #{specId},</if>
+            <if test="isRecommend != null">is_recommend = #{isRecommend},</if>
+            <if test="isNew != null">is_new = #{isNew},</if>
+            <if test="isSoldOut != null">is_sold_out = #{isSoldOut},</if>
+            <if test="saleCount != null">sale_count = #{saleCount},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE `dish` SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+</mapper>

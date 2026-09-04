@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.StaffScheduleMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.StaffScheduleEntity">
+        <id column="id" property="id"/>
+
+        <result column="staff_id" property="staffId"/>
+        <result column="work_date" property="workDate"/>
+        <result column="shift_type" property="shiftType"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, staff_id, work_date, shift_type, start_time, end_time, remark, create_time
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `staff_schedule`
+        <where>
+            <if test="query != null">
+                <if test="query.staffId != null">AND staff_id = #{query.staffId}</if>
+                <if test="query.workDate != null">AND work_date = #{query.workDate}</if>
+                <if test="query.shiftType != null">AND shift_type = #{query.shiftType}</if>
+                <if test="query.startTime != null">AND start_time = #{query.startTime}</if>
+                <if test="query.endTime != null">AND end_time = #{query.endTime}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `staff_schedule`
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.StaffScheduleEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `staff_schedule`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="staffId != null">staff_id,</if>
+            <if test="workDate != null">work_date,</if>
+            <if test="shiftType != null">shift_type,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="staffId != null">#{staffId},</if>
+            <if test="workDate != null">#{workDate},</if>
+            <if test="shiftType != null">#{shiftType},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.StaffScheduleEntity">
+        UPDATE `staff_schedule`
+        <set>
+            <if test="staffId != null">staff_id = #{staffId},</if>
+            <if test="workDate != null">work_date = #{workDate},</if>
+            <if test="shiftType != null">shift_type = #{shiftType},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM `staff_schedule` WHERE id = #{id}
+    </delete>
+
+</mapper>

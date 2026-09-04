@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.FeedbackMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.FeedbackEntity">
+        <id column="id" property="id"/>
+
+        <result column="member_id" property="memberId"/>
+        <result column="store_id" property="storeId"/>
+        <result column="content" property="content"/>
+        <result column="images" property="images"/>
+        <result column="contact_phone" property="contactPhone"/>
+        <result column="status" property="status"/>
+        <result column="reply" property="reply"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, member_id, store_id, content, images, contact_phone, status, reply, create_time, update_time
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `feedback`
+        <where>
+            <if test="query != null">
+                <if test="query.memberId != null">AND member_id = #{query.memberId}</if>
+                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+                <if test="query.content != null">AND content = #{query.content}</if>
+                <if test="query.images != null">AND images = #{query.images}</if>
+                <if test="query.contactPhone != null">AND contact_phone = #{query.contactPhone}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `feedback`
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.FeedbackEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `feedback`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="memberId != null">member_id,</if>
+            <if test="storeId != null">store_id,</if>
+            <if test="content != null">content,</if>
+            <if test="images != null">images,</if>
+            <if test="contactPhone != null">contact_phone,</if>
+            <if test="status != null">status,</if>
+            <if test="reply != null">reply,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="memberId != null">#{memberId},</if>
+            <if test="storeId != null">#{storeId},</if>
+            <if test="content != null">#{content},</if>
+            <if test="images != null">#{images},</if>
+            <if test="contactPhone != null">#{contactPhone},</if>
+            <if test="status != null">#{status},</if>
+            <if test="reply != null">#{reply},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.FeedbackEntity">
+        UPDATE `feedback`
+        <set>
+            <if test="memberId != null">member_id = #{memberId},</if>
+            <if test="storeId != null">store_id = #{storeId},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="images != null">images = #{images},</if>
+            <if test="contactPhone != null">contact_phone = #{contactPhone},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="reply != null">reply = #{reply},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM `feedback` WHERE id = #{id}
+    </delete>
+
+</mapper>

@@ -1,0 +1,440 @@
+{
+  "marker": "CRUD414759",
+  "summary": {
+    "pass": 215,
+    "fail": 0,
+    "skip": 0
+  },
+  "results": [
+    {
+      "module": "sysRoles",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 12,
+      "note": ""
+    },
+    {
+      "module": "sysPermissions",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 21,
+      "note": ""
+    },
+    {
+      "module": "sysRolePermissions",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 34,
+      "note": ""
+    },
+    {
+      "module": "sysUsers",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 14,
+      "note": ""
+    },
+    {
+      "module": "staffSchedules",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 8,
+      "note": ""
+    },
+    {
+      "module": "staffLoginLogs",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 9,
+      "note": ""
+    },
+    {
+      "module": "stores",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 10,
+      "note": ""
+    },
+    {
+      "module": "storePaymentSettings",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 17,
+      "note": ""
+    },
+    {
+      "module": "memberCategories",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 8,
+      "note": ""
+    },
+    {
+      "module": "members",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 10,
+      "note": ""
+    },
+    {
+      "module": "memberAddresses",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 9,
+      "note": ""
+    },
+    {
+      "module": "memberBankCards",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 6,
+      "note": ""
+    },
+    {
+      "module": "memberBalanceRecords",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 5,
+      "note": ""
+    },
+    {
+      "module": "memberPointsRecords",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 6,
+      "note": ""
+    },
+    {
+      "module": "memberRechargeRecords",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 5,
+      "note": ""
+    },
+    {
+      "module": "redPackets",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 5,
+      "note": ""
+    },
+    {
+      "module": "dishCategories",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 12,
+      "note": ""
+    },
+    {
+      "module": "dishTastes",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 9,
+      "note": ""
+    },
+    {
+      "module": "dishSpecs",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 8,
+      "note": ""
+    },
+    {
+      "module": "ingredientCategories",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 10,
+      "note": ""
+    },
+    {
+      "module": "ingredients",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 17,
+      "note": ""
+    },
+    {
+      "module": "dishes",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 19,
+      "note": ""
+    },
+    {
+      "module": "dishIngredientRels",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 17,
+      "note": ""
+    },
+    {
+      "module": "dishReviews",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 6,
+      "note": ""
+    },
+    {
+      "module": "tableTypes",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 12,
+      "note": ""
+    },
+    {
+      "module": "diningTables",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 16,
+      "note": ""
+    },
+    {
+      "module": "queues",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 7,
+      "note": ""
+    },
+    {
+      "module": "reservations",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 8,
+      "note": ""
+    },
+    {
+      "module": "carts",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 6,
+      "note": ""
+    },
+    {
+      "module": "orders",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 7,
+      "note": ""
+    },
+    {
+      "module": "orderDetails",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 11,
+      "note": ""
+    },
+    {
+      "module": "orderStatusLogs",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 7,
+      "note": ""
+    },
+    {
+      "module": "paymentRecords",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 6,
+      "note": ""
+    },
+    {
+      "module": "refunds",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 5,
+      "note": ""
+    },
+    {
+      "module": "coupons",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 9,
+      "note": ""
+    },
+    {
+      "module": "memberCoupons",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 8,
+      "note": ""
+    },
+    {
+      "module": "dishStocks",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 11,
+      "note": ""
+    },
+    {
+      "module": "ingredientStocks",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 17,
+      "note": ""
+    },
+    {
+      "module": "stockCheckDishes",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 7,
+      "note": ""
+    },
+    {
+      "module": "stockCheckIngredients",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 6,
+      "note": ""
+    },
+    {
+      "module": "printers",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 7,
+      "note": ""
+    },
+    {
+      "module": "receiptTemplates",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 9,
+      "note": ""
+    },
+    {
+      "module": "feedbacks",
+      "create": "PASS",
+      "readList": "PASS",
+      "readById": "PASS",
+      "update": "PASS",
+      "delete": "PASS",
+      "id": 7,
+      "note": ""
+    }
+  ]
+}

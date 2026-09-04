@@ -1,0 +1,6 @@
+# 开发环境配置
+# 连接信息统一在 application.yml 中配置，此处仅保留开发环境差异项
+logging:
+  level:
+    com.iwe3.sec: debug
+    org.springframework: warn

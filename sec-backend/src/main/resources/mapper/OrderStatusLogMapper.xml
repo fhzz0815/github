@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.OrderStatusLogMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.OrderStatusLogEntity">
+        <id column="id" property="id"/>
+
+        <result column="order_id" property="orderId"/>
+        <result column="from_status" property="fromStatus"/>
+        <result column="to_status" property="toStatus"/>
+        <result column="operator_type" property="operatorType"/>
+        <result column="operator_id" property="operatorId"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, order_id, from_status, to_status, operator_type, operator_id, remark, create_time
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `order_status_log`
+        <where>
+            <if test="query != null">
+                <if test="query.orderId != null">AND order_id = #{query.orderId}</if>
+                <if test="query.fromStatus != null">AND from_status = #{query.fromStatus}</if>
+                <if test="query.toStatus != null">AND to_status = #{query.toStatus}</if>
+                <if test="query.operatorType != null">AND operator_type = #{query.operatorType}</if>
+                <if test="query.operatorId != null">AND operator_id = #{query.operatorId}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `order_status_log`
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.OrderStatusLogEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `order_status_log`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderId != null">order_id,</if>
+            <if test="fromStatus != null">from_status,</if>
+            <if test="toStatus != null">to_status,</if>
+            <if test="operatorType != null">operator_type,</if>
+            <if test="operatorId != null">operator_id,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="orderId != null">#{orderId},</if>
+            <if test="fromStatus != null">#{fromStatus},</if>
+            <if test="toStatus != null">#{toStatus},</if>
+            <if test="operatorType != null">#{operatorType},</if>
+            <if test="operatorId != null">#{operatorId},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.OrderStatusLogEntity">
+        UPDATE `order_status_log`
+        <set>
+            <if test="orderId != null">order_id = #{orderId},</if>
+            <if test="fromStatus != null">from_status = #{fromStatus},</if>
+            <if test="toStatus != null">to_status = #{toStatus},</if>
+            <if test="operatorType != null">operator_type = #{operatorType},</if>
+            <if test="operatorId != null">operator_id = #{operatorId},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM `order_status_log` WHERE id = #{id}
+    </delete>
+
+</mapper>

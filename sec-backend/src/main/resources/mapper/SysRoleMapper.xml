@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.SysRoleMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.SysRoleEntity">
+        <id column="id" property="id"/>
+
+        <result column="role_name" property="roleName"/>
+        <result column="role_code" property="roleCode"/>
+        <result column="description" property="description"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, role_name, role_code, description, create_time, update_time, is_deleted
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `sys_role`
+        <where>
+            is_deleted = 0
+            <if test="query != null">
+                <if test="query.roleName != null">AND role_name = #{query.roleName}</if>
+                <if test="query.roleCode != null">AND role_code = #{query.roleCode}</if>
+                <if test="query.description != null">AND description = #{query.description}</if>
+                <if test="query.createTime != null">AND create_time = #{query.createTime}</if>
+                <if test="query.updateTime != null">AND update_time = #{query.updateTime}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `sys_role`
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.SysRoleEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `sys_role`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="roleName != null">role_name,</if>
+            <if test="roleCode != null">role_code,</if>
+            <if test="description != null">description,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="isDeleted != null">is_deleted,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="roleName != null">#{roleName},</if>
+            <if test="roleCode != null">#{roleCode},</if>
+            <if test="description != null">#{description},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="isDeleted != null">#{isDeleted},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.SysRoleEntity">
+        UPDATE `sys_role`
+        <set>
+            <if test="roleName != null">role_name = #{roleName},</if>
+            <if test="roleCode != null">role_code = #{roleCode},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE `sys_role` SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+</mapper>

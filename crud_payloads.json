@@ -1,0 +1,550 @@
+{
+  "marker": "CRUD414759",
+  "modules": [
+    {
+      "table": "sys_role",
+      "path": "sysRoles",
+      "payload": {
+        "roleName": "CRUD414759rol",
+        "roleCode": "CRUD414759rol"
+      },
+      "markerField": "roleName",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "sys_permission",
+      "path": "sysPermissions",
+      "payload": {
+        "permissionName": "CRUD414759per",
+        "permissionCode": "CRUD414759per"
+      },
+      "markerField": "permissionName",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "sys_role_permission",
+      "path": "sysRolePermissions",
+      "payload": {
+        "roleId": 8888,
+        "permissionId": 8888
+      },
+      "markerField": null,
+      "findField": "permissionId",
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "sys_user",
+      "path": "sysUsers",
+      "payload": {
+        "username": "CRUD414759use",
+        "password": "123456",
+        "roleId": 1
+      },
+      "markerField": "username",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "staff_schedule",
+      "path": "staffSchedules",
+      "payload": {
+        "staffId": 8888,
+        "workDate": "2026-09-10",
+        "remark": "CRUD414759M"
+      },
+      "markerField": "remark",
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "staff_login_log",
+      "path": "staffLoginLogs",
+      "payload": {
+        "staffId": 1,
+        "failReason": "CRUD414759M"
+      },
+      "markerField": "failReason",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "store",
+      "path": "stores",
+      "payload": {
+        "storeNo": "CRUD414759sto",
+        "storeName": "CRUD414759sto"
+      },
+      "markerField": "storeNo",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "store_payment_setting",
+      "path": "storePaymentSettings",
+      "payload": {
+        "storeId": 8888,
+        "payType": "CRUD414759"
+      },
+      "markerField": null,
+      "findField": "storeId",
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "member_category",
+      "path": "memberCategories",
+      "payload": {
+        "categoryName": "CRUD414759cat"
+      },
+      "markerField": "categoryName",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "member",
+      "path": "members",
+      "payload": {
+        "nickname": "CRUD414759M"
+      },
+      "markerField": "nickname",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "member_address",
+      "path": "memberAddresses",
+      "payload": {
+        "memberId": 1,
+        "contactName": "CRUD414759con",
+        "contactPhone": "13900000000",
+        "detailAddress": "CRUD414759det"
+      },
+      "markerField": "contactName",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "member_bank_card",
+      "path": "memberBankCards",
+      "payload": {
+        "memberId": 1,
+        "cardNo": "CRUD414759car",
+        "bankName": "CRUD414759M"
+      },
+      "markerField": "bankName",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "member_balance_record",
+      "path": "memberBalanceRecords",
+      "payload": {
+        "memberId": 1,
+        "changeAmount": 1,
+        "balanceAfter": 1,
+        "changeType": "CRUD414759",
+        "remark": "CRUD414759M"
+      },
+      "markerField": "remark",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "member_points_record",
+      "path": "memberPointsRecords",
+      "payload": {
+        "memberId": 1,
+        "pointsChange": 1,
+        "pointsAfter": 1,
+        "changeType": "CRUD414759",
+        "remark": "CRUD414759M"
+      },
+      "markerField": "remark",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "member_recharge_record",
+      "path": "memberRechargeRecords",
+      "payload": {
+        "rechargeNo": "CRUD414759rec",
+        "memberId": 1,
+        "rechargeAmount": 1
+      },
+      "markerField": "rechargeNo",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "red_packet",
+      "path": "redPackets",
+      "payload": {
+        "redPacketNo": "CRUD414759red",
+        "memberId": 1,
+        "amount": 1
+      },
+      "markerField": "redPacketNo",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "dish_category",
+      "path": "dishCategories",
+      "payload": {
+        "storeId": 1,
+        "categoryName": "CRUD414759cat"
+      },
+      "markerField": "categoryName",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "dish_taste",
+      "path": "dishTastes",
+      "payload": {
+        "storeId": 1,
+        "tasteName": "CRUD414759tas"
+      },
+      "markerField": "tasteName",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "dish_spec",
+      "path": "dishSpecs",
+      "payload": {
+        "storeId": 1,
+        "specName": "CRUD414759spe"
+      },
+      "markerField": "specName",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "ingredient_category",
+      "path": "ingredientCategories",
+      "payload": {
+        "storeId": 1,
+        "categoryName": "CRUD414759cat"
+      },
+      "markerField": "categoryName",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "ingredient",
+      "path": "ingredients",
+      "payload": {
+        "storeId": 1,
+        "ingredientName": "CRUD414759ing"
+      },
+      "markerField": "ingredientName",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "dish",
+      "path": "dishes",
+      "payload": {
+        "storeId": 1,
+        "categoryId": 1,
+        "dishName": "CRUD414759dis",
+        "price": 1
+      },
+      "markerField": "dishName",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "dish_ingredient_rel",
+      "path": "dishIngredientRels",
+      "payload": {
+        "dishId": 1,
+        "ingredientId": 8888
+      },
+      "markerField": null,
+      "findField": "ingredientId",
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "dish_review",
+      "path": "dishReviews",
+      "payload": {
+        "dishId": 1,
+        "memberId": 1,
+        "content": "CRUD414759M"
+      },
+      "markerField": "content",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "table_type",
+      "path": "tableTypes",
+      "payload": {
+        "storeId": 1,
+        "typeName": "CRUD414759typ"
+      },
+      "markerField": "typeName",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "dining_table",
+      "path": "diningTables",
+      "payload": {
+        "storeId": 1,
+        "tableTypeId": 1,
+        "tableNo": "CRUD414759tab"
+      },
+      "markerField": "tableNo",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "queue",
+      "path": "queues",
+      "payload": {
+        "storeId": 1,
+        "queueNo": "CRUD414759que"
+      },
+      "markerField": "queueNo",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "reservation",
+      "path": "reservations",
+      "payload": {
+        "storeId": 1,
+        "memberId": 1,
+        "contactName": "CRUD414759con",
+        "contactPhone": "13900000000",
+        "reservationDate": "2026-09-10",
+        "reservationTime": "18:30:00"
+      },
+      "markerField": "contactName",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "cart",
+      "path": "carts",
+      "payload": {
+        "memberId": 1,
+        "storeId": 1,
+        "dishId": 1,
+        "price": 1,
+        "dishName": "CRUD414759M"
+      },
+      "markerField": "dishName",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "orders",
+      "path": "orders",
+      "payload": {
+        "orderNo": "CRUD414759ord",
+        "storeId": 1,
+        "memberId": 1,
+        "orderType": 1
+      },
+      "markerField": "orderNo",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "order_detail",
+      "path": "orderDetails",
+      "payload": {
+        "orderId": 1,
+        "dishId": 1,
+        "dishName": "CRUD414759dis",
+        "dishPrice": 1
+      },
+      "markerField": "dishName",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "order_status_log",
+      "path": "orderStatusLogs",
+      "payload": {
+        "orderId": 1,
+        "toStatus": 1,
+        "remark": "CRUD414759M"
+      },
+      "markerField": "remark",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "payment_record",
+      "path": "paymentRecords",
+      "payload": {
+        "payNo": "CRUD414759pay",
+        "orderId": 1,
+        "payType": "CRUD414759",
+        "amount": 1
+      },
+      "markerField": "payNo",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "refund",
+      "path": "refunds",
+      "payload": {
+        "refundNo": "CRUD414759ref",
+        "orderId": 1,
+        "amount": 1
+      },
+      "markerField": "refundNo",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "coupon",
+      "path": "coupons",
+      "payload": {
+        "couponName": "CRUD414759cou"
+      },
+      "markerField": "couponName",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "member_coupon",
+      "path": "memberCoupons",
+      "payload": {
+        "memberId": 1,
+        "couponId": 8888
+      },
+      "markerField": null,
+      "findField": "couponId",
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "dish_stock",
+      "path": "dishStocks",
+      "payload": {
+        "storeId": 1,
+        "dishId": 8888
+      },
+      "markerField": null,
+      "findField": "dishId",
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "ingredient_stock",
+      "path": "ingredientStocks",
+      "payload": {
+        "storeId": 1,
+        "ingredientId": 8888
+      },
+      "markerField": null,
+      "findField": "ingredientId",
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "stock_check_dish",
+      "path": "stockCheckDishes",
+      "payload": {
+        "checkNo": "CRUD414759che",
+        "storeId": 1,
+        "dishId": 1
+      },
+      "markerField": "checkNo",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "stock_check_ingredient",
+      "path": "stockCheckIngredients",
+      "payload": {
+        "checkNo": "CRUD414759che",
+        "storeId": 1,
+        "ingredientId": 1
+      },
+      "markerField": "checkNo",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "printer",
+      "path": "printers",
+      "payload": {
+        "storeId": 1,
+        "printerName": "CRUD414759pri"
+      },
+      "markerField": "printerName",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "receipt_template",
+      "path": "receiptTemplates",
+      "payload": {
+        "templateType": "CRUD414759",
+        "templateName": "CRUD414759tem"
+      },
+      "markerField": "templateName",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    },
+    {
+      "table": "feedback",
+      "path": "feedbacks",
+      "payload": {
+        "content": "CRUD414759con"
+      },
+      "markerField": "content",
+      "findField": null,
+      "findValue": 8888,
+      "marker": "CRUD414759"
+    }
+  ]
+}

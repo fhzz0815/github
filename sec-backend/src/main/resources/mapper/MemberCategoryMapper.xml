@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.MemberCategoryMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.MemberCategoryEntity">
+        <id column="id" property="id"/>
+
+        <result column="category_name" property="categoryName"/>
+        <result column="discount_rate" property="discountRate"/>
+        <result column="recharge_rule" property="rechargeRule"/>
+        <result column="description" property="description"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, category_name, discount_rate, recharge_rule, description, create_time, update_time, is_deleted
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `member_category`
+        <where>
+            is_deleted = 0
+            <if test="query != null">
+                <if test="query.categoryName != null">AND category_name = #{query.categoryName}</if>
+                <if test="query.discountRate != null">AND discount_rate = #{query.discountRate}</if>
+                <if test="query.rechargeRule != null">AND recharge_rule = #{query.rechargeRule}</if>
+                <if test="query.description != null">AND description = #{query.description}</if>
+                <if test="query.createTime != null">AND create_time = #{query.createTime}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `member_category`
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.MemberCategoryEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `member_category`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="categoryName != null">category_name,</if>
+            <if test="discountRate != null">discount_rate,</if>
+            <if test="rechargeRule != null">recharge_rule,</if>
+            <if test="description != null">description,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="isDeleted != null">is_deleted,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="categoryName != null">#{categoryName},</if>
+            <if test="discountRate != null">#{discountRate},</if>
+            <if test="rechargeRule != null">#{rechargeRule},</if>
+            <if test="description != null">#{description},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="isDeleted != null">#{isDeleted},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.MemberCategoryEntity">
+        UPDATE `member_category`
+        <set>
+            <if test="categoryName != null">category_name = #{categoryName},</if>
+            <if test="discountRate != null">discount_rate = #{discountRate},</if>
+            <if test="rechargeRule != null">recharge_rule = #{rechargeRule},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE `member_category` SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+</mapper>

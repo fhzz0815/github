@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.ReceiptTemplateMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.ReceiptTemplateEntity">
+        <id column="id" property="id"/>
+
+        <result column="template_type" property="templateType"/>
+        <result column="template_name" property="templateName"/>
+        <result column="template_content" property="templateContent"/>
+        <result column="is_default" property="isDefault"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, template_type, template_name, template_content, is_default, create_time, update_time
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `receipt_template`
+        <where>
+            <if test="query != null">
+                <if test="query.templateType != null">AND template_type = #{query.templateType}</if>
+                <if test="query.templateName != null">AND template_name = #{query.templateName}</if>
+                <if test="query.templateContent != null">AND template_content = #{query.templateContent}</if>
+                <if test="query.isDefault != null">AND is_default = #{query.isDefault}</if>
+                <if test="query.createTime != null">AND create_time = #{query.createTime}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `receipt_template`
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.ReceiptTemplateEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `receipt_template`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="templateType != null">template_type,</if>
+            <if test="templateName != null">template_name,</if>
+            <if test="templateContent != null">template_content,</if>
+            <if test="isDefault != null">is_default,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="templateType != null">#{templateType},</if>
+            <if test="templateName != null">#{templateName},</if>
+            <if test="templateContent != null">#{templateContent},</if>
+            <if test="isDefault != null">#{isDefault},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.ReceiptTemplateEntity">
+        UPDATE `receipt_template`
+        <set>
+            <if test="templateType != null">template_type = #{templateType},</if>
+            <if test="templateName != null">template_name = #{templateName},</if>
+            <if test="templateContent != null">template_content = #{templateContent},</if>
+            <if test="isDefault != null">is_default = #{isDefault},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM `receipt_template` WHERE id = #{id}
+    </delete>
+
+</mapper>

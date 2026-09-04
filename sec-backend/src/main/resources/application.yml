@@ -1,0 +1,108 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /smart_restaurant
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: portal
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+  # Redis 单机配置（开发环境使用本地 Redis）
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: Flzx3qc_14yhl9t
+      database: 0
+      timeout: 5000ms
+      lettuce:
+        pool:
+          max-active: 20
+          max-wait: 3000ms
+          max-idle: 10
+          min-idle: 5
+
+  # Druid 数据源
+  datasource:
+    druid:
+      aop-patterns: com.iwe3.sec.controller.*Controller
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      filter: stat,wall,log4j
+      filter.stat.enabled: true
+      filter.stat.log-slow-sql: true
+      filter.stat.slow-sql-millis: 2000
+      filter.wall.enabled: true
+      initial-size: 5
+      max-active: 50
+      max-pool-prepared-statement-per-connection-size: 50
+      max-wait: 60000
+      min-evictable-idle-time-millis: 300000
+      min-idle: 5
+      password: Flzx3qc_14yhl9t
+      pool-prepared-statements: true
+      stat-view-servlet:
+        allow-ips: 127.0.0.1,localhost
+        enabled: true
+        login-password: 123456
+        login-username: admin
+        reset-enable: false
+        url-pattern: /druid/*
+      test-on-borrow: true
+      test-on-return: false
+      test-while-idle: false
+      time-between-eviction-runs-millis: 60000
+      url: "jdbc:mysql://192.168.153.138:3307/smart_restaurant?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true"
+      username: root
+      validation-query: select 1 from dual
+
+# MyBatis 配置
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.iwe3.sec.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# PageHelper 分页插件
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+
+# SpringDoc OpenAPI
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+
+# JWT 配置
+jwt:
+  secret: smart-restaurant-secret-key-please-change-in-production-2026
+  access-token-expire: 7200000
+  refresh-token-expire: 1209600000
+
+# 日志配置
+logging:
+  config: classpath:logback.xml
+  level:
+    com.iwe3.sec: debug
+    org.springframework: warn
+  file:
+    path: /logs/portal
+
+# Redisson 单机配置（开发环境使用本地 Redis）
+redisson:
+  single-server-config:
+    address: "redis://127.0.0.1:6379"
+    password: Flzx3qc_14yhl9t
+    database: 0
+    timeout: 5000
+    retry-attempts: 3
+    retry-interval: 1000

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.CartMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.CartEntity">
+        <id column="id" property="id"/>
+
+        <result column="member_id" property="memberId"/>
+        <result column="store_id" property="storeId"/>
+        <result column="dish_id" property="dishId"/>
+        <result column="dish_name" property="dishName"/>
+        <result column="dish_image" property="dishImage"/>
+        <result column="spec_name" property="specName"/>
+        <result column="taste_name" property="tasteName"/>
+        <result column="price" property="price"/>
+        <result column="quantity" property="quantity"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, member_id, store_id, dish_id, dish_name, dish_image, spec_name, taste_name, price, quantity, create_time, update_time
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `cart`
+        <where>
+            <if test="query != null">
+                <if test="query.memberId != null">AND member_id = #{query.memberId}</if>
+                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+                <if test="query.dishId != null">AND dish_id = #{query.dishId}</if>
+                <if test="query.dishName != null">AND dish_name = #{query.dishName}</if>
+                <if test="query.dishImage != null">AND dish_image = #{query.dishImage}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `cart`
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.CartEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `cart`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="memberId != null">member_id,</if>
+            <if test="storeId != null">store_id,</if>
+            <if test="dishId != null">dish_id,</if>
+            <if test="dishName != null">dish_name,</if>
+            <if test="dishImage != null">dish_image,</if>
+            <if test="specName != null">spec_name,</if>
+            <if test="tasteName != null">taste_name,</if>
+            <if test="price != null">price,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="memberId != null">#{memberId},</if>
+            <if test="storeId != null">#{storeId},</if>
+            <if test="dishId != null">#{dishId},</if>
+            <if test="dishName != null">#{dishName},</if>
+            <if test="dishImage != null">#{dishImage},</if>
+            <if test="specName != null">#{specName},</if>
+            <if test="tasteName != null">#{tasteName},</if>
+            <if test="price != null">#{price},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.CartEntity">
+        UPDATE `cart`
+        <set>
+            <if test="memberId != null">member_id = #{memberId},</if>
+            <if test="storeId != null">store_id = #{storeId},</if>
+            <if test="dishId != null">dish_id = #{dishId},</if>
+            <if test="dishName != null">dish_name = #{dishName},</if>
+            <if test="dishImage != null">dish_image = #{dishImage},</if>
+            <if test="specName != null">spec_name = #{specName},</if>
+            <if test="tasteName != null">taste_name = #{tasteName},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="quantity != null">quantity = #{quantity},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM `cart` WHERE id = #{id}
+    </delete>
+
+</mapper>

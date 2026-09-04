@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.DishSpecMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.DishSpecEntity">
+        <id column="id" property="id"/>
+
+        <result column="store_id" property="storeId"/>
+        <result column="spec_name" property="specName"/>
+        <result column="price_delta" property="priceDelta"/>
+        <result column="sort" property="sort"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, store_id, spec_name, price_delta, sort, status, create_time, is_deleted
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `dish_spec`
+        <where>
+            is_deleted = 0
+            <if test="query != null">
+                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+                <if test="query.specName != null">AND spec_name = #{query.specName}</if>
+                <if test="query.priceDelta != null">AND price_delta = #{query.priceDelta}</if>
+                <if test="query.sort != null">AND sort = #{query.sort}</if>
+                <if test="query.status != null">AND status = #{query.status}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `dish_spec`
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.DishSpecEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `dish_spec`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="storeId != null">store_id,</if>
+            <if test="specName != null">spec_name,</if>
+            <if test="priceDelta != null">price_delta,</if>
+            <if test="sort != null">sort,</if>
+            <if test="status != null">status,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="isDeleted != null">is_deleted,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="storeId != null">#{storeId},</if>
+            <if test="specName != null">#{specName},</if>
+            <if test="priceDelta != null">#{priceDelta},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="isDeleted != null">#{isDeleted},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.DishSpecEntity">
+        UPDATE `dish_spec`
+        <set>
+            <if test="storeId != null">store_id = #{storeId},</if>
+            <if test="specName != null">spec_name = #{specName},</if>
+            <if test="priceDelta != null">price_delta = #{priceDelta},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE `dish_spec` SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+</mapper>

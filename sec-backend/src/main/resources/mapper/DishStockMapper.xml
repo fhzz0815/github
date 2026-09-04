@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.DishStockMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.DishStockEntity">
+        <id column="id" property="id"/>
+
+        <result column="store_id" property="storeId"/>
+        <result column="dish_id" property="dishId"/>
+        <result column="stock_quantity" property="stockQuantity"/>
+        <result column="warn_threshold" property="warnThreshold"/>
+        <result column="unit" property="unit"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, store_id, dish_id, stock_quantity, warn_threshold, unit, create_time, update_time
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `dish_stock`
+        <where>
+            <if test="query != null">
+                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+                <if test="query.dishId != null">AND dish_id = #{query.dishId}</if>
+                <if test="query.stockQuantity != null">AND stock_quantity = #{query.stockQuantity}</if>
+                <if test="query.warnThreshold != null">AND warn_threshold = #{query.warnThreshold}</if>
+                <if test="query.unit != null">AND unit = #{query.unit}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `dish_stock`
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.DishStockEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `dish_stock`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="storeId != null">store_id,</if>
+            <if test="dishId != null">dish_id,</if>
+            <if test="stockQuantity != null">stock_quantity,</if>
+            <if test="warnThreshold != null">warn_threshold,</if>
+            <if test="unit != null">unit,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="storeId != null">#{storeId},</if>
+            <if test="dishId != null">#{dishId},</if>
+            <if test="stockQuantity != null">#{stockQuantity},</if>
+            <if test="warnThreshold != null">#{warnThreshold},</if>
+            <if test="unit != null">#{unit},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.DishStockEntity">
+        UPDATE `dish_stock`
+        <set>
+            <if test="storeId != null">store_id = #{storeId},</if>
+            <if test="dishId != null">dish_id = #{dishId},</if>
+            <if test="stockQuantity != null">stock_quantity = #{stockQuantity},</if>
+            <if test="warnThreshold != null">warn_threshold = #{warnThreshold},</if>
+            <if test="unit != null">unit = #{unit},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM `dish_stock` WHERE id = #{id}
+    </delete>
+
+</mapper>

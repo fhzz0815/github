@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.PrinterMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.PrinterEntity">
+        <id column="id" property="id"/>
+
+        <result column="store_id" property="storeId"/>
+        <result column="printer_name" property="printerName"/>
+        <result column="printer_no" property="printerNo"/>
+        <result column="printer_type" property="printerType"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, store_id, printer_name, printer_no, printer_type, status, create_time
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `printer`
+        <where>
+            <if test="query != null">
+                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+                <if test="query.printerName != null">AND printer_name = #{query.printerName}</if>
+                <if test="query.printerNo != null">AND printer_no = #{query.printerNo}</if>
+                <if test="query.printerType != null">AND printer_type = #{query.printerType}</if>
+                <if test="query.status != null">AND status = #{query.status}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `printer`
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.PrinterEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `printer`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="storeId != null">store_id,</if>
+            <if test="printerName != null">printer_name,</if>
+            <if test="printerNo != null">printer_no,</if>
+            <if test="printerType != null">printer_type,</if>
+            <if test="status != null">status,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="storeId != null">#{storeId},</if>
+            <if test="printerName != null">#{printerName},</if>
+            <if test="printerNo != null">#{printerNo},</if>
+            <if test="printerType != null">#{printerType},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.PrinterEntity">
+        UPDATE `printer`
+        <set>
+            <if test="storeId != null">store_id = #{storeId},</if>
+            <if test="printerName != null">printer_name = #{printerName},</if>
+            <if test="printerNo != null">printer_no = #{printerNo},</if>
+            <if test="printerType != null">printer_type = #{printerType},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM `printer` WHERE id = #{id}
+    </delete>
+
+</mapper>

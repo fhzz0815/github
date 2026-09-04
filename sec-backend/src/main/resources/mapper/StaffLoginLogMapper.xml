@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.StaffLoginLogMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.StaffLoginLogEntity">
+        <id column="id" property="id"/>
+
+        <result column="staff_id" property="staffId"/>
+        <result column="login_time" property="loginTime"/>
+        <result column="login_ip" property="loginIp"/>
+        <result column="device" property="device"/>
+        <result column="login_result" property="loginResult"/>
+        <result column="fail_reason" property="failReason"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, staff_id, login_time, login_ip, device, login_result, fail_reason
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `staff_login_log`
+        <where>
+            <if test="query != null">
+                <if test="query.staffId != null">AND staff_id = #{query.staffId}</if>
+                <if test="query.loginTime != null">AND login_time = #{query.loginTime}</if>
+                <if test="query.loginIp != null">AND login_ip = #{query.loginIp}</if>
+                <if test="query.device != null">AND device = #{query.device}</if>
+                <if test="query.loginResult != null">AND login_result = #{query.loginResult}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `staff_login_log`
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.StaffLoginLogEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `staff_login_log`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="staffId != null">staff_id,</if>
+            <if test="loginTime != null">login_time,</if>
+            <if test="loginIp != null">login_ip,</if>
+            <if test="device != null">device,</if>
+            <if test="loginResult != null">login_result,</if>
+            <if test="failReason != null">fail_reason,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="staffId != null">#{staffId},</if>
+            <if test="loginTime != null">#{loginTime},</if>
+            <if test="loginIp != null">#{loginIp},</if>
+            <if test="device != null">#{device},</if>
+            <if test="loginResult != null">#{loginResult},</if>
+            <if test="failReason != null">#{failReason},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.StaffLoginLogEntity">
+        UPDATE `staff_login_log`
+        <set>
+            <if test="staffId != null">staff_id = #{staffId},</if>
+            <if test="loginTime != null">login_time = #{loginTime},</if>
+            <if test="loginIp != null">login_ip = #{loginIp},</if>
+            <if test="device != null">device = #{device},</if>
+            <if test="loginResult != null">login_result = #{loginResult},</if>
+            <if test="failReason != null">fail_reason = #{failReason},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM `staff_login_log` WHERE id = #{id}
+    </delete>
+
+</mapper>

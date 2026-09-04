@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.StoreMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.StoreEntity">
+        <id column="id" property="id"/>
+
+        <result column="store_no" property="storeNo"/>
+        <result column="store_name" property="storeName"/>
+        <result column="province" property="province"/>
+        <result column="city" property="city"/>
+        <result column="district" property="district"/>
+        <result column="address" property="address"/>
+        <result column="longitude" property="longitude"/>
+        <result column="latitude" property="latitude"/>
+        <result column="phone" property="phone"/>
+        <result column="contact_name" property="contactName"/>
+        <result column="business_status" property="businessStatus"/>
+        <result column="open_time" property="openTime"/>
+        <result column="close_time" property="closeTime"/>
+        <result column="dine_in_enabled" property="dineInEnabled"/>
+        <result column="takeout_enabled" property="takeoutEnabled"/>
+        <result column="delivery_radius" property="deliveryRadius"/>
+        <result column="min_order_amount" property="minOrderAmount"/>
+        <result column="delivery_fee" property="deliveryFee"/>
+        <result column="delivery_free_threshold" property="deliveryFreeThreshold"/>
+        <result column="delivery_start_time" property="deliveryStartTime"/>
+        <result column="delivery_end_time" property="deliveryEndTime"/>
+        <result column="logo" property="logo"/>
+        <result column="description" property="description"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, store_no, store_name, province, city, district, address, longitude, latitude, phone, contact_name, business_status, open_time, close_time, dine_in_enabled, takeout_enabled, delivery_radius, min_order_amount, delivery_fee, delivery_free_threshold, delivery_start_time, delivery_end_time, logo, description, create_time, update_time, is_deleted
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `store`
+        <where>
+            is_deleted = 0
+            <if test="query != null">
+                <if test="query.storeNo != null">AND store_no = #{query.storeNo}</if>
+                <if test="query.storeName != null">AND store_name = #{query.storeName}</if>
+                <if test="query.province != null">AND province = #{query.province}</if>
+                <if test="query.city != null">AND city = #{query.city}</if>
+                <if test="query.district != null">AND district = #{query.district}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `store`
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.StoreEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `store`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="storeNo != null">store_no,</if>
+            <if test="storeName != null">store_name,</if>
+            <if test="province != null">province,</if>
+            <if test="city != null">city,</if>
+            <if test="district != null">district,</if>
+            <if test="address != null">address,</if>
+            <if test="longitude != null">longitude,</if>
+            <if test="latitude != null">latitude,</if>
+            <if test="phone != null">phone,</if>
+            <if test="contactName != null">contact_name,</if>
+            <if test="businessStatus != null">business_status,</if>
+            <if test="openTime != null">open_time,</if>
+            <if test="closeTime != null">close_time,</if>
+            <if test="dineInEnabled != null">dine_in_enabled,</if>
+            <if test="takeoutEnabled != null">takeout_enabled,</if>
+            <if test="deliveryRadius != null">delivery_radius,</if>
+            <if test="minOrderAmount != null">min_order_amount,</if>
+            <if test="deliveryFee != null">delivery_fee,</if>
+            <if test="deliveryFreeThreshold != null">delivery_free_threshold,</if>
+            <if test="deliveryStartTime != null">delivery_start_time,</if>
+            <if test="deliveryEndTime != null">delivery_end_time,</if>
+            <if test="logo != null">logo,</if>
+            <if test="description != null">description,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="isDeleted != null">is_deleted,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="storeNo != null">#{storeNo},</if>
+            <if test="storeName != null">#{storeName},</if>
+            <if test="province != null">#{province},</if>
+            <if test="city != null">#{city},</if>
+            <if test="district != null">#{district},</if>
+            <if test="address != null">#{address},</if>
+            <if test="longitude != null">#{longitude},</if>
+            <if test="latitude != null">#{latitude},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="contactName != null">#{contactName},</if>
+            <if test="businessStatus != null">#{businessStatus},</if>
+            <if test="openTime != null">#{openTime},</if>
+            <if test="closeTime != null">#{closeTime},</if>
+            <if test="dineInEnabled != null">#{dineInEnabled},</if>
+            <if test="takeoutEnabled != null">#{takeoutEnabled},</if>
+            <if test="deliveryRadius != null">#{deliveryRadius},</if>
+            <if test="minOrderAmount != null">#{minOrderAmount},</if>
+            <if test="deliveryFee != null">#{deliveryFee},</if>
+            <if test="deliveryFreeThreshold != null">#{deliveryFreeThreshold},</if>
+            <if test="deliveryStartTime != null">#{deliveryStartTime},</if>
+            <if test="deliveryEndTime != null">#{deliveryEndTime},</if>
+            <if test="logo != null">#{logo},</if>
+            <if test="description != null">#{description},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="isDeleted != null">#{isDeleted},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.StoreEntity">
+        UPDATE `store`
+        <set>
+            <if test="storeNo != null">store_no = #{storeNo},</if>
+            <if test="storeName != null">store_name = #{storeName},</if>
+            <if test="province != null">province = #{province},</if>
+            <if test="city != null">city = #{city},</if>
+            <if test="district != null">district = #{district},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="longitude != null">longitude = #{longitude},</if>
+            <if test="latitude != null">latitude = #{latitude},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="contactName != null">contact_name = #{contactName},</if>
+            <if test="businessStatus != null">business_status = #{businessStatus},</if>
+            <if test="openTime != null">open_time = #{openTime},</if>
+            <if test="closeTime != null">close_time = #{closeTime},</if>
+            <if test="dineInEnabled != null">dine_in_enabled = #{dineInEnabled},</if>
+            <if test="takeoutEnabled != null">takeout_enabled = #{takeoutEnabled},</if>
+            <if test="deliveryRadius != null">delivery_radius = #{deliveryRadius},</if>
+            <if test="minOrderAmount != null">min_order_amount = #{minOrderAmount},</if>
+            <if test="deliveryFee != null">delivery_fee = #{deliveryFee},</if>
+            <if test="deliveryFreeThreshold != null">delivery_free_threshold = #{deliveryFreeThreshold},</if>
+            <if test="deliveryStartTime != null">delivery_start_time = #{deliveryStartTime},</if>
+            <if test="deliveryEndTime != null">delivery_end_time = #{deliveryEndTime},</if>
+            <if test="logo != null">logo = #{logo},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE `store` SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+</mapper>

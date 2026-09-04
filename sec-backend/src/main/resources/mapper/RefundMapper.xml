@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.RefundMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.RefundEntity">
+        <id column="id" property="id"/>
+
+        <result column="refund_no" property="refundNo"/>
+        <result column="order_id" property="orderId"/>
+        <result column="order_detail_id" property="orderDetailId"/>
+        <result column="store_id" property="storeId"/>
+        <result column="member_id" property="memberId"/>
+        <result column="refund_type" property="refundType"/>
+        <result column="dish_name" property="dishName"/>
+        <result column="quantity" property="quantity"/>
+        <result column="amount" property="amount"/>
+        <result column="reason" property="reason"/>
+        <result column="status" property="status"/>
+        <result column="operator_id" property="operatorId"/>
+        <result column="refund_time" property="refundTime"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, refund_no, order_id, order_detail_id, store_id, member_id, refund_type, dish_name, quantity, amount, reason, status, operator_id, refund_time, create_time
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `refund`
+        <where>
+            <if test="query != null">
+                <if test="query.refundNo != null">AND refund_no = #{query.refundNo}</if>
+                <if test="query.orderId != null">AND order_id = #{query.orderId}</if>
+                <if test="query.orderDetailId != null">AND order_detail_id = #{query.orderDetailId}</if>
+                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+                <if test="query.memberId != null">AND member_id = #{query.memberId}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `refund`
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.RefundEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `refund`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="refundNo != null">refund_no,</if>
+            <if test="orderId != null">order_id,</if>
+            <if test="orderDetailId != null">order_detail_id,</if>
+            <if test="storeId != null">store_id,</if>
+            <if test="memberId != null">member_id,</if>
+            <if test="refundType != null">refund_type,</if>
+            <if test="dishName != null">dish_name,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="amount != null">amount,</if>
+            <if test="reason != null">reason,</if>
+            <if test="status != null">status,</if>
+            <if test="operatorId != null">operator_id,</if>
+            <if test="refundTime != null">refund_time,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="refundNo != null">#{refundNo},</if>
+            <if test="orderId != null">#{orderId},</if>
+            <if test="orderDetailId != null">#{orderDetailId},</if>
+            <if test="storeId != null">#{storeId},</if>
+            <if test="memberId != null">#{memberId},</if>
+            <if test="refundType != null">#{refundType},</if>
+            <if test="dishName != null">#{dishName},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="reason != null">#{reason},</if>
+            <if test="status != null">#{status},</if>
+            <if test="operatorId != null">#{operatorId},</if>
+            <if test="refundTime != null">#{refundTime},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.RefundEntity">
+        UPDATE `refund`
+        <set>
+            <if test="refundNo != null">refund_no = #{refundNo},</if>
+            <if test="orderId != null">order_id = #{orderId},</if>
+            <if test="orderDetailId != null">order_detail_id = #{orderDetailId},</if>
+            <if test="storeId != null">store_id = #{storeId},</if>
+            <if test="memberId != null">member_id = #{memberId},</if>
+            <if test="refundType != null">refund_type = #{refundType},</if>
+            <if test="dishName != null">dish_name = #{dishName},</if>
+            <if test="quantity != null">quantity = #{quantity},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="reason != null">reason = #{reason},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="operatorId != null">operator_id = #{operatorId},</if>
+            <if test="refundTime != null">refund_time = #{refundTime},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM `refund` WHERE id = #{id}
+    </delete>
+
+</mapper>

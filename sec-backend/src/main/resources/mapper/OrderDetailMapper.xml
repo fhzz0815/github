@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.OrderDetailMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.OrderDetailEntity">
+        <id column="id" property="id"/>
+
+        <result column="order_id" property="orderId"/>
+        <result column="dish_id" property="dishId"/>
+        <result column="dish_name" property="dishName"/>
+        <result column="dish_image" property="dishImage"/>
+        <result column="dish_price" property="dishPrice"/>
+        <result column="spec_name" property="specName"/>
+        <result column="taste_name" property="tasteName"/>
+        <result column="quantity" property="quantity"/>
+        <result column="subtotal" property="subtotal"/>
+        <result column="refund_amount" property="refundAmount"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, order_id, dish_id, dish_name, dish_image, dish_price, spec_name, taste_name, quantity, subtotal, refund_amount, status, remark, create_time, update_time, is_deleted
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `order_detail`
+        <where>
+            is_deleted = 0
+            <if test="query != null">
+                <if test="query.orderId != null">AND order_id = #{query.orderId}</if>
+                <if test="query.dishId != null">AND dish_id = #{query.dishId}</if>
+                <if test="query.dishName != null">AND dish_name = #{query.dishName}</if>
+                <if test="query.dishImage != null">AND dish_image = #{query.dishImage}</if>
+                <if test="query.dishPrice != null">AND dish_price = #{query.dishPrice}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `order_detail`
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.OrderDetailEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `order_detail`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderId != null">order_id,</if>
+            <if test="dishId != null">dish_id,</if>
+            <if test="dishName != null">dish_name,</if>
+            <if test="dishImage != null">dish_image,</if>
+            <if test="dishPrice != null">dish_price,</if>
+            <if test="specName != null">spec_name,</if>
+            <if test="tasteName != null">taste_name,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="subtotal != null">subtotal,</if>
+            <if test="refundAmount != null">refund_amount,</if>
+            <if test="status != null">status,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="isDeleted != null">is_deleted,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="orderId != null">#{orderId},</if>
+            <if test="dishId != null">#{dishId},</if>
+            <if test="dishName != null">#{dishName},</if>
+            <if test="dishImage != null">#{dishImage},</if>
+            <if test="dishPrice != null">#{dishPrice},</if>
+            <if test="specName != null">#{specName},</if>
+            <if test="tasteName != null">#{tasteName},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="subtotal != null">#{subtotal},</if>
+            <if test="refundAmount != null">#{refundAmount},</if>
+            <if test="status != null">#{status},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="isDeleted != null">#{isDeleted},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.OrderDetailEntity">
+        UPDATE `order_detail`
+        <set>
+            <if test="orderId != null">order_id = #{orderId},</if>
+            <if test="dishId != null">dish_id = #{dishId},</if>
+            <if test="dishName != null">dish_name = #{dishName},</if>
+            <if test="dishImage != null">dish_image = #{dishImage},</if>
+            <if test="dishPrice != null">dish_price = #{dishPrice},</if>
+            <if test="specName != null">spec_name = #{specName},</if>
+            <if test="tasteName != null">taste_name = #{tasteName},</if>
+            <if test="quantity != null">quantity = #{quantity},</if>
+            <if test="subtotal != null">subtotal = #{subtotal},</if>
+            <if test="refundAmount != null">refund_amount = #{refundAmount},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE `order_detail` SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+</mapper>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.StockCheckIngredientMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.StockCheckIngredientEntity">
+        <id column="id" property="id"/>
+
+        <result column="check_no" property="checkNo"/>
+        <result column="store_id" property="storeId"/>
+        <result column="ingredient_id" property="ingredientId"/>
+        <result column="stock_before" property="stockBefore"/>
+        <result column="stock_after" property="stockAfter"/>
+        <result column="diff" property="diff"/>
+        <result column="reason" property="reason"/>
+        <result column="status" property="status"/>
+        <result column="creator_id" property="creatorId"/>
+        <result column="auditor_id" property="auditorId"/>
+        <result column="audit_time" property="auditTime"/>
+        <result column="audit_remark" property="auditRemark"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, check_no, store_id, ingredient_id, stock_before, stock_after, diff, reason, status, creator_id, auditor_id, audit_time, audit_remark, create_time
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `stock_check_ingredient`
+        <where>
+            <if test="query != null">
+                <if test="query.checkNo != null">AND check_no = #{query.checkNo}</if>
+                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+                <if test="query.ingredientId != null">AND ingredient_id = #{query.ingredientId}</if>
+                <if test="query.stockBefore != null">AND stock_before = #{query.stockBefore}</if>
+                <if test="query.stockAfter != null">AND stock_after = #{query.stockAfter}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `stock_check_ingredient`
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.StockCheckIngredientEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `stock_check_ingredient`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="checkNo != null">check_no,</if>
+            <if test="storeId != null">store_id,</if>
+            <if test="ingredientId != null">ingredient_id,</if>
+            <if test="stockBefore != null">stock_before,</if>
+            <if test="stockAfter != null">stock_after,</if>
+            <if test="diff != null">diff,</if>
+            <if test="reason != null">reason,</if>
+            <if test="status != null">status,</if>
+            <if test="creatorId != null">creator_id,</if>
+            <if test="auditorId != null">auditor_id,</if>
+            <if test="auditTime != null">audit_time,</if>
+            <if test="auditRemark != null">audit_remark,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="checkNo != null">#{checkNo},</if>
+            <if test="storeId != null">#{storeId},</if>
+            <if test="ingredientId != null">#{ingredientId},</if>
+            <if test="stockBefore != null">#{stockBefore},</if>
+            <if test="stockAfter != null">#{stockAfter},</if>
+            <if test="diff != null">#{diff},</if>
+            <if test="reason != null">#{reason},</if>
+            <if test="status != null">#{status},</if>
+            <if test="creatorId != null">#{creatorId},</if>
+            <if test="auditorId != null">#{auditorId},</if>
+            <if test="auditTime != null">#{auditTime},</if>
+            <if test="auditRemark != null">#{auditRemark},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.StockCheckIngredientEntity">
+        UPDATE `stock_check_ingredient`
+        <set>
+            <if test="checkNo != null">check_no = #{checkNo},</if>
+            <if test="storeId != null">store_id = #{storeId},</if>
+            <if test="ingredientId != null">ingredient_id = #{ingredientId},</if>
+            <if test="stockBefore != null">stock_before = #{stockBefore},</if>
+            <if test="stockAfter != null">stock_after = #{stockAfter},</if>
+            <if test="diff != null">diff = #{diff},</if>
+            <if test="reason != null">reason = #{reason},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="creatorId != null">creator_id = #{creatorId},</if>
+            <if test="auditorId != null">auditor_id = #{auditorId},</if>
+            <if test="auditTime != null">audit_time = #{auditTime},</if>
+            <if test="auditRemark != null">audit_remark = #{auditRemark},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM `stock_check_ingredient` WHERE id = #{id}
+    </delete>
+
+</mapper>

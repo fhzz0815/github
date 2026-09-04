@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.SysUserMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.SysUserEntity">
+        <id column="id" property="id"/>
+
+        <result column="store_id" property="storeId"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="real_name" property="realName"/>
+        <result column="staff_no" property="staffNo"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="id_card" property="idCard"/>
+        <result column="role_id" property="roleId"/>
+        <result column="avatar" property="avatar"/>
+        <result column="status" property="status"/>
+        <result column="last_login_time" property="lastLoginTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, store_id, username, password, real_name, staff_no, email, phone, id_card, role_id, avatar, status, last_login_time, create_time, update_time, is_deleted
+    </sql>
+
+    <!-- 根据用户名查询用户，用于登录校验 -->
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `sys_user`
+        WHERE username = #{username} AND is_deleted = 0
+        LIMIT 1
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `sys_user`
+        <where>
+            is_deleted = 0
+            <if test="query != null">
+                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+                <if test="query.username != null">AND username = #{query.username}</if>
+                <if test="query.password != null">AND password = #{query.password}</if>
+                <if test="query.realName != null">AND real_name = #{query.realName}</if>
+                <if test="query.staffNo != null">AND staff_no = #{query.staffNo}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `sys_user`
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.SysUserEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `sys_user`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="storeId != null">store_id,</if>
+            <if test="username != null">username,</if>
+            <if test="password != null">password,</if>
+            <if test="realName != null">real_name,</if>
+            <if test="staffNo != null">staff_no,</if>
+            <if test="email != null">email,</if>
+            <if test="phone != null">phone,</if>
+            <if test="idCard != null">id_card,</if>
+            <if test="roleId != null">role_id,</if>
+            <if test="avatar != null">avatar,</if>
+            <if test="status != null">status,</if>
+            <if test="lastLoginTime != null">last_login_time,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="isDeleted != null">is_deleted,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="storeId != null">#{storeId},</if>
+            <if test="username != null">#{username},</if>
+            <if test="password != null">#{password},</if>
+            <if test="realName != null">#{realName},</if>
+            <if test="staffNo != null">#{staffNo},</if>
+            <if test="email != null">#{email},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="idCard != null">#{idCard},</if>
+            <if test="roleId != null">#{roleId},</if>
+            <if test="avatar != null">#{avatar},</if>
+            <if test="status != null">#{status},</if>
+            <if test="lastLoginTime != null">#{lastLoginTime},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="isDeleted != null">#{isDeleted},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.SysUserEntity">
+        UPDATE `sys_user`
+        <set>
+            <if test="storeId != null">store_id = #{storeId},</if>
+            <if test="username != null">username = #{username},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="realName != null">real_name = #{realName},</if>
+            <if test="staffNo != null">staff_no = #{staffNo},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="idCard != null">id_card = #{idCard},</if>
+            <if test="roleId != null">role_id = #{roleId},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="lastLoginTime != null">last_login_time = #{lastLoginTime},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE `sys_user` SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+</mapper>

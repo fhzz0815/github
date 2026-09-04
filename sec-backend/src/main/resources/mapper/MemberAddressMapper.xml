@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.MemberAddressMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.MemberAddressEntity">
+        <id column="id" property="id"/>
+
+        <result column="member_id" property="memberId"/>
+        <result column="contact_name" property="contactName"/>
+        <result column="contact_phone" property="contactPhone"/>
+        <result column="province" property="province"/>
+        <result column="city" property="city"/>
+        <result column="district" property="district"/>
+        <result column="detail_address" property="detailAddress"/>
+        <result column="longitude" property="longitude"/>
+        <result column="latitude" property="latitude"/>
+        <result column="tag" property="tag"/>
+        <result column="is_default" property="isDefault"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, member_id, contact_name, contact_phone, province, city, district, detail_address, longitude, latitude, tag, is_default, create_time, update_time, is_deleted
+    </sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `member_address`
+        <where>
+            is_deleted = 0
+            <if test="query != null">
+                <if test="query.memberId != null">AND member_id = #{query.memberId}</if>
+                <if test="query.contactName != null">AND contact_name = #{query.contactName}</if>
+                <if test="query.contactPhone != null">AND contact_phone = #{query.contactPhone}</if>
+                <if test="query.province != null">AND province = #{query.province}</if>
+                <if test="query.city != null">AND city = #{query.city}</if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `member_address`
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.MemberAddressEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `member_address`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="memberId != null">member_id,</if>
+            <if test="contactName != null">contact_name,</if>
+            <if test="contactPhone != null">contact_phone,</if>
+            <if test="province != null">province,</if>
+            <if test="city != null">city,</if>
+            <if test="district != null">district,</if>
+            <if test="detailAddress != null">detail_address,</if>
+            <if test="longitude != null">longitude,</if>
+            <if test="latitude != null">latitude,</if>
+            <if test="tag != null">tag,</if>
+            <if test="isDefault != null">is_default,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="isDeleted != null">is_deleted,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="memberId != null">#{memberId},</if>
+            <if test="contactName != null">#{contactName},</if>
+            <if test="contactPhone != null">#{contactPhone},</if>
+            <if test="province != null">#{province},</if>
+            <if test="city != null">#{city},</if>
+            <if test="district != null">#{district},</if>
+            <if test="detailAddress != null">#{detailAddress},</if>
+            <if test="longitude != null">#{longitude},</if>
+            <if test="latitude != null">#{latitude},</if>
+            <if test="tag != null">#{tag},</if>
+            <if test="isDefault != null">#{isDefault},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="isDeleted != null">#{isDeleted},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.iwe3.sec.entity.MemberAddressEntity">
+        UPDATE `member_address`
+        <set>
+            <if test="memberId != null">member_id = #{memberId},</if>
+            <if test="contactName != null">contact_name = #{contactName},</if>
+            <if test="contactPhone != null">contact_phone = #{contactPhone},</if>
+            <if test="province != null">province = #{province},</if>
+            <if test="city != null">city = #{city},</if>
+            <if test="district != null">district = #{district},</if>
+            <if test="detailAddress != null">detail_address = #{detailAddress},</if>
+            <if test="longitude != null">longitude = #{longitude},</if>
+            <if test="latitude != null">latitude = #{latitude},</if>
+            <if test="tag != null">tag = #{tag},</if>
+            <if test="isDefault != null">is_default = #{isDefault},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE `member_address` SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+</mapper>

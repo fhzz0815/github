@@ -1,0 +1,35 @@
+﻿# Java
+*.class
+*.jar
+*.war
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Node
+node_modules/
+dist/
+build/
+
+# IDE
+.idea/
+*.iml
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Database
+*.sql.gz
+*.sql.zip
+
+# Maven
+.mvn/

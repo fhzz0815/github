@@ -1,0 +1,37 @@
+{
+  "name": "sec-frontend",
+  "version": "1.0.0",
+  "description": "智慧餐厅后台管理系统前端",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .vue,.js,.jsx --fix",
+    "prepare": "husky install"
+  },
+  "dependencies": {
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0",
+    "pinia": "^2.3.0",
+    "pinia-plugin-persistedstate": "^3.2.1",
+    "element-plus": "^2.9.1",
+    "@element-plus/icons-vue": "^2.3.1",
+    "axios": "^1.7.9",
+    "echarts": "^5.5.1",
+    "dayjs": "^1.11.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.0.5",
+    "eslint": "^9.17.0",
+    "eslint-plugin-vue": "^9.32.0",
+    "@eslint/js": "^9.17.0",
+    "prettier": "^3.4.2",
+    "sass": "^1.83.0",
+    "unplugin-auto-import": "^0.18.6",
+    "unplugin-vue-components": "^0.27.5",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.11"
+  }
+}
