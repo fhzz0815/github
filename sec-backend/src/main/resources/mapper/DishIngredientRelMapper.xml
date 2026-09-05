@@ -18,17 +18,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, dish_id, ingredient_id, quantity, unit, create_time
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `dish_ingredient_rel`
         <where>
-            <if test="query != null">
-                <if test="query.dishId != null">AND dish_id = #{query.dishId}</if>
-                <if test="query.ingredientId != null">AND ingredient_id = #{query.ingredientId}</if>
-                <if test="query.quantity != null">AND quantity = #{query.quantity}</if>
-                <if test="query.unit != null">AND unit = #{query.unit}</if>
-                <if test="query.createTime != null">AND create_time = #{query.createTime}</if>
-            </if>
+            <if test="query.unit != null and query.unit != ''">AND unit LIKE CONCAT('%', #{query.unit}, '%')</if>
+            <if test="query.dishId != null">AND dish_id = #{query.dishId}</if>
+            <if test="query.ingredientId != null">AND ingredient_id = #{query.ingredientId}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

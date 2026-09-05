@@ -1,10 +1,23 @@
 <template>
   <div class="memberAddresses-page">
-    <!-- 搜索区域 -->
+        <!-- 搜索区域 -->
     <el-card class="search-card" shadow="never">
       <el-form :inline="true" :model="queryForm">
         <el-form-item label="关键字">
-          <el-input v-model="queryForm.keyword" placeholder="请输入关键字" clearable />
+          <el-input v-model="queryForm.keyword" placeholder="请输入联系人姓名/联系人电话" clearable style="width: 220px" @keyup.enter="handleSearch" />
+        </el-form-item>
+        <el-form-item label="是否默认">
+          <el-select v-model="queryForm.isDefault" clearable placeholder="全部" style="width: 130px">
+            <el-option v-for="o in enumOptions.isDefault" :key="o.value" :label="o.label" :value="o.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="会员">
+          <el-select v-model="queryForm.memberId" clearable filterable placeholder="全部" style="width: 150px">
+            <el-option v-for="o in searchOptions.members" :key="o.id" :label="o.realName || o.nickname || o.phone" :value="o.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="创建时间">
+          <el-date-picker v-model="queryForm.dateRange" type="daterange" value-format="YYYY-MM-DD" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" style="width: 260px" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">搜索</el-button>
@@ -45,8 +58,8 @@
           :total="memberAddressStore.total"
           :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
-          @size-change="memberAddressStore.fetchList"
-          @current-change="memberAddressStore.fetchList"
+          @size-change="onPageChange"
+          @current-change="onPageChange"
         />
       </div>
     </el-card>
@@ -101,7 +114,55 @@ import memberAddressApi from '@/api/memberAddress'
 
 const memberAddressStore = useMemberAddressStore()
 
-const queryForm = reactive({ keyword: '' })
+import memberApi from '@/api/member'
+
+// ===== 搜索专用：枚举选项 / 外键下拉数据 =====
+const enumOptions = {
+  isDefault: [{ value: 1, label: '是' }, { value: 0, label: '否' }]
+}
+const searchOptions = reactive({
+  members: []
+})
+const loadSearchOptions = () => {
+  memberApi.list({ page: 1, size: 1000 }).then((r) => { searchOptions.members = r.data?.list || [] }).catch(() => {})
+}
+loadSearchOptions()
+
+// 搜索表单
+const queryForm = reactive({
+  keyword: '',
+  isDefault: null,
+  memberId: null,
+  dateRange: null
+})
+// 把搜索表单整理成接口参数（空值剔除、时间范围拆分）
+const buildParams = () => {
+  const params = { ...queryForm }
+  params.searchKeyword = queryForm.keyword
+  delete params.keyword
+  if (queryForm.dateRange && queryForm.dateRange.length === 2) {
+    params.searchBeginTime = queryForm.dateRange[0]
+    params.searchEndTime = queryForm.dateRange[1]
+  }
+  delete params.dateRange
+  Object.keys(params).forEach((k) => {
+    if (params[k] === '' || params[k] === null || params[k] === undefined) delete params[k]
+  })
+  return params
+}
+const handleSearch = () => {
+  memberAddressStore.page = 1
+  memberAddressStore.fetchList(buildParams())
+}
+const handleReset = () => {
+  Object.keys(queryForm).forEach((k) => { queryForm[k] = k === 'dateRange' ? null : '' })
+  memberAddressStore.page = 1
+  memberAddressStore.fetchList()
+}
+// 翻页时保留搜索条件
+const onPageChange = () => {
+  memberAddressStore.fetchList(buildParams())
+}
 
 const dialogVisible = ref(false)
 const dialogTitle = ref('新增收货地址')
@@ -119,15 +180,7 @@ const formData = reactive({
   tag: ''
 })
 
-const handleSearch = () => {
-  memberAddressStore.page = 1
-  memberAddressStore.fetchList()
-}
 
-const handleReset = () => {
-  queryForm.keyword = ''
-  handleSearch()
-}
 
 const handleAdd = () => {
   dialogTitle.value = '新增收货地址'

@@ -1,10 +1,15 @@
 <template>
   <div class="sysRolePermissions-page">
-    <!-- 搜索区域 -->
+        <!-- 搜索区域 -->
     <el-card class="search-card" shadow="never">
       <el-form :inline="true" :model="queryForm">
-        <el-form-item label="关键字">
-          <el-input v-model="queryForm.keyword" placeholder="请输入关键字" clearable />
+        <el-form-item label="角色">
+          <el-select v-model="queryForm.roleId" clearable filterable placeholder="全部" style="width: 150px">
+            <el-option v-for="o in searchOptions.roles" :key="o.id" :label="o.roleName" :value="o.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="创建时间">
+          <el-date-picker v-model="queryForm.dateRange" type="daterange" value-format="YYYY-MM-DD" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" style="width: 260px" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">搜索</el-button>
@@ -39,8 +44,8 @@
           :total="sysRolePermissionStore.total"
           :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
-          @size-change="sysRolePermissionStore.fetchList"
-          @current-change="sysRolePermissionStore.fetchList"
+          @size-change="onPageChange"
+          @current-change="onPageChange"
         />
       </div>
     </el-card>
@@ -71,7 +76,54 @@ import sysRolePermissionApi from '@/api/sysRolePermission'
 
 const sysRolePermissionStore = useSysRolePermissionStore()
 
-const queryForm = reactive({ keyword: '' })
+import sysRoleApi from '@/api/sysRole'
+
+// ===== 搜索专用：枚举选项 / 外键下拉数据 =====
+const enumOptions = {
+
+}
+const searchOptions = reactive({
+  roles: []
+})
+const loadSearchOptions = () => {
+  sysRoleApi.list({ page: 1, size: 1000 }).then((r) => { searchOptions.roles = r.data?.list || [] }).catch(() => {})
+}
+loadSearchOptions()
+
+// 搜索表单
+const queryForm = reactive({
+  keyword: '',
+  roleId: null,
+  dateRange: null
+})
+// 把搜索表单整理成接口参数（空值剔除、时间范围拆分）
+const buildParams = () => {
+  const params = { ...queryForm }
+  params.searchKeyword = queryForm.keyword
+  delete params.keyword
+  if (queryForm.dateRange && queryForm.dateRange.length === 2) {
+    params.searchBeginTime = queryForm.dateRange[0]
+    params.searchEndTime = queryForm.dateRange[1]
+  }
+  delete params.dateRange
+  Object.keys(params).forEach((k) => {
+    if (params[k] === '' || params[k] === null || params[k] === undefined) delete params[k]
+  })
+  return params
+}
+const handleSearch = () => {
+  sysRolePermissionStore.page = 1
+  sysRolePermissionStore.fetchList(buildParams())
+}
+const handleReset = () => {
+  Object.keys(queryForm).forEach((k) => { queryForm[k] = k === 'dateRange' ? null : '' })
+  sysRolePermissionStore.page = 1
+  sysRolePermissionStore.fetchList()
+}
+// 翻页时保留搜索条件
+const onPageChange = () => {
+  sysRolePermissionStore.fetchList(buildParams())
+}
 
 const dialogVisible = ref(false)
 const dialogTitle = ref('新增角色权限')
@@ -81,15 +133,7 @@ const formData = reactive({
   permissionId: ''
 })
 
-const handleSearch = () => {
-  sysRolePermissionStore.page = 1
-  sysRolePermissionStore.fetchList()
-}
 
-const handleReset = () => {
-  queryForm.keyword = ''
-  handleSearch()
-}
 
 const handleAdd = () => {
   dialogTitle.value = '新增角色权限'

@@ -28,17 +28,28 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, store_id, table_id, table_type_id, member_id, contact_name, contact_phone, reservation_date, reservation_time, persons, remark, status, confirm_time, complete_time, create_time, update_time
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `reservation`
         <where>
-            <if test="query != null">
-                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
-                <if test="query.tableId != null">AND table_id = #{query.tableId}</if>
-                <if test="query.tableTypeId != null">AND table_type_id = #{query.tableTypeId}</if>
-                <if test="query.memberId != null">AND member_id = #{query.memberId}</if>
-                <if test="query.contactName != null">AND contact_name = #{query.contactName}</if>
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (
+contact_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                OR contact_phone LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                OR remark LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                )
             </if>
+            <if test="query.contactName != null and query.contactName != ''">AND contact_name LIKE CONCAT('%', #{query.contactName}, '%')</if>
+            <if test="query.contactPhone != null and query.contactPhone != ''">AND contact_phone LIKE CONCAT('%', #{query.contactPhone}, '%')</if>
+            <if test="query.remark != null and query.remark != ''">AND remark LIKE CONCAT('%', #{query.remark}, '%')</if>
+            <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+            <if test="query.tableId != null">AND table_id = #{query.tableId}</if>
+            <if test="query.tableTypeId != null">AND table_type_id = #{query.tableTypeId}</if>
+            <if test="query.memberId != null">AND member_id = #{query.memberId}</if>
+            <if test="query.persons != null">AND persons = #{query.persons}</if>
+            <if test="query.status != null">AND status = #{query.status}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

@@ -20,18 +20,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, store_id, type_name, max_persons, sort, status, create_time, is_deleted
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `table_type`
         <where>
             is_deleted = 0
-            <if test="query != null">
-                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
-                <if test="query.typeName != null">AND type_name = #{query.typeName}</if>
-                <if test="query.maxPersons != null">AND max_persons = #{query.maxPersons}</if>
-                <if test="query.sort != null">AND sort = #{query.sort}</if>
-                <if test="query.status != null">AND status = #{query.status}</if>
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (
+type_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                )
             </if>
+            <if test="query.typeName != null and query.typeName != ''">AND type_name LIKE CONCAT('%', #{query.typeName}, '%')</if>
+            <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+            <if test="query.maxPersons != null">AND max_persons = #{query.maxPersons}</if>
+            <if test="query.sort != null">AND sort = #{query.sort}</if>
+            <if test="query.status != null">AND status = #{query.status}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

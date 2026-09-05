@@ -1,10 +1,28 @@
 <template>
   <div class="stockCheckIngredients-page">
-    <!-- 搜索区域 -->
+        <!-- 搜索区域 -->
     <el-card class="search-card" shadow="never">
       <el-form :inline="true" :model="queryForm">
         <el-form-item label="关键字">
-          <el-input v-model="queryForm.keyword" placeholder="请输入关键字" clearable />
+          <el-input v-model="queryForm.keyword" placeholder="请输入盘点单号" clearable style="width: 220px" @keyup.enter="handleSearch" />
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-select v-model="queryForm.status" clearable placeholder="全部" style="width: 130px">
+            <el-option v-for="o in enumOptions.status" :key="o.value" :label="o.label" :value="o.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="门店">
+          <el-select v-model="queryForm.storeId" clearable filterable placeholder="全部" style="width: 150px">
+            <el-option v-for="o in searchOptions.stores" :key="o.id" :label="o.storeName" :value="o.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="原料">
+          <el-select v-model="queryForm.ingredientId" clearable filterable placeholder="全部" style="width: 150px">
+            <el-option v-for="o in searchOptions.ingredients" :key="o.id" :label="o.ingredientName" :value="o.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="创建时间">
+          <el-date-picker v-model="queryForm.dateRange" type="daterange" value-format="YYYY-MM-DD" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" style="width: 260px" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">搜索</el-button>
@@ -45,8 +63,8 @@
           :total="stockCheckIngredientStore.total"
           :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
-          @size-change="stockCheckIngredientStore.fetchList"
-          @current-change="stockCheckIngredientStore.fetchList"
+          @size-change="onPageChange"
+          @current-change="onPageChange"
         />
       </div>
     </el-card>
@@ -101,7 +119,59 @@ import stockCheckIngredientApi from '@/api/stockCheckIngredient'
 
 const stockCheckIngredientStore = useStockCheckIngredientStore()
 
-const queryForm = reactive({ keyword: '' })
+import storeApi from '@/api/store'
+import ingredientApi from '@/api/ingredient'
+
+// ===== 搜索专用：枚举选项 / 外键下拉数据 =====
+const enumOptions = {
+  status: [{ value: 1, label: '待审核' }, { value: 2, label: '已通过' }, { value: 3, label: '已驳回' }]
+}
+const searchOptions = reactive({
+  stores: [],
+  ingredients: []
+})
+const loadSearchOptions = () => {
+  storeApi.list({ page: 1, size: 1000 }).then((r) => { searchOptions.stores = r.data?.list || [] }).catch(() => {})
+  ingredientApi.list({ page: 1, size: 1000 }).then((r) => { searchOptions.ingredients = r.data?.list || [] }).catch(() => {})
+}
+loadSearchOptions()
+
+// 搜索表单
+const queryForm = reactive({
+  keyword: '',
+  status: null,
+  storeId: null,
+  ingredientId: null,
+  dateRange: null
+})
+// 把搜索表单整理成接口参数（空值剔除、时间范围拆分）
+const buildParams = () => {
+  const params = { ...queryForm }
+  params.searchKeyword = queryForm.keyword
+  delete params.keyword
+  if (queryForm.dateRange && queryForm.dateRange.length === 2) {
+    params.searchBeginTime = queryForm.dateRange[0]
+    params.searchEndTime = queryForm.dateRange[1]
+  }
+  delete params.dateRange
+  Object.keys(params).forEach((k) => {
+    if (params[k] === '' || params[k] === null || params[k] === undefined) delete params[k]
+  })
+  return params
+}
+const handleSearch = () => {
+  stockCheckIngredientStore.page = 1
+  stockCheckIngredientStore.fetchList(buildParams())
+}
+const handleReset = () => {
+  Object.keys(queryForm).forEach((k) => { queryForm[k] = k === 'dateRange' ? null : '' })
+  stockCheckIngredientStore.page = 1
+  stockCheckIngredientStore.fetchList()
+}
+// 翻页时保留搜索条件
+const onPageChange = () => {
+  stockCheckIngredientStore.fetchList(buildParams())
+}
 
 const dialogVisible = ref(false)
 const dialogTitle = ref('新增原料盘点')
@@ -119,15 +189,7 @@ const formData = reactive({
   auditorId: ''
 })
 
-const handleSearch = () => {
-  stockCheckIngredientStore.page = 1
-  stockCheckIngredientStore.fetchList()
-}
 
-const handleReset = () => {
-  queryForm.keyword = ''
-  handleSearch()
-}
 
 const handleAdd = () => {
   dialogTitle.value = '新增原料盘点'

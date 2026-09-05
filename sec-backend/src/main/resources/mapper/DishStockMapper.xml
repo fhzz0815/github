@@ -20,17 +20,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, store_id, dish_id, stock_quantity, warn_threshold, unit, create_time, update_time
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `dish_stock`
         <where>
-            <if test="query != null">
-                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
-                <if test="query.dishId != null">AND dish_id = #{query.dishId}</if>
-                <if test="query.stockQuantity != null">AND stock_quantity = #{query.stockQuantity}</if>
-                <if test="query.warnThreshold != null">AND warn_threshold = #{query.warnThreshold}</if>
-                <if test="query.unit != null">AND unit = #{query.unit}</if>
-            </if>
+            <if test="query.unit != null and query.unit != ''">AND unit LIKE CONCAT('%', #{query.unit}, '%')</if>
+            <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+            <if test="query.dishId != null">AND dish_id = #{query.dishId}</if>
+            <if test="query.stockQuantity != null">AND stock_quantity = #{query.stockQuantity}</if>
+            <if test="query.warnThreshold != null">AND warn_threshold = #{query.warnThreshold}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

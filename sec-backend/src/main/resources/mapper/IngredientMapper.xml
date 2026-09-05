@@ -21,18 +21,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, store_id, category_id, ingredient_name, unit, spec, status, create_time, is_deleted
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `ingredient`
         <where>
             is_deleted = 0
-            <if test="query != null">
-                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
-                <if test="query.categoryId != null">AND category_id = #{query.categoryId}</if>
-                <if test="query.ingredientName != null">AND ingredient_name = #{query.ingredientName}</if>
-                <if test="query.unit != null">AND unit = #{query.unit}</if>
-                <if test="query.spec != null">AND spec = #{query.spec}</if>
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (
+ingredient_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                )
             </if>
+            <if test="query.ingredientName != null and query.ingredientName != ''">AND ingredient_name LIKE CONCAT('%', #{query.ingredientName}, '%')</if>
+            <if test="query.unit != null and query.unit != ''">AND unit LIKE CONCAT('%', #{query.unit}, '%')</if>
+            <if test="query.spec != null and query.spec != ''">AND spec LIKE CONCAT('%', #{query.spec}, '%')</if>
+            <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+            <if test="query.categoryId != null">AND category_id = #{query.categoryId}</if>
+            <if test="query.status != null">AND status = #{query.status}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

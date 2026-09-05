@@ -25,6 +25,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import request from '@/api/request'
+import sysUserApi from '@/api/sysUser'
 import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
@@ -39,13 +40,30 @@ const rules = {
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
 }
 
+// 从 JWT 中解析出登录人信息（token 第二段是用户信息）
+function parseToken(token) {
+  try {
+    const b64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+    return JSON.parse(atob(b64))
+  } catch {
+    return {}
+  }
+}
+
 const handleLogin = async () => {
   await loginFormRef.value.validate()
   loading.value = true
   try {
     const res = await request.post('/auth/login', loginForm)
     localStorage.setItem('token', res.data.token)
-    userStore.setUserInfo({ realName: loginForm.username })
+    // 拉取当前登录人的完整资料存入状态，供顶部栏和个人中心使用
+    try {
+      const payload = parseToken(res.data.token)
+      const detail = await sysUserApi.get(payload.userId)
+      userStore.setUserInfo(detail.data || { realName: loginForm.username })
+    } catch {
+      userStore.setUserInfo({ realName: loginForm.username })
+    }
     ElMessage.success('登录成功')
     router.push('/dashboard')
   } finally {

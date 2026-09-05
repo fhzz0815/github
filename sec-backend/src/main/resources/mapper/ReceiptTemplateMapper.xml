@@ -19,17 +19,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, template_type, template_name, template_content, is_default, create_time, update_time
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `receipt_template`
         <where>
-            <if test="query != null">
-                <if test="query.templateType != null">AND template_type = #{query.templateType}</if>
-                <if test="query.templateName != null">AND template_name = #{query.templateName}</if>
-                <if test="query.templateContent != null">AND template_content = #{query.templateContent}</if>
-                <if test="query.isDefault != null">AND is_default = #{query.isDefault}</if>
-                <if test="query.createTime != null">AND create_time = #{query.createTime}</if>
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (
+template_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                OR template_content LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                )
             </if>
+            <if test="query.templateType != null and query.templateType != ''">AND template_type LIKE CONCAT('%', #{query.templateType}, '%')</if>
+            <if test="query.templateName != null and query.templateName != ''">AND template_name LIKE CONCAT('%', #{query.templateName}, '%')</if>
+            <if test="query.templateContent != null and query.templateContent != ''">AND template_content LIKE CONCAT('%', #{query.templateContent}, '%')</if>
+            <if test="query.isDefault != null">AND is_default = #{query.isDefault}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

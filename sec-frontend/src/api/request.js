@@ -40,9 +40,12 @@ function removePending(config) {
 // 请求拦截器
 service.interceptors.request.use(
   (config) => {
-    // 取消重复请求
-    removePending(config)
-    addPending(config)
+    // 字典类等需要稳定返回的请求可设置 _noCancel，跳过"重复请求自动取消"
+    // （避免页面切换/并发时被误取消导致下拉数据为空）
+    if (!config._noCancel) {
+      removePending(config)
+      addPending(config)
+    }
     // 统一添加token
     const token = localStorage.getItem('token')
     if (token) {
@@ -56,7 +59,9 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
   (response) => {
-    removePending(response.config)
+    if (!response.config._noCancel) {
+      removePending(response.config)
+    }
     const res = response.data
     // 后端统一返回 { code, message, data }
     if (res.code !== undefined && res.code !== 0) {

@@ -32,18 +32,29 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, store_id, coupon_name, coupon_type, threshold_amount, discount_amount, discount_rate, total_count, issued_count, per_user_limit, valid_type, valid_start, valid_end, valid_days, use_scope, scope_category_id, status, create_time, update_time, is_deleted
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `coupon`
         <where>
             is_deleted = 0
-            <if test="query != null">
-                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
-                <if test="query.couponName != null">AND coupon_name = #{query.couponName}</if>
-                <if test="query.couponType != null">AND coupon_type = #{query.couponType}</if>
-                <if test="query.thresholdAmount != null">AND threshold_amount = #{query.thresholdAmount}</if>
-                <if test="query.discountAmount != null">AND discount_amount = #{query.discountAmount}</if>
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (
+coupon_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                )
             </if>
+            <if test="query.couponName != null and query.couponName != ''">AND coupon_name LIKE CONCAT('%', #{query.couponName}, '%')</if>
+            <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+            <if test="query.couponType != null">AND coupon_type = #{query.couponType}</if>
+            <if test="query.totalCount != null">AND total_count = #{query.totalCount}</if>
+            <if test="query.issuedCount != null">AND issued_count = #{query.issuedCount}</if>
+            <if test="query.perUserLimit != null">AND per_user_limit = #{query.perUserLimit}</if>
+            <if test="query.validType != null">AND valid_type = #{query.validType}</if>
+            <if test="query.validDays != null">AND valid_days = #{query.validDays}</if>
+            <if test="query.useScope != null">AND use_scope = #{query.useScope}</if>
+            <if test="query.scopeCategoryId != null">AND scope_category_id = #{query.scopeCategoryId}</if>
+            <if test="query.status != null">AND status = #{query.status}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

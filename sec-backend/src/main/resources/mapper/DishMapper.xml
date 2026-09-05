@@ -33,18 +33,35 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, store_id, category_id, dish_name, dish_no, image, description, price, origin_price, unit, taste_id, spec_id, is_recommend, is_new, is_sold_out, sale_count, sort, status, create_time, update_time, is_deleted
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `dish`
         <where>
             is_deleted = 0
-            <if test="query != null">
-                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
-                <if test="query.categoryId != null">AND category_id = #{query.categoryId}</if>
-                <if test="query.dishName != null">AND dish_name = #{query.dishName}</if>
-                <if test="query.dishNo != null">AND dish_no = #{query.dishNo}</if>
-                <if test="query.image != null">AND image = #{query.image}</if>
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (
+dish_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                OR dish_no LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                OR description LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                )
             </if>
+            <if test="query.dishName != null and query.dishName != ''">AND dish_name LIKE CONCAT('%', #{query.dishName}, '%')</if>
+            <if test="query.dishNo != null and query.dishNo != ''">AND dish_no LIKE CONCAT('%', #{query.dishNo}, '%')</if>
+            <if test="query.image != null and query.image != ''">AND image LIKE CONCAT('%', #{query.image}, '%')</if>
+            <if test="query.description != null and query.description != ''">AND description LIKE CONCAT('%', #{query.description}, '%')</if>
+            <if test="query.unit != null and query.unit != ''">AND unit LIKE CONCAT('%', #{query.unit}, '%')</if>
+            <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+            <if test="query.categoryId != null">AND category_id = #{query.categoryId}</if>
+            <if test="query.tasteId != null">AND taste_id = #{query.tasteId}</if>
+            <if test="query.specId != null">AND spec_id = #{query.specId}</if>
+            <if test="query.isRecommend != null">AND is_recommend = #{query.isRecommend}</if>
+            <if test="query.isNew != null">AND is_new = #{query.isNew}</if>
+            <if test="query.isSoldOut != null">AND is_sold_out = #{query.isSoldOut}</if>
+            <if test="query.saleCount != null">AND sale_count = #{query.saleCount}</if>
+            <if test="query.sort != null">AND sort = #{query.sort}</if>
+            <if test="query.status != null">AND status = #{query.status}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

@@ -20,17 +20,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, order_id, from_status, to_status, operator_type, operator_id, remark, create_time
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `order_status_log`
         <where>
-            <if test="query != null">
-                <if test="query.orderId != null">AND order_id = #{query.orderId}</if>
-                <if test="query.fromStatus != null">AND from_status = #{query.fromStatus}</if>
-                <if test="query.toStatus != null">AND to_status = #{query.toStatus}</if>
-                <if test="query.operatorType != null">AND operator_type = #{query.operatorType}</if>
-                <if test="query.operatorId != null">AND operator_id = #{query.operatorId}</if>
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (
+remark LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                )
             </if>
+            <if test="query.operatorType != null and query.operatorType != ''">AND operator_type LIKE CONCAT('%', #{query.operatorType}, '%')</if>
+            <if test="query.remark != null and query.remark != ''">AND remark LIKE CONCAT('%', #{query.remark}, '%')</if>
+            <if test="query.orderId != null">AND order_id = #{query.orderId}</if>
+            <if test="query.fromStatus != null">AND from_status = #{query.fromStatus}</if>
+            <if test="query.toStatus != null">AND to_status = #{query.toStatus}</if>
+            <if test="query.operatorId != null">AND operator_id = #{query.operatorId}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

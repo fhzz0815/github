@@ -25,7 +25,7 @@
         <druid-spring-boot.version>1.2.28</druid-spring-boot.version>
         <pagehelper-spring-boot.version>2.1.0</pagehelper-spring-boot.version>
         <redisson-spring-boot.version>3.34.1</redisson-spring-boot.version>
-        <springdoc-openapi.version>2.6.0</springdoc-openapi.version>
+        <springdoc-openapi.version>3.0.3</springdoc-openapi.version>
         <hutool.version>5.8.32</hutool.version>
         <guava.version>33.4.0-jre</guava.version>
         <jjwt.version>0.12.6</jjwt.version>

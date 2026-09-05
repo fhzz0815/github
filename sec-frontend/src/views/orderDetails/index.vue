@@ -1,10 +1,23 @@
 <template>
   <div class="orderDetails-page">
-    <!-- 搜索区域 -->
+        <!-- 搜索区域 -->
     <el-card class="search-card" shadow="never">
       <el-form :inline="true" :model="queryForm">
         <el-form-item label="关键字">
-          <el-input v-model="queryForm.keyword" placeholder="请输入关键字" clearable />
+          <el-input v-model="queryForm.keyword" placeholder="请输入菜品名称快照/规格快照/口味快照" clearable style="width: 220px" @keyup.enter="handleSearch" />
+        </el-form-item>
+        <el-form-item label="制作状态">
+          <el-select v-model="queryForm.status" clearable placeholder="全部" style="width: 130px">
+            <el-option v-for="o in enumOptions.status" :key="o.value" :label="o.label" :value="o.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="菜品">
+          <el-select v-model="queryForm.dishId" clearable filterable placeholder="全部" style="width: 150px">
+            <el-option v-for="o in searchOptions.dishes" :key="o.id" :label="o.dishName" :value="o.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="创建时间">
+          <el-date-picker v-model="queryForm.dateRange" type="daterange" value-format="YYYY-MM-DD" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" style="width: 260px" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">搜索</el-button>
@@ -45,8 +58,8 @@
           :total="orderDetailStore.total"
           :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
-          @size-change="orderDetailStore.fetchList"
-          @current-change="orderDetailStore.fetchList"
+          @size-change="onPageChange"
+          @current-change="onPageChange"
         />
       </div>
     </el-card>
@@ -101,7 +114,55 @@ import orderDetailApi from '@/api/orderDetail'
 
 const orderDetailStore = useOrderDetailStore()
 
-const queryForm = reactive({ keyword: '' })
+import dishApi from '@/api/dish'
+
+// ===== 搜索专用：枚举选项 / 外键下拉数据 =====
+const enumOptions = {
+  status: [{ value: 1, label: '待制作' }, { value: 2, label: '制作中' }, { value: 3, label: '已上齐' }, { value: 4, label: '退菜' }]
+}
+const searchOptions = reactive({
+  dishes: []
+})
+const loadSearchOptions = () => {
+  dishApi.list({ page: 1, size: 1000 }).then((r) => { searchOptions.dishes = r.data?.list || [] }).catch(() => {})
+}
+loadSearchOptions()
+
+// 搜索表单
+const queryForm = reactive({
+  keyword: '',
+  status: null,
+  dishId: null,
+  dateRange: null
+})
+// 把搜索表单整理成接口参数（空值剔除、时间范围拆分）
+const buildParams = () => {
+  const params = { ...queryForm }
+  params.searchKeyword = queryForm.keyword
+  delete params.keyword
+  if (queryForm.dateRange && queryForm.dateRange.length === 2) {
+    params.searchBeginTime = queryForm.dateRange[0]
+    params.searchEndTime = queryForm.dateRange[1]
+  }
+  delete params.dateRange
+  Object.keys(params).forEach((k) => {
+    if (params[k] === '' || params[k] === null || params[k] === undefined) delete params[k]
+  })
+  return params
+}
+const handleSearch = () => {
+  orderDetailStore.page = 1
+  orderDetailStore.fetchList(buildParams())
+}
+const handleReset = () => {
+  Object.keys(queryForm).forEach((k) => { queryForm[k] = k === 'dateRange' ? null : '' })
+  orderDetailStore.page = 1
+  orderDetailStore.fetchList()
+}
+// 翻页时保留搜索条件
+const onPageChange = () => {
+  orderDetailStore.fetchList(buildParams())
+}
 
 const dialogVisible = ref(false)
 const dialogTitle = ref('新增订单明细')
@@ -119,15 +180,7 @@ const formData = reactive({
   refundAmount: null
 })
 
-const handleSearch = () => {
-  orderDetailStore.page = 1
-  orderDetailStore.fetchList()
-}
 
-const handleReset = () => {
-  queryForm.keyword = ''
-  handleSearch()
-}
 
 const handleAdd = () => {
   dialogTitle.value = '新增订单明细'

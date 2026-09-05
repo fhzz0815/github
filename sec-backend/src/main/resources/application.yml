@@ -2,6 +2,10 @@ server:
   port: 8080
   servlet:
     context-path: /smart_restaurant
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 spring:
   profiles:
@@ -12,12 +16,12 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
 
-  # Redis 单机配置（开发环境使用本地 Redis）
+  # Redis 单机配置（开发环境使用本地 Redis，未设置密码）
   data:
     redis:
       host: 127.0.0.1
       port: 6379
-      password: Flzx3qc_14yhl9t
+      password:
       database: 0
       timeout: 5000ms
       lettuce:
@@ -97,11 +101,11 @@ logging:
   file:
     path: /logs/portal
 
-# Redisson 单机配置（开发环境使用本地 Redis）
+# Redisson 单机配置（开发环境使用本地 Redis，未设置密码）
 redisson:
   single-server-config:
     address: "redis://127.0.0.1:6379"
-    password: Flzx3qc_14yhl9t
+    password:
     database: 0
     timeout: 5000
     retry-attempts: 3

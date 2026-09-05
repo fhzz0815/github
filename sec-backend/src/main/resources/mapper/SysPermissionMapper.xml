@@ -21,17 +21,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, permission_name, permission_code, menu_url, parent_id, sort, status, create_time, update_time
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `sys_permission`
         <where>
-            <if test="query != null">
-                <if test="query.permissionName != null">AND permission_name = #{query.permissionName}</if>
-                <if test="query.permissionCode != null">AND permission_code = #{query.permissionCode}</if>
-                <if test="query.menuUrl != null">AND menu_url = #{query.menuUrl}</if>
-                <if test="query.parentId != null">AND parent_id = #{query.parentId}</if>
-                <if test="query.sort != null">AND sort = #{query.sort}</if>
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (
+permission_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                )
             </if>
+            <if test="query.permissionName != null and query.permissionName != ''">AND permission_name LIKE CONCAT('%', #{query.permissionName}, '%')</if>
+            <if test="query.permissionCode != null and query.permissionCode != ''">AND permission_code LIKE CONCAT('%', #{query.permissionCode}, '%')</if>
+            <if test="query.menuUrl != null and query.menuUrl != ''">AND menu_url LIKE CONCAT('%', #{query.menuUrl}, '%')</if>
+            <if test="query.parentId != null">AND parent_id = #{query.parentId}</if>
+            <if test="query.sort != null">AND sort = #{query.sort}</if>
+            <if test="query.status != null">AND status = #{query.status}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

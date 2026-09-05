@@ -23,17 +23,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, recharge_no, member_id, store_id, recharge_amount, gift_amount, pay_type, status, operator_id, recharge_time, remark
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `member_recharge_record`
         <where>
-            <if test="query != null">
-                <if test="query.rechargeNo != null">AND recharge_no = #{query.rechargeNo}</if>
-                <if test="query.memberId != null">AND member_id = #{query.memberId}</if>
-                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
-                <if test="query.rechargeAmount != null">AND recharge_amount = #{query.rechargeAmount}</if>
-                <if test="query.giftAmount != null">AND gift_amount = #{query.giftAmount}</if>
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (
+recharge_no LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                OR remark LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                )
             </if>
+            <if test="query.rechargeNo != null and query.rechargeNo != ''">AND recharge_no LIKE CONCAT('%', #{query.rechargeNo}, '%')</if>
+            <if test="query.payType != null and query.payType != ''">AND pay_type LIKE CONCAT('%', #{query.payType}, '%')</if>
+            <if test="query.remark != null and query.remark != ''">AND remark LIKE CONCAT('%', #{query.remark}, '%')</if>
+            <if test="query.memberId != null">AND member_id = #{query.memberId}</if>
+            <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+            <if test="query.status != null">AND status = #{query.status}</if>
+            <if test="query.operatorId != null">AND operator_id = #{query.operatorId}</if>
         </where>
         ORDER BY id DESC
     </select>

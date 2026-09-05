@@ -20,18 +20,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, member_id, bank_name, card_no, holder_name, is_default, create_time, is_deleted
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `member_bank_card`
         <where>
             is_deleted = 0
-            <if test="query != null">
-                <if test="query.memberId != null">AND member_id = #{query.memberId}</if>
-                <if test="query.bankName != null">AND bank_name = #{query.bankName}</if>
-                <if test="query.cardNo != null">AND card_no = #{query.cardNo}</if>
-                <if test="query.holderName != null">AND holder_name = #{query.holderName}</if>
-                <if test="query.isDefault != null">AND is_default = #{query.isDefault}</if>
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (
+bank_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                OR holder_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                OR card_no LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                )
             </if>
+            <if test="query.bankName != null and query.bankName != ''">AND bank_name LIKE CONCAT('%', #{query.bankName}, '%')</if>
+            <if test="query.cardNo != null and query.cardNo != ''">AND card_no LIKE CONCAT('%', #{query.cardNo}, '%')</if>
+            <if test="query.holderName != null and query.holderName != ''">AND holder_name LIKE CONCAT('%', #{query.holderName}, '%')</if>
+            <if test="query.memberId != null">AND member_id = #{query.memberId}</if>
+            <if test="query.isDefault != null">AND is_default = #{query.isDefault}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

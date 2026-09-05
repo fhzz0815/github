@@ -50,18 +50,39 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, order_no, store_id, member_id, order_type, table_id, table_type_id, queue_id, person_count, order_status, pay_status, take_type, address_id, address_snapshot, dish_amount, discount_amount, free_amount, rounding_amount, coupon_id, coupon_amount, delivery_fee, payable_amount, actual_amount, member_pay_amount, source, operator_id, remark, order_time, pay_time, expected_time, shipping_time, version, finish_time, cancel_time, cancel_reason, create_time, update_time, is_deleted
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `orders`
         <where>
             is_deleted = 0
-            <if test="query != null">
-                <if test="query.orderNo != null">AND order_no = #{query.orderNo}</if>
-                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
-                <if test="query.memberId != null">AND member_id = #{query.memberId}</if>
-                <if test="query.orderType != null">AND order_type = #{query.orderType}</if>
-                <if test="query.tableId != null">AND table_id = #{query.tableId}</if>
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (
+order_no LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                OR remark LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                OR cancel_reason LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                )
             </if>
+            <if test="query.orderNo != null and query.orderNo != ''">AND order_no LIKE CONCAT('%', #{query.orderNo}, '%')</if>
+            <if test="query.addressSnapshot != null and query.addressSnapshot != ''">AND address_snapshot LIKE CONCAT('%', #{query.addressSnapshot}, '%')</if>
+            <if test="query.remark != null and query.remark != ''">AND remark LIKE CONCAT('%', #{query.remark}, '%')</if>
+            <if test="query.cancelReason != null and query.cancelReason != ''">AND cancel_reason LIKE CONCAT('%', #{query.cancelReason}, '%')</if>
+            <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+            <if test="query.memberId != null">AND member_id = #{query.memberId}</if>
+            <if test="query.orderType != null">AND order_type = #{query.orderType}</if>
+            <if test="query.tableId != null">AND table_id = #{query.tableId}</if>
+            <if test="query.tableTypeId != null">AND table_type_id = #{query.tableTypeId}</if>
+            <if test="query.queueId != null">AND queue_id = #{query.queueId}</if>
+            <if test="query.personCount != null">AND person_count = #{query.personCount}</if>
+            <if test="query.orderStatus != null">AND order_status = #{query.orderStatus}</if>
+            <if test="query.payStatus != null">AND pay_status = #{query.payStatus}</if>
+            <if test="query.takeType != null">AND take_type = #{query.takeType}</if>
+            <if test="query.addressId != null">AND address_id = #{query.addressId}</if>
+            <if test="query.couponId != null">AND coupon_id = #{query.couponId}</if>
+            <if test="query.source != null">AND source = #{query.source}</if>
+            <if test="query.operatorId != null">AND operator_id = #{query.operatorId}</if>
+            <if test="query.version != null">AND version = #{query.version}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

@@ -7,6 +7,7 @@
         <span v-else>智</span>
       </div>
       <el-menu
+        class="sidebar-menu"
         :default-active="activeMenu"
         :collapse="isCollapse"
         :collapse-transition="false"
@@ -84,26 +85,30 @@ const userStore = useUserStore()
 const isCollapse = ref(false)
 const activeMenu = computed(() => route.path)
 
-// 菜单分组
+// 菜单分组（path 必须与 router 里的路由地址完全一致，使用驼峰命名）
 const menuGroups = [
   {
     title: '门店管理',
     icon: 'Shop',
     children: [
       { path: '/stores', title: '门店列表' },
-      { path: '/store-payment-settings', title: '支付设置' },
-      { path: '/dining-tables', title: '台桌管理' },
-      { path: '/table-types', title: '桌型管理' }
+      { path: '/storePaymentSettings', title: '支付设置' },
+      { path: '/diningTables', title: '台桌管理' },
+      { path: '/tableTypes', title: '桌型管理' },
+      { path: '/queues', title: '排队管理' },
+      { path: '/reservations', title: '预约管理' }
     ]
   },
   {
     title: '员工管理',
     icon: 'User',
     children: [
-      { path: '/sys-users', title: '员工列表' },
-      { path: '/sys-roles', title: '角色管理' },
-      { path: '/staff-schedules', title: '排班管理' },
-      { path: '/staff-login-logs', title: '登录日志' }
+      { path: '/sysUsers', title: '员工列表' },
+      { path: '/sysRoles', title: '角色管理' },
+      { path: '/sysPermissions', title: '权限管理' },
+      { path: '/sysRolePermissions', title: '角色权限' },
+      { path: '/staffSchedules', title: '排班管理' },
+      { path: '/staffLoginLogs', title: '登录日志' }
     ]
   },
   {
@@ -111,11 +116,13 @@ const menuGroups = [
     icon: 'Food',
     children: [
       { path: '/dishes', title: '菜品列表' },
-      { path: '/dish-categories', title: '菜品分类' },
-      { path: '/dish-tastes', title: '菜品口味' },
-      { path: '/dish-specs', title: '菜品规格' },
+      { path: '/dishCategories', title: '菜品分类' },
+      { path: '/dishTastes', title: '菜品口味' },
+      { path: '/dishSpecs', title: '菜品规格' },
+      { path: '/dishReviews', title: '菜品评价' },
       { path: '/ingredients', title: '原料管理' },
-      { path: '/ingredient-categories', title: '原料类别' }
+      { path: '/ingredientCategories', title: '原料类别' },
+      { path: '/dishIngredientRels', title: '菜品原料' }
     ]
   },
   {
@@ -123,10 +130,11 @@ const menuGroups = [
     icon: 'List',
     children: [
       { path: '/orders', title: '订单列表' },
-      { path: '/order-details', title: '订单明细' },
-      { path: '/order-status-logs', title: '订单日志' },
-      { path: '/payment-records', title: '支付记录' },
-      { path: '/refunds', title: '退单管理' }
+      { path: '/orderDetails', title: '订单明细' },
+      { path: '/orderStatusLogs', title: '订单日志' },
+      { path: '/paymentRecords', title: '支付记录' },
+      { path: '/refunds', title: '退单管理' },
+      { path: '/carts', title: '购物车' }
     ]
   },
   {
@@ -134,22 +142,23 @@ const menuGroups = [
     icon: 'Avatar',
     children: [
       { path: '/members', title: '会员列表' },
-      { path: '/member-categories', title: '会员类别' },
-      { path: '/member-addresses', title: '收货地址' },
-      { path: '/member-bank-cards', title: '银行卡' },
-      { path: '/member-balance-records', title: '钱包流水' },
-      { path: '/member-points-records', title: '积分流水' },
-      { path: '/member-recharge-records', title: '充值记录' }
+      { path: '/memberCategories', title: '会员类别' },
+      { path: '/memberAddresses', title: '收货地址' },
+      { path: '/memberBankCards', title: '银行卡' },
+      { path: '/memberBalanceRecords', title: '钱包流水' },
+      { path: '/memberPointsRecords', title: '积分流水' },
+      { path: '/memberRechargeRecords', title: '充值记录' },
+      { path: '/redPackets', title: '红包管理' }
     ]
   },
   {
     title: '库存管理',
     icon: 'Box',
     children: [
-      { path: '/dish-stocks', title: '菜品库存' },
-      { path: '/ingredient-stocks', title: '原料库存' },
-      { path: '/stock-check-dishes', title: '菜品盘点' },
-      { path: '/stock-check-ingredients', title: '原料盘点' }
+      { path: '/dishStocks', title: '菜品库存' },
+      { path: '/ingredientStocks', title: '原料库存' },
+      { path: '/stockCheckDishes', title: '菜品盘点' },
+      { path: '/stockCheckIngredients', title: '原料盘点' }
     ]
   },
   {
@@ -157,8 +166,7 @@ const menuGroups = [
     icon: 'Present',
     children: [
       { path: '/coupons', title: '优惠券' },
-      { path: '/member-coupons', title: '用户优惠券' },
-      { path: '/red-packets', title: '红包管理' }
+      { path: '/memberCoupons', title: '用户优惠券' }
     ]
   },
   {
@@ -166,7 +174,7 @@ const menuGroups = [
     icon: 'Setting',
     children: [
       { path: '/printers', title: '打印机' },
-      { path: '/receipt-templates', title: '小票模板' },
+      { path: '/receiptTemplates', title: '小票模板' },
       { path: '/feedbacks', title: '意见反馈' }
     ]
   }
@@ -181,7 +189,7 @@ const handleCommand = (command) => {
       })
       .catch(() => {})
   } else if (command === 'profile') {
-    router.push('/dashboard')
+    router.push('/profile')
   }
 }
 </script>
@@ -194,6 +202,29 @@ const handleCommand = (command) => {
   background-color: #001529;
   transition: width 0.3s;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+/* 只针对最外层主菜单：固定占满侧边栏剩余高度，内容超出时在菜单内部滚动。
+   注意不能用 :deep(.el-menu)，因为展开分组时子菜单 ul.el-menu--inline 也带 el-menu 类，
+   会被错误地设成 879px 高，导致每个分组展开后下方出现一大片空白。 */
+.sidebar-menu {
+  flex: 1;
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-right: none;
+}
+/* 滚动条样式，贴合深色侧边栏 */
+.sidebar-menu::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-menu::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+.sidebar-menu::-webkit-scrollbar-track {
+  background: transparent;
 }
 .logo {
   height: 60px;

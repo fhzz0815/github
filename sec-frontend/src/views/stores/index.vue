@@ -1,10 +1,28 @@
 <template>
   <div class="stores-page">
-    <!-- 搜索区域 -->
+        <!-- 搜索区域 -->
     <el-card class="search-card" shadow="never">
       <el-form :inline="true" :model="queryForm">
         <el-form-item label="关键字">
-          <el-input v-model="queryForm.keyword" placeholder="请输入关键字" clearable />
+          <el-input v-model="queryForm.keyword" placeholder="请输入门店名称/负责人/门店编号/门店电话" clearable style="width: 220px" @keyup.enter="handleSearch" />
+        </el-form-item>
+        <el-form-item label="营业状态">
+          <el-select v-model="queryForm.businessStatus" clearable placeholder="全部" style="width: 130px">
+            <el-option v-for="o in enumOptions.businessStatus" :key="o.value" :label="o.label" :value="o.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="是否允许堂食">
+          <el-select v-model="queryForm.dineInEnabled" clearable placeholder="全部" style="width: 130px">
+            <el-option v-for="o in enumOptions.dineInEnabled" :key="o.value" :label="o.label" :value="o.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="是否允许外卖">
+          <el-select v-model="queryForm.takeoutEnabled" clearable placeholder="全部" style="width: 130px">
+            <el-option v-for="o in enumOptions.takeoutEnabled" :key="o.value" :label="o.label" :value="o.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="创建时间">
+          <el-date-picker v-model="queryForm.dateRange" type="daterange" value-format="YYYY-MM-DD" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" style="width: 260px" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">搜索</el-button>
@@ -45,8 +63,8 @@
           :total="storeStore.total"
           :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
-          @size-change="storeStore.fetchList"
-          @current-change="storeStore.fetchList"
+          @size-change="onPageChange"
+          @current-change="onPageChange"
         />
       </div>
     </el-card>
@@ -101,7 +119,58 @@ import storeApi from '@/api/store'
 
 const storeStore = useStoreStore()
 
-const queryForm = reactive({ keyword: '' })
+
+
+// ===== 搜索专用：枚举选项 / 外键下拉数据 =====
+const enumOptions = {
+  businessStatus: [{ value: 1, label: '营业' }, { value: 0, label: '打烊' }],
+  dineInEnabled: [{ value: 1, label: '是' }, { value: 0, label: '否' }],
+  takeoutEnabled: [{ value: 1, label: '是' }, { value: 0, label: '否' }]
+}
+const searchOptions = reactive({
+
+})
+const loadSearchOptions = () => {
+  
+}
+loadSearchOptions()
+
+// 搜索表单
+const queryForm = reactive({
+  keyword: '',
+  businessStatus: null,
+  dineInEnabled: null,
+  takeoutEnabled: null,
+  dateRange: null
+})
+// 把搜索表单整理成接口参数（空值剔除、时间范围拆分）
+const buildParams = () => {
+  const params = { ...queryForm }
+  params.searchKeyword = queryForm.keyword
+  delete params.keyword
+  if (queryForm.dateRange && queryForm.dateRange.length === 2) {
+    params.searchBeginTime = queryForm.dateRange[0]
+    params.searchEndTime = queryForm.dateRange[1]
+  }
+  delete params.dateRange
+  Object.keys(params).forEach((k) => {
+    if (params[k] === '' || params[k] === null || params[k] === undefined) delete params[k]
+  })
+  return params
+}
+const handleSearch = () => {
+  storeStore.page = 1
+  storeStore.fetchList(buildParams())
+}
+const handleReset = () => {
+  Object.keys(queryForm).forEach((k) => { queryForm[k] = k === 'dateRange' ? null : '' })
+  storeStore.page = 1
+  storeStore.fetchList()
+}
+// 翻页时保留搜索条件
+const onPageChange = () => {
+  storeStore.fetchList(buildParams())
+}
 
 const dialogVisible = ref(false)
 const dialogTitle = ref('新增门店')
@@ -119,15 +188,7 @@ const formData = reactive({
   contactName: ''
 })
 
-const handleSearch = () => {
-  storeStore.page = 1
-  storeStore.fetchList()
-}
 
-const handleReset = () => {
-  queryForm.keyword = ''
-  handleSearch()
-}
 
 const handleAdd = () => {
   dialogTitle.value = '新增门店'

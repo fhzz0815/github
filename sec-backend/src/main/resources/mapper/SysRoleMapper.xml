@@ -19,18 +19,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, role_name, role_code, description, create_time, update_time, is_deleted
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `sys_role`
         <where>
             is_deleted = 0
-            <if test="query != null">
-                <if test="query.roleName != null">AND role_name = #{query.roleName}</if>
-                <if test="query.roleCode != null">AND role_code = #{query.roleCode}</if>
-                <if test="query.description != null">AND description = #{query.description}</if>
-                <if test="query.createTime != null">AND create_time = #{query.createTime}</if>
-                <if test="query.updateTime != null">AND update_time = #{query.updateTime}</if>
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (
+role_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                OR description LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                )
             </if>
+            <if test="query.roleName != null and query.roleName != ''">AND role_name LIKE CONCAT('%', #{query.roleName}, '%')</if>
+            <if test="query.roleCode != null and query.roleCode != ''">AND role_code LIKE CONCAT('%', #{query.roleCode}, '%')</if>
+            <if test="query.description != null and query.description != ''">AND description LIKE CONCAT('%', #{query.description}, '%')</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

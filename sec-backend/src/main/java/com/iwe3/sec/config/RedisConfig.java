@@ -1,18 +1,16 @@
 package com.iwe3.sec.config;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
@@ -22,6 +20,8 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  */
 @Configuration
 public class RedisConfig {
+
+    private static final Logger log = LoggerFactory.getLogger(RedisConfig.class);
 
     @Value("${spring.data.redis.host:127.0.0.1}")
     private String redisHost;
@@ -49,18 +49,16 @@ public class RedisConfig {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(factory);
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        mapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
-
-        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(mapper, Object.class);
+        // 使用 RedisSerializer.json() 替代已过时的 Jackson2JsonRedisSerializer
+        // 它会在序列化时自动带上 @class 类型信息，确保反序列化时能正确还原对象类型
+        RedisSerializer<?> jsonSerializer = RedisSerializer.json();
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
 
-        // key采用String序列化，value采用jackson序列化
+        // key 采用 String 序列化，value 采用 JSON 序列化（带类型信息）
         template.setKeySerializer(stringRedisSerializer);
         template.setHashKeySerializer(stringRedisSerializer);
-        template.setValueSerializer(jackson2JsonRedisSerializer);
-        template.setHashValueSerializer(jackson2JsonRedisSerializer);
+        template.setValueSerializer(jsonSerializer);
+        template.setHashValueSerializer(jsonSerializer);
         template.afterPropertiesSet();
         return template;
     }
@@ -73,9 +71,10 @@ public class RedisConfig {
     public RedissonClient redissonClient() {
         try {
             Config config = new Config();
+            // 本机开发环境 Redis 通常未设密码：配置为空时必须传 null，否则 Redisson 会发送 AUTH 报错
             config.useSingleServer()
                     .setAddress("redis://" + redisHost + ":" + redisPort)
-                    .setPassword(redisPassword.isEmpty() ? null : redisPassword)
+                    .setPassword(redisPassword == null || redisPassword.isEmpty() ? null : redisPassword)
                     .setDatabase(redisDatabase)
                     .setTimeout(timeout)
                     .setRetryAttempts(retryAttempts)
@@ -84,7 +83,7 @@ public class RedisConfig {
             return Redisson.create(config);
         } catch (Exception e) {
             // Redis 不可用时降级处理，不影响主程序启动
-            System.err.println("[警告] Redisson 连接失败，Redis 相关功能将不可用: " + e.getMessage());
+            log.warn("Redisson 连接失败，Redis 相关功能将降级运行", e);
             return null;
         }
     }

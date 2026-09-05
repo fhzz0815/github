@@ -25,18 +25,28 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, store_id, table_type_id, table_no, table_name, qr_code, status, person_count, enable_reservation, sort, create_time, update_time, is_deleted
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `dining_table`
         <where>
             is_deleted = 0
-            <if test="query != null">
-                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
-                <if test="query.tableTypeId != null">AND table_type_id = #{query.tableTypeId}</if>
-                <if test="query.tableNo != null">AND table_no = #{query.tableNo}</if>
-                <if test="query.tableName != null">AND table_name = #{query.tableName}</if>
-                <if test="query.qrCode != null">AND qr_code = #{query.qrCode}</if>
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (
+table_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                OR table_no LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                )
             </if>
+            <if test="query.tableNo != null and query.tableNo != ''">AND table_no LIKE CONCAT('%', #{query.tableNo}, '%')</if>
+            <if test="query.tableName != null and query.tableName != ''">AND table_name LIKE CONCAT('%', #{query.tableName}, '%')</if>
+            <if test="query.qrCode != null and query.qrCode != ''">AND qr_code LIKE CONCAT('%', #{query.qrCode}, '%')</if>
+            <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+            <if test="query.tableTypeId != null">AND table_type_id = #{query.tableTypeId}</if>
+            <if test="query.status != null">AND status = #{query.status}</if>
+            <if test="query.personCount != null">AND person_count = #{query.personCount}</if>
+            <if test="query.enableReservation != null">AND enable_reservation = #{query.enableReservation}</if>
+            <if test="query.sort != null">AND sort = #{query.sort}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

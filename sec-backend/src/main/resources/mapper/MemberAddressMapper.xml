@@ -27,18 +27,29 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, member_id, contact_name, contact_phone, province, city, district, detail_address, longitude, latitude, tag, is_default, create_time, update_time, is_deleted
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `member_address`
         <where>
             is_deleted = 0
-            <if test="query != null">
-                <if test="query.memberId != null">AND member_id = #{query.memberId}</if>
-                <if test="query.contactName != null">AND contact_name = #{query.contactName}</if>
-                <if test="query.contactPhone != null">AND contact_phone = #{query.contactPhone}</if>
-                <if test="query.province != null">AND province = #{query.province}</if>
-                <if test="query.city != null">AND city = #{query.city}</if>
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (
+contact_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                OR contact_phone LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                OR detail_address LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                )
             </if>
+            <if test="query.contactName != null and query.contactName != ''">AND contact_name LIKE CONCAT('%', #{query.contactName}, '%')</if>
+            <if test="query.contactPhone != null and query.contactPhone != ''">AND contact_phone LIKE CONCAT('%', #{query.contactPhone}, '%')</if>
+            <if test="query.province != null and query.province != ''">AND province LIKE CONCAT('%', #{query.province}, '%')</if>
+            <if test="query.city != null and query.city != ''">AND city LIKE CONCAT('%', #{query.city}, '%')</if>
+            <if test="query.district != null and query.district != ''">AND district LIKE CONCAT('%', #{query.district}, '%')</if>
+            <if test="query.detailAddress != null and query.detailAddress != ''">AND detail_address LIKE CONCAT('%', #{query.detailAddress}, '%')</if>
+            <if test="query.tag != null and query.tag != ''">AND tag LIKE CONCAT('%', #{query.tag}, '%')</if>
+            <if test="query.memberId != null">AND member_id = #{query.memberId}</if>
+            <if test="query.isDefault != null">AND is_default = #{query.isDefault}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

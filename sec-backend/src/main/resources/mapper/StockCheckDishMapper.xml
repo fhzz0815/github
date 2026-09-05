@@ -26,17 +26,30 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, check_no, store_id, dish_id, stock_before, stock_after, diff, reason, status, creator_id, auditor_id, audit_time, audit_remark, create_time
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `stock_check_dish`
         <where>
-            <if test="query != null">
-                <if test="query.checkNo != null">AND check_no = #{query.checkNo}</if>
-                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
-                <if test="query.dishId != null">AND dish_id = #{query.dishId}</if>
-                <if test="query.stockBefore != null">AND stock_before = #{query.stockBefore}</if>
-                <if test="query.stockAfter != null">AND stock_after = #{query.stockAfter}</if>
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (
+check_no LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                OR reason LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                OR audit_remark LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                )
             </if>
+            <if test="query.checkNo != null and query.checkNo != ''">AND check_no LIKE CONCAT('%', #{query.checkNo}, '%')</if>
+            <if test="query.reason != null and query.reason != ''">AND reason LIKE CONCAT('%', #{query.reason}, '%')</if>
+            <if test="query.auditRemark != null and query.auditRemark != ''">AND audit_remark LIKE CONCAT('%', #{query.auditRemark}, '%')</if>
+            <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+            <if test="query.dishId != null">AND dish_id = #{query.dishId}</if>
+            <if test="query.stockBefore != null">AND stock_before = #{query.stockBefore}</if>
+            <if test="query.stockAfter != null">AND stock_after = #{query.stockAfter}</if>
+            <if test="query.diff != null">AND diff = #{query.diff}</if>
+            <if test="query.status != null">AND status = #{query.status}</if>
+            <if test="query.creatorId != null">AND creator_id = #{query.creatorId}</if>
+            <if test="query.auditorId != null">AND auditor_id = #{query.auditorId}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

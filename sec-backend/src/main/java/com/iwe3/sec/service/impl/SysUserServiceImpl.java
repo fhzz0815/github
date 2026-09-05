@@ -31,13 +31,20 @@ public class SysUserServiceImpl implements ISysUserService {
     public PageResult<SysUserEntity> list(SysUserEntity query, Integer page, Integer size) {
         PageHelper.startPage(page, size);
         List<SysUserEntity> list = sysUserMapper.selectList(query);
+        // 密码散列不外泄：列表返回前统一清空
+        list.forEach(u -> u.setPassword(null));
         PageInfo<SysUserEntity> pageInfo = new PageInfo<>(list);
         return PageResult.of(pageInfo.getTotal(), pageInfo.getPages(), list);
     }
 
     @Override
     public SysUserEntity getById(Long id) {
-        return sysUserMapper.selectById(id);
+        SysUserEntity entity = sysUserMapper.selectById(id);
+        // 详情返回前同样清空密码，避免散列泄露到前端
+        if (entity != null) {
+            entity.setPassword(null);
+        }
+        return entity;
     }
 
     @Override
@@ -53,6 +60,10 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Override
     public boolean update(SysUserEntity entity) {
+        // 修改资料时如果带了新密码（非空），同样做MD5加密后再存，避免明文落库导致无法登录
+        if (entity.getPassword() != null && !entity.getPassword().isEmpty()) {
+            entity.setPassword(SecureUtil.md5(entity.getPassword()));
+        }
         return sysUserMapper.update(entity) > 0;
     }
 

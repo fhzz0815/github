@@ -32,18 +32,35 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, openid, unionid, nickname, avatar, gender, phone, real_name, id_card, member_no, member_category_id, balance, total_points, available_points, pay_password, register_store_id, status, create_time, update_time, is_deleted
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `member`
         <where>
             is_deleted = 0
-            <if test="query != null">
-                <if test="query.openid != null">AND openid = #{query.openid}</if>
-                <if test="query.unionid != null">AND unionid = #{query.unionid}</if>
-                <if test="query.nickname != null">AND nickname = #{query.nickname}</if>
-                <if test="query.avatar != null">AND avatar = #{query.avatar}</if>
-                <if test="query.gender != null">AND gender = #{query.gender}</if>
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (
+real_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                OR member_no LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                OR phone LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                )
             </if>
+            <if test="query.openid != null and query.openid != ''">AND openid LIKE CONCAT('%', #{query.openid}, '%')</if>
+            <if test="query.unionid != null and query.unionid != ''">AND unionid LIKE CONCAT('%', #{query.unionid}, '%')</if>
+            <if test="query.nickname != null and query.nickname != ''">AND nickname LIKE CONCAT('%', #{query.nickname}, '%')</if>
+            <if test="query.avatar != null and query.avatar != ''">AND avatar LIKE CONCAT('%', #{query.avatar}, '%')</if>
+            <if test="query.phone != null and query.phone != ''">AND phone LIKE CONCAT('%', #{query.phone}, '%')</if>
+            <if test="query.realName != null and query.realName != ''">AND real_name LIKE CONCAT('%', #{query.realName}, '%')</if>
+            <if test="query.idCard != null and query.idCard != ''">AND id_card LIKE CONCAT('%', #{query.idCard}, '%')</if>
+            <if test="query.memberNo != null and query.memberNo != ''">AND member_no LIKE CONCAT('%', #{query.memberNo}, '%')</if>
+            <if test="query.payPassword != null and query.payPassword != ''">AND pay_password LIKE CONCAT('%', #{query.payPassword}, '%')</if>
+            <if test="query.gender != null">AND gender = #{query.gender}</if>
+            <if test="query.memberCategoryId != null">AND member_category_id = #{query.memberCategoryId}</if>
+            <if test="query.totalPoints != null">AND total_points = #{query.totalPoints}</if>
+            <if test="query.availablePoints != null">AND available_points = #{query.availablePoints}</if>
+            <if test="query.registerStoreId != null">AND register_store_id = #{query.registerStoreId}</if>
+            <if test="query.status != null">AND status = #{query.status}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

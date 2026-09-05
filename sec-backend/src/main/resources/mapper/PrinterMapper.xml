@@ -19,17 +19,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, store_id, printer_name, printer_no, printer_type, status, create_time
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `printer`
         <where>
-            <if test="query != null">
-                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
-                <if test="query.printerName != null">AND printer_name = #{query.printerName}</if>
-                <if test="query.printerNo != null">AND printer_no = #{query.printerNo}</if>
-                <if test="query.printerType != null">AND printer_type = #{query.printerType}</if>
-                <if test="query.status != null">AND status = #{query.status}</if>
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (
+printer_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                OR printer_no LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                )
             </if>
+            <if test="query.printerName != null and query.printerName != ''">AND printer_name LIKE CONCAT('%', #{query.printerName}, '%')</if>
+            <if test="query.printerNo != null and query.printerNo != ''">AND printer_no LIKE CONCAT('%', #{query.printerNo}, '%')</if>
+            <if test="query.printerType != null and query.printerType != ''">AND printer_type LIKE CONCAT('%', #{query.printerType}, '%')</if>
+            <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+            <if test="query.status != null">AND status = #{query.status}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

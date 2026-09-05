@@ -16,15 +16,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, role_id, permission_id, create_time
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `sys_role_permission`
         <where>
-            <if test="query != null">
-                <if test="query.roleId != null">AND role_id = #{query.roleId}</if>
-                <if test="query.permissionId != null">AND permission_id = #{query.permissionId}</if>
-                <if test="query.createTime != null">AND create_time = #{query.createTime}</if>
-            </if>
+            <if test="query.roleId != null">AND role_id = #{query.roleId}</if>
+            <if test="query.permissionId != null">AND permission_id = #{query.permissionId}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

@@ -23,17 +23,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, red_packet_no, member_id, store_id, amount, source, status, expire_time, use_time, order_id, create_time
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `red_packet`
         <where>
-            <if test="query != null">
-                <if test="query.redPacketNo != null">AND red_packet_no = #{query.redPacketNo}</if>
-                <if test="query.memberId != null">AND member_id = #{query.memberId}</if>
-                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
-                <if test="query.amount != null">AND amount = #{query.amount}</if>
-                <if test="query.source != null">AND source = #{query.source}</if>
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (
+red_packet_no LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                )
             </if>
+            <if test="query.redPacketNo != null and query.redPacketNo != ''">AND red_packet_no LIKE CONCAT('%', #{query.redPacketNo}, '%')</if>
+            <if test="query.source != null and query.source != ''">AND source LIKE CONCAT('%', #{query.source}, '%')</if>
+            <if test="query.memberId != null">AND member_id = #{query.memberId}</if>
+            <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+            <if test="query.status != null">AND status = #{query.status}</if>
+            <if test="query.orderId != null">AND order_id = #{query.orderId}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

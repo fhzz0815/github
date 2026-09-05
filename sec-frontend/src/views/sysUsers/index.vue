@@ -1,10 +1,28 @@
 <template>
   <div class="sysUsers-page">
-    <!-- 搜索区域 -->
+        <!-- 搜索区域 -->
     <el-card class="search-card" shadow="never">
       <el-form :inline="true" :model="queryForm">
         <el-form-item label="关键字">
-          <el-input v-model="queryForm.keyword" placeholder="请输入关键字" clearable />
+          <el-input v-model="queryForm.keyword" placeholder="请输入姓名/员工工号/登录账号/邮箱" clearable style="width: 220px" @keyup.enter="handleSearch" />
+        </el-form-item>
+        <el-form-item label="账号状态">
+          <el-select v-model="queryForm.status" clearable placeholder="全部" style="width: 130px">
+            <el-option v-for="o in enumOptions.status" :key="o.value" :label="o.label" :value="o.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="门店">
+          <el-select v-model="queryForm.storeId" clearable filterable placeholder="全部" style="width: 150px">
+            <el-option v-for="o in searchOptions.stores" :key="o.id" :label="o.storeName" :value="o.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="角色">
+          <el-select v-model="queryForm.roleId" clearable filterable placeholder="全部" style="width: 150px">
+            <el-option v-for="o in searchOptions.roles" :key="o.id" :label="o.roleName" :value="o.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="创建时间">
+          <el-date-picker v-model="queryForm.dateRange" type="daterange" value-format="YYYY-MM-DD" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" style="width: 260px" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">搜索</el-button>
@@ -24,7 +42,6 @@
         <el-table-column type="index" label="序号" width="60" align="center" />
         <el-table-column prop="storeId" label="所属门店ID（总店长为空）" width="160" show-overflow-tooltip />
         <el-table-column prop="username" label="登录账号（手机号）" width="160" show-overflow-tooltip />
-        <el-table-column prop="password" label="登录密码（生产用bcrypt加密存储）" width="160" show-overflow-tooltip />
         <el-table-column prop="realName" label="姓名" width="120" show-overflow-tooltip />
         <el-table-column prop="staffNo" label="员工工号" width="120" show-overflow-tooltip />
         <el-table-column prop="email" label="邮箱" width="120" show-overflow-tooltip />
@@ -45,8 +62,8 @@
           :total="sysUserStore.total"
           :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
-          @size-change="sysUserStore.fetchList"
-          @current-change="sysUserStore.fetchList"
+          @size-change="onPageChange"
+          @current-change="onPageChange"
         />
       </div>
     </el-card>
@@ -101,7 +118,59 @@ import sysUserApi from '@/api/sysUser'
 
 const sysUserStore = useSysUserStore()
 
-const queryForm = reactive({ keyword: '' })
+import storeApi from '@/api/store'
+import sysRoleApi from '@/api/sysRole'
+
+// ===== 搜索专用：枚举选项 / 外键下拉数据 =====
+const enumOptions = {
+  status: [{ value: 1, label: '在职' }, { value: 0, label: '离职' }]
+}
+const searchOptions = reactive({
+  stores: [],
+  roles: []
+})
+const loadSearchOptions = () => {
+  storeApi.list({ page: 1, size: 1000 }).then((r) => { searchOptions.stores = r.data?.list || [] }).catch(() => {})
+  sysRoleApi.list({ page: 1, size: 1000 }).then((r) => { searchOptions.roles = r.data?.list || [] }).catch(() => {})
+}
+loadSearchOptions()
+
+// 搜索表单
+const queryForm = reactive({
+  keyword: '',
+  status: null,
+  storeId: null,
+  roleId: null,
+  dateRange: null
+})
+// 把搜索表单整理成接口参数（空值剔除、时间范围拆分）
+const buildParams = () => {
+  const params = { ...queryForm }
+  params.searchKeyword = queryForm.keyword
+  delete params.keyword
+  if (queryForm.dateRange && queryForm.dateRange.length === 2) {
+    params.searchBeginTime = queryForm.dateRange[0]
+    params.searchEndTime = queryForm.dateRange[1]
+  }
+  delete params.dateRange
+  Object.keys(params).forEach((k) => {
+    if (params[k] === '' || params[k] === null || params[k] === undefined) delete params[k]
+  })
+  return params
+}
+const handleSearch = () => {
+  sysUserStore.page = 1
+  sysUserStore.fetchList(buildParams())
+}
+const handleReset = () => {
+  Object.keys(queryForm).forEach((k) => { queryForm[k] = k === 'dateRange' ? null : '' })
+  sysUserStore.page = 1
+  sysUserStore.fetchList()
+}
+// 翻页时保留搜索条件
+const onPageChange = () => {
+  sysUserStore.fetchList(buildParams())
+}
 
 const dialogVisible = ref(false)
 const dialogTitle = ref('新增员工')
@@ -119,15 +188,7 @@ const formData = reactive({
   avatar: ''
 })
 
-const handleSearch = () => {
-  sysUserStore.page = 1
-  sysUserStore.fetchList()
-}
 
-const handleReset = () => {
-  queryForm.keyword = ''
-  handleSearch()
-}
 
 const handleAdd = () => {
   dialogTitle.value = '新增员工'

@@ -27,17 +27,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, pay_no, order_id, store_id, member_id, pay_type, pay_channel, amount, status, transaction_id, idempotency_key, payer_account, notify_time, pay_time, create_time
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `payment_record`
         <where>
-            <if test="query != null">
-                <if test="query.payNo != null">AND pay_no = #{query.payNo}</if>
-                <if test="query.orderId != null">AND order_id = #{query.orderId}</if>
-                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
-                <if test="query.memberId != null">AND member_id = #{query.memberId}</if>
-                <if test="query.payType != null">AND pay_type = #{query.payType}</if>
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (
+pay_no LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                )
             </if>
+            <if test="query.payNo != null and query.payNo != ''">AND pay_no LIKE CONCAT('%', #{query.payNo}, '%')</if>
+            <if test="query.payType != null and query.payType != ''">AND pay_type LIKE CONCAT('%', #{query.payType}, '%')</if>
+            <if test="query.payChannel != null and query.payChannel != ''">AND pay_channel LIKE CONCAT('%', #{query.payChannel}, '%')</if>
+            <if test="query.transactionId != null and query.transactionId != ''">AND transaction_id LIKE CONCAT('%', #{query.transactionId}, '%')</if>
+            <if test="query.idempotencyKey != null and query.idempotencyKey != ''">AND idempotency_key LIKE CONCAT('%', #{query.idempotencyKey}, '%')</if>
+            <if test="query.payerAccount != null and query.payerAccount != ''">AND payer_account LIKE CONCAT('%', #{query.payerAccount}, '%')</if>
+            <if test="query.orderId != null">AND order_id = #{query.orderId}</if>
+            <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+            <if test="query.memberId != null">AND member_id = #{query.memberId}</if>
+            <if test="query.status != null">AND status = #{query.status}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

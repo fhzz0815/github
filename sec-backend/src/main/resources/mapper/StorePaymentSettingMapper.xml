@@ -17,16 +17,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         id, store_id, pay_type, is_enabled, create_time
     </sql>
 
-    <select id="selectList" resultMap="BaseResultMap">
+                <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `store_payment_setting`
         <where>
-            <if test="query != null">
-                <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
-                <if test="query.payType != null">AND pay_type = #{query.payType}</if>
-                <if test="query.isEnabled != null">AND is_enabled = #{query.isEnabled}</if>
-                <if test="query.createTime != null">AND create_time = #{query.createTime}</if>
-            </if>
+            <if test="query.payType != null and query.payType != ''">AND pay_type LIKE CONCAT('%', #{query.payType}, '%')</if>
+            <if test="query.storeId != null">AND store_id = #{query.storeId}</if>
+            <if test="query.isEnabled != null">AND is_enabled = #{query.isEnabled}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime != null and query.searchEndTime != ''">AND create_time &lt;= CONCAT(#{query.searchEndTime}, ' 23:59:59')</if>
         </where>
         ORDER BY id DESC
     </select>

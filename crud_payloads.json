@@ -1,29 +1,29 @@
 {
-  "marker": "CRUD414759",
+  "marker": "CRUD737090",
   "modules": [
     {
       "table": "sys_role",
       "path": "sysRoles",
       "payload": {
-        "roleName": "CRUD414759rol",
-        "roleCode": "CRUD414759rol"
+        "roleName": "CRUD737090rol",
+        "roleCode": "CRUD737090rol"
       },
       "markerField": "roleName",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "sys_permission",
       "path": "sysPermissions",
       "payload": {
-        "permissionName": "CRUD414759per",
-        "permissionCode": "CRUD414759per"
+        "permissionName": "CRUD737090per",
+        "permissionCode": "CRUD737090per"
       },
       "markerField": "permissionName",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "sys_role_permission",
@@ -35,20 +35,20 @@
       "markerField": null,
       "findField": "permissionId",
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "sys_user",
       "path": "sysUsers",
       "payload": {
-        "username": "CRUD414759use",
+        "username": "CRUD737090use",
         "password": "123456",
         "roleId": 1
       },
       "markerField": "username",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "staff_schedule",
@@ -56,96 +56,96 @@
       "payload": {
         "staffId": 8888,
         "workDate": "2026-09-10",
-        "remark": "CRUD414759M"
+        "remark": "CRUD737090M"
       },
       "markerField": "remark",
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "staff_login_log",
       "path": "staffLoginLogs",
       "payload": {
         "staffId": 1,
-        "failReason": "CRUD414759M"
+        "failReason": "CRUD737090M"
       },
       "markerField": "failReason",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "store",
       "path": "stores",
       "payload": {
-        "storeNo": "CRUD414759sto",
-        "storeName": "CRUD414759sto"
+        "storeNo": "CRUD737090sto",
+        "storeName": "CRUD737090sto"
       },
       "markerField": "storeNo",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "store_payment_setting",
       "path": "storePaymentSettings",
       "payload": {
         "storeId": 8888,
-        "payType": "CRUD414759"
+        "payType": "CRUD737090"
       },
       "markerField": null,
       "findField": "storeId",
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "member_category",
       "path": "memberCategories",
       "payload": {
-        "categoryName": "CRUD414759cat"
+        "categoryName": "CRUD737090cat"
       },
       "markerField": "categoryName",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "member",
       "path": "members",
       "payload": {
-        "nickname": "CRUD414759M"
+        "nickname": "CRUD737090M"
       },
       "markerField": "nickname",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "member_address",
       "path": "memberAddresses",
       "payload": {
         "memberId": 1,
-        "contactName": "CRUD414759con",
+        "contactName": "CRUD737090con",
         "contactPhone": "13900000000",
-        "detailAddress": "CRUD414759det"
+        "detailAddress": "CRUD737090det"
       },
       "markerField": "contactName",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "member_bank_card",
       "path": "memberBankCards",
       "payload": {
         "memberId": 1,
-        "cardNo": "CRUD414759car",
-        "bankName": "CRUD414759M"
+        "cardNo": "CRUD737090car",
+        "bankName": "CRUD737090M"
       },
       "markerField": "bankName",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "member_balance_record",
@@ -154,13 +154,13 @@
         "memberId": 1,
         "changeAmount": 1,
         "balanceAfter": 1,
-        "changeType": "CRUD414759",
-        "remark": "CRUD414759M"
+        "changeType": "CRUD737090",
+        "remark": "CRUD737090M"
       },
       "markerField": "remark",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "member_points_record",
@@ -169,99 +169,99 @@
         "memberId": 1,
         "pointsChange": 1,
         "pointsAfter": 1,
-        "changeType": "CRUD414759",
-        "remark": "CRUD414759M"
+        "changeType": "CRUD737090",
+        "remark": "CRUD737090M"
       },
       "markerField": "remark",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "member_recharge_record",
       "path": "memberRechargeRecords",
       "payload": {
-        "rechargeNo": "CRUD414759rec",
+        "rechargeNo": "CRUD737090rec",
         "memberId": 1,
         "rechargeAmount": 1
       },
       "markerField": "rechargeNo",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "red_packet",
       "path": "redPackets",
       "payload": {
-        "redPacketNo": "CRUD414759red",
+        "redPacketNo": "CRUD737090red",
         "memberId": 1,
         "amount": 1
       },
       "markerField": "redPacketNo",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "dish_category",
       "path": "dishCategories",
       "payload": {
         "storeId": 1,
-        "categoryName": "CRUD414759cat"
+        "categoryName": "CRUD737090cat"
       },
       "markerField": "categoryName",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "dish_taste",
       "path": "dishTastes",
       "payload": {
         "storeId": 1,
-        "tasteName": "CRUD414759tas"
+        "tasteName": "CRUD737090tas"
       },
       "markerField": "tasteName",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "dish_spec",
       "path": "dishSpecs",
       "payload": {
         "storeId": 1,
-        "specName": "CRUD414759spe"
+        "specName": "CRUD737090spe"
       },
       "markerField": "specName",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "ingredient_category",
       "path": "ingredientCategories",
       "payload": {
         "storeId": 1,
-        "categoryName": "CRUD414759cat"
+        "categoryName": "CRUD737090cat"
       },
       "markerField": "categoryName",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "ingredient",
       "path": "ingredients",
       "payload": {
         "storeId": 1,
-        "ingredientName": "CRUD414759ing"
+        "ingredientName": "CRUD737090ing"
       },
       "markerField": "ingredientName",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "dish",
@@ -269,13 +269,13 @@
       "payload": {
         "storeId": 1,
         "categoryId": 1,
-        "dishName": "CRUD414759dis",
+        "dishName": "CRUD737090dis",
         "price": 1
       },
       "markerField": "dishName",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "dish_ingredient_rel",
@@ -287,7 +287,7 @@
       "markerField": null,
       "findField": "ingredientId",
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "dish_review",
@@ -295,24 +295,24 @@
       "payload": {
         "dishId": 1,
         "memberId": 1,
-        "content": "CRUD414759M"
+        "content": "CRUD737090M"
       },
       "markerField": "content",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "table_type",
       "path": "tableTypes",
       "payload": {
         "storeId": 1,
-        "typeName": "CRUD414759typ"
+        "typeName": "CRUD737090typ"
       },
       "markerField": "typeName",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "dining_table",
@@ -320,24 +320,24 @@
       "payload": {
         "storeId": 1,
         "tableTypeId": 1,
-        "tableNo": "CRUD414759tab"
+        "tableNo": "CRUD737090tab"
       },
       "markerField": "tableNo",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "queue",
       "path": "queues",
       "payload": {
         "storeId": 1,
-        "queueNo": "CRUD414759que"
+        "queueNo": "CRUD737090que"
       },
       "markerField": "queueNo",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "reservation",
@@ -345,7 +345,7 @@
       "payload": {
         "storeId": 1,
         "memberId": 1,
-        "contactName": "CRUD414759con",
+        "contactName": "CRUD737090con",
         "contactPhone": "13900000000",
         "reservationDate": "2026-09-10",
         "reservationTime": "18:30:00"
@@ -353,7 +353,7 @@
       "markerField": "contactName",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "cart",
@@ -363,18 +363,18 @@
         "storeId": 1,
         "dishId": 1,
         "price": 1,
-        "dishName": "CRUD414759M"
+        "dishName": "CRUD737090M"
       },
       "markerField": "dishName",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "orders",
       "path": "orders",
       "payload": {
-        "orderNo": "CRUD414759ord",
+        "orderNo": "CRUD737090ord",
         "storeId": 1,
         "memberId": 1,
         "orderType": 1
@@ -382,7 +382,7 @@
       "markerField": "orderNo",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "order_detail",
@@ -390,13 +390,13 @@
       "payload": {
         "orderId": 1,
         "dishId": 1,
-        "dishName": "CRUD414759dis",
+        "dishName": "CRUD737090dis",
         "dishPrice": 1
       },
       "markerField": "dishName",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "order_status_log",
@@ -404,50 +404,50 @@
       "payload": {
         "orderId": 1,
         "toStatus": 1,
-        "remark": "CRUD414759M"
+        "remark": "CRUD737090M"
       },
       "markerField": "remark",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "payment_record",
       "path": "paymentRecords",
       "payload": {
-        "payNo": "CRUD414759pay",
+        "payNo": "CRUD737090pay",
         "orderId": 1,
-        "payType": "CRUD414759",
+        "payType": "CRUD737090",
         "amount": 1
       },
       "markerField": "payNo",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "refund",
       "path": "refunds",
       "payload": {
-        "refundNo": "CRUD414759ref",
+        "refundNo": "CRUD737090ref",
         "orderId": 1,
         "amount": 1
       },
       "markerField": "refundNo",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "coupon",
       "path": "coupons",
       "payload": {
-        "couponName": "CRUD414759cou"
+        "couponName": "CRUD737090cou"
       },
       "markerField": "couponName",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "member_coupon",
@@ -459,7 +459,7 @@
       "markerField": null,
       "findField": "couponId",
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "dish_stock",
@@ -471,7 +471,7 @@
       "markerField": null,
       "findField": "dishId",
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "ingredient_stock",
@@ -483,68 +483,68 @@
       "markerField": null,
       "findField": "ingredientId",
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "stock_check_dish",
       "path": "stockCheckDishes",
       "payload": {
-        "checkNo": "CRUD414759che",
+        "checkNo": "CRUD737090che",
         "storeId": 1,
         "dishId": 1
       },
       "markerField": "checkNo",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "stock_check_ingredient",
       "path": "stockCheckIngredients",
       "payload": {
-        "checkNo": "CRUD414759che",
+        "checkNo": "CRUD737090che",
         "storeId": 1,
         "ingredientId": 1
       },
       "markerField": "checkNo",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "printer",
       "path": "printers",
       "payload": {
         "storeId": 1,
-        "printerName": "CRUD414759pri"
+        "printerName": "CRUD737090pri"
       },
       "markerField": "printerName",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "receipt_template",
       "path": "receiptTemplates",
       "payload": {
-        "templateType": "CRUD414759",
-        "templateName": "CRUD414759tem"
+        "templateType": "CRUD737090",
+        "templateName": "CRUD737090tem"
       },
       "markerField": "templateName",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     },
     {
       "table": "feedback",
       "path": "feedbacks",
       "payload": {
-        "content": "CRUD414759con"
+        "content": "CRUD737090con"
       },
       "markerField": "content",
       "findField": null,
       "findValue": 8888,
-      "marker": "CRUD414759"
+      "marker": "CRUD737090"
     }
   ]
 }
