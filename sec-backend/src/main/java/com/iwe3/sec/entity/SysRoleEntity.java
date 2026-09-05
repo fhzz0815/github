@@ -21,6 +21,8 @@ public class SysRoleEntity {
     private String roleName;
     // 角色编码
     private String roleCode;
+    // 角色等级（数字越大权限越高 99/50/10）
+    private Integer level;
     // 角色描述
     private String description;
     // 创建时间

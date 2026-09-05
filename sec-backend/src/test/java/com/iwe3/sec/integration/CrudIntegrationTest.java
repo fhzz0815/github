@@ -2,7 +2,9 @@ package com.iwe3.sec.integration;
 
 import com.iwe3.sec.SecApplication;
 import com.iwe3.sec.common.BusinessException;
+import com.iwe3.sec.common.LoginUser;
 import com.iwe3.sec.common.PageResult;
+import com.iwe3.sec.common.PermissionChecker;
 import com.iwe3.sec.entity.DiningTableEntity;
 import com.iwe3.sec.entity.FeedbackEntity;
 import com.iwe3.sec.entity.StoreEntity;
@@ -14,19 +16,48 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 /**
  * 集成测试：真实 MySQL 数据库的完整增删改查链路
  * 整个类加事务并自动回滚，测试产生的数据不会落库，可重复执行。
  */
-@SpringBootTest(classes = SecApplication.class)
+@SpringBootTest(classes = {SecApplication.class, CrudIntegrationTest.TestPermissionConfig.class})
 @Transactional
 @Rollback
 class CrudIntegrationTest {
+
+    /**
+     * 用 Mock 替换 PermissionChecker，模拟总店长身份，
+     * 让集成测试专注于 CRUD 链路验证，不受 HTTP 请求上下文限制。
+     */
+    @TestConfiguration
+    static class TestPermissionConfig {
+        @Bean
+        @Primary
+        public PermissionChecker permissionChecker() {
+            PermissionChecker mock = mock(PermissionChecker.class);
+            // 总店长等级，所有权限校验放行
+            when(mock.currentRoleLevel()).thenReturn(PermissionChecker.LEVEL_GENERAL_MANAGER);
+            when(mock.currentStoreId()).thenReturn(null);
+            when(mock.currentUserId()).thenReturn(999L);
+            when(mock.current()).thenReturn(LoginUser.builder()
+                    .userId(999L)
+                    .roleLevel(99)
+                    .roleCode("GENERAL_MANAGER")
+                    .username("it-test-gm")
+                    .build());
+            // void 方法默认不做事，assertGeneralManager 等校验直接放行
+            return mock;
+        }
+    }
 
     @Autowired
     private IStoreService storeService;

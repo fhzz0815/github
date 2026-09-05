@@ -1,6 +1,7 @@
 package com.iwe3.sec.service.impl;
 
 import com.iwe3.sec.common.PageResult;
+import com.iwe3.sec.common.PermissionChecker;
 import com.iwe3.sec.entity.MemberEntity;
 import com.iwe3.sec.mapper.MemberMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,11 +28,14 @@ class MemberServiceImplTest {
     @Mock
     private MemberMapper memberMapper;
 
+    @Mock
+    private PermissionChecker permissionChecker;
+
     private MemberServiceImpl memberService;
 
     @BeforeEach
     void setUp() {
-        memberService = new MemberServiceImpl(memberMapper);
+        memberService = new MemberServiceImpl(memberMapper, permissionChecker);
     }
 
     @Test
@@ -62,6 +66,7 @@ class MemberServiceImplTest {
     @Test
     @DisplayName("Get by id when exists should return entity")
     void testGetById_WhenExists_ShouldReturnEntity() {
+        when(permissionChecker.currentRoleLevel()).thenReturn(99);
         MemberEntity mockEntity = MemberEntity.builder().id(1L).build();
         when(memberMapper.selectById(1L)).thenReturn(mockEntity);
 

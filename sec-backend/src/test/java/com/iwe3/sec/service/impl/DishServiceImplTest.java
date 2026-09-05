@@ -1,6 +1,7 @@
 package com.iwe3.sec.service.impl;
 
 import com.iwe3.sec.common.PageResult;
+import com.iwe3.sec.common.PermissionChecker;
 import com.iwe3.sec.entity.DishEntity;
 import com.iwe3.sec.mapper.DishMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,11 +28,14 @@ class DishServiceImplTest {
     @Mock
     private DishMapper dishMapper;
 
+    @Mock
+    private PermissionChecker permissionChecker;
+
     private DishServiceImpl dishService;
 
     @BeforeEach
     void setUp() {
-        dishService = new DishServiceImpl(dishMapper);
+        dishService = new DishServiceImpl(dishMapper, permissionChecker);
     }
 
     @Test
@@ -51,6 +55,7 @@ class DishServiceImplTest {
     @Test
     @DisplayName("List with no data should return empty list")
     void testList_WhenNoData_ShouldReturnEmptyList() {
+        when(permissionChecker.currentRoleLevel()).thenReturn(99);
         when(dishMapper.selectList(any())).thenReturn(Collections.emptyList());
 
         PageResult<DishEntity> result = dishService.list(new DishEntity(), 1, 10);
@@ -62,6 +67,7 @@ class DishServiceImplTest {
     @Test
     @DisplayName("Get by id when exists should return entity")
     void testGetById_WhenExists_ShouldReturnEntity() {
+        when(permissionChecker.currentRoleLevel()).thenReturn(99);
         DishEntity mockEntity = DishEntity.builder().id(1L).build();
         when(dishMapper.selectById(1L)).thenReturn(mockEntity);
 

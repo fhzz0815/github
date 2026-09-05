@@ -9,6 +9,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
         <result column="role_name" property="roleName"/>
         <result column="role_code" property="roleCode"/>
+        <result column="level" property="level"/>
         <result column="description" property="description"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
@@ -16,7 +17,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, role_name, role_code, description, create_time, update_time, is_deleted
+        id, role_name, role_code, level, description, create_time, update_time, is_deleted
     </sql>
 
                 <select id="selectList" resultMap="BaseResultMap">
@@ -50,6 +51,7 @@ role_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="roleName != null">role_name,</if>
             <if test="roleCode != null">role_code,</if>
+            <if test="level != null">level,</if>
             <if test="description != null">description,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateTime != null">update_time,</if>
@@ -58,6 +60,7 @@ role_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
         <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
             <if test="roleName != null">#{roleName},</if>
             <if test="roleCode != null">#{roleCode},</if>
+            <if test="level != null">#{level},</if>
             <if test="description != null">#{description},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateTime != null">#{updateTime},</if>
@@ -70,6 +73,7 @@ role_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
         <set>
             <if test="roleName != null">role_name = #{roleName},</if>
             <if test="roleCode != null">role_code = #{roleCode},</if>
+            <if test="level != null">level = #{level},</if>
             <if test="description != null">description = #{description},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>

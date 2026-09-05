@@ -1,6 +1,7 @@
 package com.iwe3.sec.service.impl;
 
 import com.iwe3.sec.common.PageResult;
+import com.iwe3.sec.common.PermissionChecker;
 import com.iwe3.sec.entity.DiningTableEntity;
 import com.iwe3.sec.mapper.DiningTableMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,16 +28,20 @@ class DiningTableServiceImplTest {
     @Mock
     private DiningTableMapper diningTableMapper;
 
+    @Mock
+    private PermissionChecker permissionChecker;
+
     private DiningTableServiceImpl diningTableService;
 
     @BeforeEach
     void setUp() {
-        diningTableService = new DiningTableServiceImpl(diningTableMapper);
+        diningTableService = new DiningTableServiceImpl(diningTableMapper, permissionChecker);
     }
 
     @Test
     @DisplayName("List with data should return page result")
     void testList_ShouldReturnPageResult() {
+        when(permissionChecker.currentRoleLevel()).thenReturn(99);
         DiningTableEntity entity1 = DiningTableEntity.builder().id(1L).build();
         DiningTableEntity entity2 = DiningTableEntity.builder().id(2L).build();
         List<DiningTableEntity> mockList = Arrays.asList(entity1, entity2);
@@ -62,6 +67,7 @@ class DiningTableServiceImplTest {
     @Test
     @DisplayName("Get by id when exists should return entity")
     void testGetById_WhenExists_ShouldReturnEntity() {
+        when(permissionChecker.currentRoleLevel()).thenReturn(99);
         DiningTableEntity mockEntity = DiningTableEntity.builder().id(1L).build();
         when(diningTableMapper.selectById(1L)).thenReturn(mockEntity);
 

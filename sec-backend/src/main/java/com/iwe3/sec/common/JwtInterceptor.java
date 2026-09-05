@@ -1,6 +1,10 @@
 package com.iwe3.sec.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iwe3.sec.entity.SysRoleEntity;
+import com.iwe3.sec.entity.SysUserEntity;
+import com.iwe3.sec.mapper.SysRoleMapper;
+import com.iwe3.sec.mapper.SysUserMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -13,17 +17,22 @@ import java.util.List;
 /**
  * JWT 登录认证拦截器
  * 校验请求头中的令牌，未携带或无效则拒绝访问
+ * 校验通过后把 LoginUser 装入请求域，供业务层权限判断使用
  */
 @Slf4j
 @Component
 public class JwtInterceptor implements HandlerInterceptor {
 
     private final JwtUtil jwtUtil;
+    private final SysUserMapper sysUserMapper;
+    private final SysRoleMapper sysRoleMapper;
     // JSON 序列化工具，用来输出错误信息
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public JwtInterceptor(JwtUtil jwtUtil) {
+    public JwtInterceptor(JwtUtil jwtUtil, SysUserMapper sysUserMapper, SysRoleMapper sysRoleMapper) {
         this.jwtUtil = jwtUtil;
+        this.sysUserMapper = sysUserMapper;
+        this.sysRoleMapper = sysRoleMapper;
     }
 
     /** 白名单：无需登录即可访问的路径 */
@@ -61,9 +70,26 @@ public class JwtInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        // 将用户ID放入请求域，供后续使用
+        // 解析用户ID，并查库装载完整登录人信息
         Long userId = jwtUtil.getUserId(token);
+        SysUserEntity user = sysUserMapper.selectById(userId);
+        if (user == null || (user.getIsDeleted() != null && user.getIsDeleted() == 1)) {
+            writeError(response, 401, "账号不存在或已删除，请重新登录");
+            return false;
+        }
+        SysRoleEntity role = user.getRoleId() == null ? null : sysRoleMapper.selectById(user.getRoleId());
+        LoginUser loginUser = LoginUser.builder()
+                .userId(user.getId())
+                .storeId(user.getStoreId())
+                .roleId(user.getRoleId())
+                .roleLevel(role == null ? null : role.getLevel())
+                .roleCode(role == null ? null : role.getRoleCode())
+                .username(user.getUsername())
+                .build();
+        // 保留原属性，向后兼容
         request.setAttribute("currentUserId", userId);
+        // 新增统一登录人对象
+        request.setAttribute("loginUser", loginUser);
         return true;
     }
 

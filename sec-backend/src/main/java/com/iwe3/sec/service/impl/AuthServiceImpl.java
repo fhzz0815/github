@@ -7,12 +7,16 @@ import com.iwe3.sec.mapper.SysUserMapper;
 import com.iwe3.sec.service.IAuthService;
 import cn.hutool.crypto.SecureUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 /**
  * 认证业务实现类
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements IAuthService {
@@ -45,6 +49,17 @@ public class AuthServiceImpl implements IAuthService {
                 && passwordEncoder.matches(password, user.getPassword());
         if (!md5Match && !bcryptMatch) {
             throw new BusinessException(1004, "密码错误");
+        }
+        // 登录成功：记录最后登录时间，精确到秒
+        // 使用应用服务器当前时间（Date），MyBatis 会以 JDBC TIMESTAMP 格式写入，
+        // 配合 application.yml 中 jackson time-zone=GMT+8，保证时间与系统标准时间同步。
+        Date now = new Date();
+        try {
+            sysUserMapper.updateLastLoginTime(user.getId(), now);
+            log.info("用户登录成功，已更新最后登录时间：userId={}, lastLoginTime={}", user.getId(), now);
+        } catch (Exception e) {
+            // 更新登录时间失败不应阻断登录流程，仅记录日志
+            log.warn("更新最后登录时间失败：userId={}, err={}", user.getId(), e.getMessage());
         }
         return jwtUtil.generateAccessToken(user.getId(), user.getUsername());
     }

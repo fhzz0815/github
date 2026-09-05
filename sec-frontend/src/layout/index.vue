@@ -20,7 +20,7 @@
           <el-icon><Odometer /></el-icon>
           <template #title>首页</template>
         </el-menu-item>
-        <el-sub-menu v-for="group in menuGroups" :key="group.title" :index="group.title">
+        <el-sub-menu v-for="group in filteredMenuGroups" :key="group.title" :index="group.title">
           <template #title>
             <el-icon><component :is="group.icon" /></el-icon>
             <span>{{ group.title }}</span>
@@ -47,7 +47,10 @@
         <div class="header-right">
           <el-dropdown @command="handleCommand">
             <span class="user-info">
-              <el-avatar :size="32" :src="userStore.userInfo?.avatar" />
+              <!-- 头像：有图片时显示图片；为空或加载失败时显示用户名首字母作为兜底 -->
+              <el-avatar :size="32" :src="userStore.userInfo?.avatar" @error="onAvatarError">
+                <span class="avatar-fallback">{{ avatarFallbackText }}</span>
+              </el-avatar>
               <span class="username">{{ userStore.userInfo?.realName || '管理员' }}</span>
             </span>
             <template #dropdown>
@@ -84,6 +87,38 @@ const userStore = useUserStore()
 
 const isCollapse = ref(false)
 const activeMenu = computed(() => route.path)
+
+// 仅总店长可见的菜单路径（角色管理、权限管理、角色权限、门店管理）
+const GM_ONLY_PATHS = [
+  '/sysRoles',
+  '/sysPermissions',
+  '/sysRolePermissions',
+  '/stores'
+]
+
+// 判断某个菜单项当前用户是否可见
+function canSeeMenu(path) {
+  if (GM_ONLY_PATHS.includes(path)) {
+    return userStore.isGeneralManager
+  }
+  return true
+}
+
+// 按角色过滤后的菜单（移除不可见的菜单项，若分组无可见项则整个分组隐藏）
+const filteredMenuGroups = computed(() => {
+  return menuGroups
+    .map((g) => ({ ...g, children: (g.children || []).filter((c) => canSeeMenu(c.path)) }))
+    .filter((g) => g.children.length > 0)
+})
+
+// 头像兜底：当用户没设置头像或图片加载失败时，显示姓名首字母
+const avatarFallbackText = computed(() => {
+  const name = userStore.userInfo?.realName || userStore.userInfo?.username || '管'
+  // 取第一个字符（中文取首字，英文取首字母大写）
+  return name.charAt(0).toUpperCase()
+})
+// 头像图片加载失败时返回 true，让 el-avatar 显示 default slot 兜底内容
+const onAvatarError = () => true
 
 // 菜单分组（path 必须与 router 里的路由地址完全一致，使用驼峰命名）
 const menuGroups = [
@@ -260,6 +295,18 @@ const handleCommand = (command) => {
 }
 .username {
   font-size: 14px;
+}
+/* 头像兜底首字母样式 */
+.avatar-fallback {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  line-height: 32px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(135deg, #409EFF 0%, #6c63ff 100%);
 }
 .main-content {
   background: #f5f7fa;

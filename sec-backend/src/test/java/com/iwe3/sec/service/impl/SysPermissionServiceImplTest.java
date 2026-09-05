@@ -1,6 +1,7 @@
 package com.iwe3.sec.service.impl;
 
 import com.iwe3.sec.common.PageResult;
+import com.iwe3.sec.common.PermissionChecker;
 import com.iwe3.sec.entity.SysPermissionEntity;
 import com.iwe3.sec.mapper.SysPermissionMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,11 +28,14 @@ class SysPermissionServiceImplTest {
     @Mock
     private SysPermissionMapper sysPermissionMapper;
 
+    @Mock
+    private PermissionChecker permissionChecker;
+
     private SysPermissionServiceImpl sysPermissionService;
 
     @BeforeEach
     void setUp() {
-        sysPermissionService = new SysPermissionServiceImpl(sysPermissionMapper);
+        sysPermissionService = new SysPermissionServiceImpl(sysPermissionMapper, permissionChecker);
     }
 
     @Test

@@ -55,4 +55,14 @@ public class SysUserEntity {
     private String searchBeginTime;
     /** 查询结束时间，格式 yyyy-MM-dd */
     private String searchEndTime;
+
+    // ===== 以下字段不是数据库列，仅用于联表回显，方便前端展示 =====
+    /** 角色等级（来自 sys_role.level，列表/详情时联表回显） */
+    private Integer roleLevel;
+    /** 角色名称（来自 sys_role.role_name） */
+    private String roleName;
+    /** 角色编码（来自 sys_role.role_code） */
+    private String roleCode;
+    /** 门店名称（来自 store.store_name） */
+    private String storeName;
 }

@@ -60,7 +60,11 @@ spring:
       test-on-return: false
       test-while-idle: false
       time-between-eviction-runs-millis: 60000
-      url: "jdbc:mysql://192.168.153.138:3307/smart_restaurant?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true"
+      # 数据库连接 URL：显式声明 UTF-8 字符集，避免读取中文时出现乱码
+      # useUnicode=true         开启 Unicode 支持
+      # characterEncoding=UTF-8 指定连接字符集为 UTF-8（对应 MySQL utf8mb4）
+      # connectionCollation     指定连接 collation，保证排序与比较一致
+      url: "jdbc:mysql://192.168.153.138:3307/smart_restaurant?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_general_ci"
       username: root
       validation-query: select 1 from dual
 

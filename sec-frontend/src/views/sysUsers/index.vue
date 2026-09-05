@@ -11,7 +11,7 @@
             <el-option v-for="o in enumOptions.status" :key="o.value" :label="o.label" :value="o.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="门店">
+        <el-form-item v-if="userStore.isGeneralManager" label="门店">
           <el-select v-model="queryForm.storeId" clearable filterable placeholder="全部" style="width: 150px">
             <el-option v-for="o in searchOptions.stores" :key="o.id" :label="o.storeName" :value="o.id" />
           </el-select>
@@ -34,23 +34,22 @@
     <!-- 数据表格 -->
     <el-card class="table-card" shadow="never">
       <div class="table-toolbar">
-        <el-button type="primary" @click="handleAdd">新增</el-button>
+        <el-button v-if="canCreate" type="primary" @click="handleAdd">新增</el-button>
         <el-button @click="handleRefresh">刷新</el-button>
       </div>
 
       <el-table :data="sysUserStore.list" v-loading="sysUserStore.loading" border stripe style="width: 100%">
         <el-table-column type="index" label="序号" width="60" align="center" />
-        <el-table-column prop="storeId" label="所属门店ID（总店长为空）" width="160" show-overflow-tooltip />
-        <el-table-column prop="username" label="登录账号（手机号）" width="160" show-overflow-tooltip />
+        <el-table-column prop="storeName" label="所属门店" width="160" show-overflow-tooltip />
         <el-table-column prop="realName" label="姓名" width="120" show-overflow-tooltip />
         <el-table-column prop="staffNo" label="员工工号" width="120" show-overflow-tooltip />
-        <el-table-column prop="email" label="邮箱" width="120" show-overflow-tooltip />
         <el-table-column prop="phone" label="手机号" width="120" show-overflow-tooltip />
-        <el-table-column prop="idCard" label="身份证号" width="120" show-overflow-tooltip />
-        <el-table-column label="操作" width="160" fixed="right">
+        <el-table-column prop="roleName" label="角色" width="120" show-overflow-tooltip />
+        <el-table-column label="操作" width="180" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
-            <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
+            <el-button v-if="canEdit(row)" type="primary" link @click="handleEdit(row)">编辑</el-button>
+            <el-button v-if="canDelete(row)" type="danger" link @click="handleDelete(row)">删除</el-button>
+            <span v-if="!canEdit(row) && !canDelete(row)" class="text-muted">仅查看</span>
           </template>
         </el-table-column>
       </el-table>
@@ -71,14 +70,16 @@
     <!-- 新增/编辑弹窗 -->
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="700px">
       <el-form :model="formData" label-width="120px">
-        <el-form-item label="所属门店ID（总店长为空）">
-          <el-input v-model="formData.storeId" placeholder="请输入所属门店ID（总店长为空）" />
+        <el-form-item label="所属门店">
+          <el-select v-model="formData.storeId" clearable filterable placeholder="请选择门店（总店长可空）" style="width: 100%" :disabled="!userStore.isGeneralManager">
+            <el-option v-for="o in searchOptions.stores" :key="o.id" :label="o.storeName" :value="o.id" />
+          </el-select>
         </el-form-item>
         <el-form-item label="登录账号（手机号）">
           <el-input v-model="formData.username" placeholder="请输入登录账号（手机号）" />
         </el-form-item>
-        <el-form-item label="登录密码（生产用bcrypt加密存储）">
-          <el-input v-model="formData.password" placeholder="请输入登录密码（生产用bcrypt加密存储）" />
+        <el-form-item label="登录密码">
+          <el-input v-model="formData.password" placeholder="留空则默认123456" />
         </el-form-item>
         <el-form-item label="姓名">
           <el-input v-model="formData.realName" placeholder="请输入姓名" />
@@ -95,8 +96,16 @@
         <el-form-item label="身份证号">
           <el-input v-model="formData.idCard" placeholder="请输入身份证号" />
         </el-form-item>
-        <el-form-item label="角色ID">
-          <el-input v-model="formData.roleId" placeholder="请输入角色ID" />
+        <el-form-item label="角色">
+          <el-select v-model="formData.roleId" clearable filterable placeholder="请选择角色" style="width: 100%">
+            <el-option
+              v-for="o in searchOptions.roles"
+              :key="o.id"
+              :label="o.roleName + (o.level != null ? ' (等级 ' + o.level + ')' : '')"
+              :value="o.id"
+              :disabled="isRoleDisabled(o)"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="头像URL">
           <el-input v-model="formData.avatar" placeholder="请输入头像URL" />
@@ -111,15 +120,42 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useSysUserStore } from '@/stores/sysUser'
+import { useUserStore } from '@/stores/user'
 import sysUserApi from '@/api/sysUser'
 
 const sysUserStore = useSysUserStore()
+const userStore = useUserStore()
 
 import storeApi from '@/api/store'
 import sysRoleApi from '@/api/sysRole'
+
+// ===== 权限判断 =====
+// 是否显示新增按钮：店长及以上
+const canCreate = computed(() => userStore.canManageUsers)
+// 是否可编辑某行：总店长全可；店长仅本门店且目标等级严格更低
+const canEdit = (row) => {
+  if (userStore.isGeneralManager) return true
+  if (userStore.isStoreManager) {
+    if (row.storeId !== userStore.storeId) return false
+    const targetLevel = row.roleLevel
+    if (targetLevel == null) return false
+    return targetLevel < userStore.roleLevel
+  }
+  return false
+}
+// 是否可删除某行：同编辑规则
+const canDelete = (row) => canEdit(row)
+// 表单角色下拉是否禁用某项：店长不能选总店长/店长角色
+const isRoleDisabled = (role) => {
+  if (userStore.isGeneralManager) return false
+  if (userStore.isStoreManager) {
+    return role.level == null || role.level >= userStore.roleLevel
+  }
+  return true
+}
 
 // ===== 搜索专用：枚举选项 / 外键下拉数据 =====
 const enumOptions = {
@@ -247,4 +283,5 @@ onMounted(() => {
 .search-card { margin-bottom: 16px; }
 .table-toolbar { margin-bottom: 16px; }
 .pagination { margin-top: 16px; display: flex; justify-content: flex-end; }
+.text-muted { color: #999; font-size: 13px; }
 </style>

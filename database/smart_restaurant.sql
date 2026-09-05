@@ -40,6 +40,7 @@ CREATE TABLE `sys_role` (
   `id`          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '角色ID',
   `role_name`   VARCHAR(50)     NOT NULL                COMMENT '角色名称',
   `role_code`   VARCHAR(50)     NOT NULL                COMMENT '角色编码',
+  `level`       INT             NOT NULL DEFAULT 10     COMMENT '角色等级（数字越大权限越高 99/50/10）',
   `description` VARCHAR(255)    DEFAULT NULL            COMMENT '角色描述',
   `create_time` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -1024,12 +1025,12 @@ CREATE TABLE `feedback` (
 -- ---------------------------------------------------------------------
 -- 1. 角色初始化
 -- ---------------------------------------------------------------------
-INSERT INTO `sys_role` (`id`,`role_name`,`role_code`,`description`) VALUES
-(1,'总店长','GENERAL_MANAGER','管理全国所有门店'),
-(2,'店长','STORE_MANAGER','管理本门店日常运营'),
-(3,'服务员','WAITER','为客户点餐、开台、叫号'),
-(4,'收银','CASHIER','收银结账、会员充值'),
-(5,'后厨','KITCHEN','制作菜品、查看后厨订单');
+INSERT INTO `sys_role` (`id`,`role_name`,`role_code`,`level`,`description`) VALUES
+(1,'总店长','GENERAL_MANAGER',99,'管理全国所有门店'),
+(2,'店长','STORE_MANAGER',50,'管理本门店日常运营'),
+(3,'服务员','WAITER',10,'为客户点餐、开台、叫号'),
+(4,'收银','CASHIER',10,'收银结账、会员充值'),
+(5,'后厨','KITCHEN',10,'制作菜品、查看后厨订单');
 
 -- ---------------------------------------------------------------------
 -- 2. 权限（商户端菜单权限）初始化

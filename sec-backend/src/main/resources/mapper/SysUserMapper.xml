@@ -24,6 +24,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result column="is_deleted" property="isDeleted"/>
     </resultMap>
 
+    <!-- 扩展 ResultMap：联表回显角色等级/名称/编码、门店名称 -->
+    <resultMap id="DetailResultMap" type="com.iwe3.sec.entity.SysUserEntity" extends="BaseResultMap">
+        <result column="role_level" property="roleLevel"/>
+        <result column="role_name" property="roleName"/>
+        <result column="role_code" property="roleCode"/>
+        <result column="store_name" property="storeName"/>
+    </resultMap>
+
     <sql id="Base_Column_List">
         id, store_id, username, password, real_name, staff_no, email, phone, id_card, role_id, avatar, status, last_login_time, create_time, update_time, is_deleted
     </sql>
@@ -66,10 +74,64 @@ real_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
         ORDER BY id DESC
     </select>
 
-    <select id="selectById" resultMap="BaseResultMap">
-        SELECT <include refid="Base_Column_List"/>
-        FROM `sys_user`
-        WHERE id = #{id} AND is_deleted = 0
+    <!-- 按数据范围分页查询员工，联表回显角色/门店信息 -->
+    <select id="selectListByDataScope" resultMap="DetailResultMap">
+        SELECT u.id, u.store_id, u.username, u.password, u.real_name, u.staff_no,
+               u.email, u.phone, u.id_card, u.role_id, u.avatar, u.status,
+               u.last_login_time, u.create_time, u.update_time, u.is_deleted,
+               r.level AS role_level, r.role_name, r.role_code,
+               s.store_name
+        FROM `sys_user` u
+        LEFT JOIN `sys_role` r ON u.role_id = r.id AND r.is_deleted = 0
+        LEFT JOIN `store`   s ON u.store_id = s.id AND s.is_deleted = 0
+        <where>
+            u.is_deleted = 0
+            <!-- 数据范围过滤 -->
+            <choose>
+                <when test="scope.allStores == true">
+                    <!-- 总店长：不加门店/等级过滤 -->
+                </when>
+                <when test="scope.levelOnly != null">
+                    AND r.level = #{scope.levelOnly}
+                </when>
+                <when test="scope.includeSameLevelCrossStore == true">
+                    AND (u.store_id = #{scope.storeId} OR r.level = #{scope.currentLevel})
+                </when>
+                <otherwise>
+                    AND u.store_id = #{scope.storeId}
+                </otherwise>
+            </choose>
+            <!-- 复用原有搜索条件 -->
+            <if test="query.searchKeyword != null and query.searchKeyword != ''">
+                AND (u.real_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                  OR u.staff_no LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                  OR u.username LIKE CONCAT('%', #{query.searchKeyword}, '%')
+                  OR u.email LIKE CONCAT('%', #{query.searchKeyword}, '%'))
+            </if>
+            <if test="query.username != null and query.username != ''">AND u.username LIKE CONCAT('%', #{query.username}, '%')</if>
+            <if test="query.realName != null and query.realName != ''">AND u.real_name LIKE CONCAT('%', #{query.realName}, '%')</if>
+            <if test="query.staffNo  != null and query.staffNo  != ''">AND u.staff_no  LIKE CONCAT('%', #{query.staffNo},  '%')</if>
+            <if test="query.email    != null and query.email    != ''">AND u.email     LIKE CONCAT('%', #{query.email},    '%')</if>
+            <if test="query.phone    != null and query.phone    != ''">AND u.phone     LIKE CONCAT('%', #{query.phone},    '%')</if>
+            <if test="query.idCard   != null and query.idCard   != ''">AND u.id_card   LIKE CONCAT('%', #{query.idCard},   '%')</if>
+            <if test="query.roleId   != null">AND u.role_id = #{query.roleId}</if>
+            <if test="query.status   != null">AND u.status = #{query.status}</if>
+            <if test="query.searchBeginTime != null and query.searchBeginTime != ''">AND u.create_time &gt;= CONCAT(#{query.searchBeginTime}, ' 00:00:00')</if>
+            <if test="query.searchEndTime   != null and query.searchEndTime   != ''">AND u.create_time &lt;= CONCAT(#{query.searchEndTime},   ' 23:59:59')</if>
+        </where>
+        ORDER BY u.id DESC
+    </select>
+
+    <select id="selectById" resultMap="DetailResultMap">
+        SELECT u.id, u.store_id, u.username, u.password, u.real_name, u.staff_no,
+               u.email, u.phone, u.id_card, u.role_id, u.avatar, u.status,
+               u.last_login_time, u.create_time, u.update_time, u.is_deleted,
+               r.level AS role_level, r.role_name, r.role_code,
+               s.store_name
+        FROM `sys_user` u
+        LEFT JOIN `sys_role` r ON u.role_id = r.id AND r.is_deleted = 0
+        LEFT JOIN `store`   s ON u.store_id = s.id AND s.is_deleted = 0
+        WHERE u.id = #{id} AND u.is_deleted = 0
     </select>
 
     <insert id="insert" parameterType="com.iwe3.sec.entity.SysUserEntity" useGeneratedKeys="true" keyProperty="id">
@@ -134,6 +196,13 @@ real_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
 
     <update id="deleteById">
         UPDATE `sys_user` SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+    <!-- 更新最后登录时间，精确到秒；用 NOW() 写入数据库服务器时间保证一致性 -->
+    <update id="updateLastLoginTime">
+        UPDATE `sys_user`
+        SET last_login_time = #{lastLoginTime}
+        WHERE id = #{id}
     </update>
 
 </mapper>

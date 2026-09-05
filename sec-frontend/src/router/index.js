@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 
 // 路由配置
 const routes = [
@@ -29,19 +30,19 @@ const routes = [
       path: '/sysRoles',
       name: 'SysRole',
       component: () => import('@/views/sysRoles/index.vue'),
-      meta: { title: '角色管理', requiresAuth: true }
+      meta: { title: '角色管理', requiresAuth: true, requireGM: true }
     },
     {
       path: '/sysPermissions',
       name: 'SysPermission',
       component: () => import('@/views/sysPermissions/index.vue'),
-      meta: { title: '权限管理', requiresAuth: true }
+      meta: { title: '权限管理', requiresAuth: true, requireGM: true }
     },
     {
       path: '/sysRolePermissions',
       name: 'SysRolePermission',
       component: () => import('@/views/sysRolePermissions/index.vue'),
-      meta: { title: '角色权限', requiresAuth: true }
+      meta: { title: '角色权限', requiresAuth: true, requireGM: true }
     },
     {
       path: '/sysUsers',
@@ -65,7 +66,7 @@ const routes = [
       path: '/stores',
       name: 'Store',
       component: () => import('@/views/stores/index.vue'),
-      meta: { title: '门店管理', requiresAuth: true }
+      meta: { title: '门店管理', requiresAuth: true, requireGM: true }
     },
     {
       path: '/storePaymentSettings',
@@ -298,15 +299,23 @@ const router = createRouter({
   routes
 })
 
-// 路由守卫：登录校验
+// 路由守卫：登录校验 + 总店长专属页面权限校验
 router.beforeEach((to, from, next) => {
   document.title = `${to.meta.title || ''} - 智慧餐厅后台`
   const token = localStorage.getItem('token')
   if (to.meta.requiresAuth && !token) {
     next('/login')
-  } else {
-    next()
+    return
   }
+  // 总店长专属页面：非总店长跳回首页
+  if (to.meta.requireGM) {
+    const userStore = useUserStore()
+    if (!userStore.isGeneralManager) {
+      next('/dashboard')
+      return
+    }
+  }
+  next()
 })
 
 export default router
