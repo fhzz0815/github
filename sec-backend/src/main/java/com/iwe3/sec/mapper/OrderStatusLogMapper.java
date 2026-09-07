@@ -17,6 +17,9 @@ public interface OrderStatusLogMapper {
     /** 根据ID查询 */
     OrderStatusLogEntity selectById(@Param("id") Long id);
 
+    /** 根据订单ID查询 */
+    List<OrderStatusLogEntity> selectByOrderId(@Param("orderId") Long orderId);
+
     /** 新增 */
     int insert(OrderStatusLogEntity entity);
 

@@ -52,7 +52,7 @@ spring:
       stat-view-servlet:
         allow-ips: 127.0.0.1,localhost
         enabled: true
-        login-password: 123456
+        login-password:
         login-username: admin
         reset-enable: false
         url-pattern: /druid/*

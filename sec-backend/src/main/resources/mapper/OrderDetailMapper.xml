@@ -126,4 +126,34 @@ dish_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
         UPDATE `order_detail` SET is_deleted = 1 WHERE id = #{id}
     </update>
 
+    <select id="selectByOrderId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `order_detail`
+        WHERE order_id = #{orderId} AND is_deleted = 0
+        ORDER BY id ASC
+    </select>
+
+    <insert id="insertBatch" parameterType="list">
+        INSERT INTO `order_detail`
+        (order_id, dish_id, dish_name, dish_image, dish_price, spec_name, taste_name,
+         quantity, subtotal, refund_amount, status, remark, create_time, is_deleted)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.orderId}, #{item.dishId}, #{item.dishName}, #{item.dishImage},
+             #{item.dishPrice}, #{item.specName}, #{item.tasteName},
+             #{item.quantity}, #{item.subtotal}, #{item.refundAmount},
+             #{item.status}, #{item.remark}, NOW(), 0)
+        </foreach>
+    </insert>
+
+    <update id="updateMakeStatus">
+        UPDATE `order_detail`
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteByOrderId">
+        UPDATE `order_detail` SET is_deleted = 1 WHERE order_id = #{orderId}
+    </update>
+
 </mapper>

@@ -81,4 +81,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         DELETE FROM `dish_stock` WHERE id = #{id}
     </delete>
 
+    <select id="selectByStoreAndDish" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `dish_stock`
+        WHERE store_id = #{storeId} AND dish_id = #{dishId}
+    </select>
+
+    <update id="decreaseStock">
+        UPDATE `dish_stock`
+        SET stock_quantity = stock_quantity - #{quantity}
+        WHERE store_id = #{storeId} AND dish_id = #{dishId}
+          AND stock_quantity >= #{quantity}
+    </update>
+
 </mapper>

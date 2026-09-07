@@ -21,11 +21,6 @@
             <el-option v-for="o in enumOptions.payStatus" :key="o.value" :label="o.label" :value="o.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="外卖取餐方式">
-          <el-select v-model="queryForm.takeType" clearable placeholder="全部" style="width: 130px">
-            <el-option v-for="o in enumOptions.takeType" :key="o.value" :label="o.label" :value="o.value" />
-          </el-select>
-        </el-form-item>
         <el-form-item label="门店">
           <el-select v-model="queryForm.storeId" clearable filterable placeholder="全部" style="width: 150px">
             <el-option v-for="o in searchOptions.stores" :key="o.id" :label="o.storeName" :value="o.id" />
@@ -54,53 +49,40 @@
     <!-- 操作按钮 -->
     <el-card class="table-card" shadow="never">
       <div class="table-toolbar">
-        <el-button type="primary" @click="handleAdd">新增</el-button>
-        <el-button @click="handleRefresh">刷新</el-button>
+        <el-button type="primary" @click="handleRefresh">刷新</el-button>
       </div>
 
       <el-table :data="ordersStore.list" v-loading="ordersStore.loading" border stripe style="width: 100%">
         <el-table-column type="index" label="序号" width="60" align="center" />
-        <el-table-column prop="id" label="订单ID" width="110" show-overflow-tooltip />
         <el-table-column prop="orderNo" label="订单号" width="160" show-overflow-tooltip />
-        <el-table-column prop="storeId" label="门店ID" width="110" show-overflow-tooltip />
-        <el-table-column prop="memberId" label="客户ID" width="110" show-overflow-tooltip />
-        <el-table-column prop="orderType" label="订单类型" width="110">
+        <el-table-column prop="orderType" label="订单类型" width="100">
           <template #default="{ row }">
-            <el-tag :type="row.orderType === 7 ? 'success' : row.orderType === 8 || row.orderType === 9 ? 'danger' : 'info'" size="small">
+            <el-tag :type="row.orderType === 1 ? 'primary' : row.orderType === 2 ? 'warning' : 'info'" size="small">
               {{ (enumOptions.orderType.find((i) => i.value === row.orderType) || {}).label || row.orderType }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="personCount" label="用餐人数" width="110" show-overflow-tooltip />
-        <el-table-column prop="orderStatus" label="订单状态" width="110">
+        <el-table-column prop="personCount" label="人数" width="70" align="center" />
+        <el-table-column prop="orderStatus" label="订单状态" width="100">
           <template #default="{ row }">
-            <el-tag :type="row.orderStatus === 7 ? 'success' : row.orderStatus === 8 || row.orderStatus === 9 ? 'danger' : 'info'" size="small">
+            <el-tag :type="getOrderStatusTagType(row.orderStatus)" size="small">
               {{ (enumOptions.orderStatus.find((i) => i.value === row.orderStatus) || {}).label || row.orderStatus }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="payStatus" label="支付状态" width="110">
+        <el-table-column prop="payStatus" label="支付状态" width="90">
           <template #default="{ row }">
-            <el-tag :type="row.payStatus === 7 ? 'success' : row.payStatus === 8 || row.payStatus === 9 ? 'danger' : 'info'" size="small">
+            <el-tag :type="row.payStatus === 2 ? 'success' : 'warning'" size="small">
               {{ (enumOptions.payStatus.find((i) => i.value === row.payStatus) || {}).label || row.payStatus }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="takeType" label="外卖取餐方式" width="110">
+        <el-table-column prop="payableAmount" label="应付" width="90" align="right" />
+        <el-table-column prop="actualAmount" label="实付" width="90" align="right" />
+        <el-table-column prop="orderTime" label="下单时间" width="170" />
+        <el-table-column label="操作" width="260" fixed="right">
           <template #default="{ row }">
-            <el-tag :type="row.takeType === 7 ? 'success' : row.takeType === 8 || row.takeType === 9 ? 'danger' : 'info'" size="small">
-              {{ (enumOptions.takeType.find((i) => i.value === row.takeType) || {}).label || row.takeType }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="payableAmount" label="应付金额" width="110" show-overflow-tooltip />
-        <el-table-column prop="actualAmount" label="实付金额" width="110" show-overflow-tooltip />
-        <el-table-column prop="source" label="订单来源" width="110" show-overflow-tooltip />
-        <el-table-column prop="orderTime" label="下单时间" width="110" show-overflow-tooltip />
-        <el-table-column prop="createTime" label="创建时间" width="110" show-overflow-tooltip />
-        <el-table-column label="操作" width="160" fixed="right">
-          <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
+            <el-button type="primary" link @click="handleViewDetail(row)">查看详情</el-button>
             <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
@@ -119,127 +101,102 @@
       </div>
     </el-card>
 
-    <!-- 新增/编辑弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="700px">
-      <el-form :model="formData" label-width="110px">
-        <el-form-item label="订单号">
-          <el-input v-model="formData.orderNo"  placeholder="请输入订单号" />
-        </el-form-item>
-        <el-form-item label="门店ID">
-          <el-input-number v-model="formData.storeId" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="客户ID">
-          <el-input-number v-model="formData.memberId" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="订单类型">
-          <el-select v-model="formData.orderType" placeholder="请选择订单类型" style="width:100%">
-            <el-option v-for="o in enumOptions.orderType" :key="o.value" :label="o.label" :value="o.value" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="台桌ID">
-          <el-input-number v-model="formData.tableId" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="桌型ID">
-          <el-input-number v-model="formData.tableTypeId" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="排队ID">
-          <el-input-number v-model="formData.queueId" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="用餐人数">
-          <el-input-number v-model="formData.personCount" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="订单状态">
-          <el-select v-model="formData.orderStatus" placeholder="请选择订单状态" style="width:100%">
-            <el-option v-for="o in enumOptions.orderStatus" :key="o.value" :label="o.label" :value="o.value" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="支付状态">
-          <el-select v-model="formData.payStatus" placeholder="请选择支付状态" style="width:100%">
-            <el-option v-for="o in enumOptions.payStatus" :key="o.value" :label="o.label" :value="o.value" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="外卖取餐方式">
-          <el-select v-model="formData.takeType" placeholder="请选择外卖取餐方式" style="width:100%">
-            <el-option v-for="o in enumOptions.takeType" :key="o.value" :label="o.label" :value="o.value" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="收货地址ID">
-          <el-input-number v-model="formData.addressId" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="地址快照">
-          <el-input v-model="formData.addressSnapshot" type="textarea" :rows="2" placeholder="请输入地址快照" />
-        </el-form-item>
-        <el-form-item label="菜品原价合计">
-          <el-input-number v-model="formData.dishAmount" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="优惠/折扣金额">
-          <el-input-number v-model="formData.discountAmount" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="免单金额">
-          <el-input-number v-model="formData.freeAmount" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="抹零金额">
-          <el-input-number v-model="formData.roundingAmount" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="使用的优惠券ID">
-          <el-input-number v-model="formData.couponId" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="优惠券抵扣金额">
-          <el-input-number v-model="formData.couponAmount" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="配送费">
-          <el-input-number v-model="formData.deliveryFee" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="应付金额">
-          <el-input-number v-model="formData.payableAmount" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="实付金额">
-          <el-input-number v-model="formData.actualAmount" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="会员余额支付金额">
-          <el-input-number v-model="formData.memberPayAmount" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="订单来源">
-          <el-input-number v-model="formData.source" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="操作员工ID">
-          <el-input-number v-model="formData.operatorId" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="订单备注">
-          <el-input v-model="formData.remark" type="textarea" :rows="2" placeholder="请输入订单备注" />
-        </el-form-item>
-        <el-form-item label="下单时间">
-          <el-date-picker v-model="formData.orderTime" type="datetime" value-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择下单时间" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="支付时间">
-          <el-date-picker v-model="formData.payTime" type="datetime" value-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择支付时间" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="预计送达/自取时间">
-          <el-date-picker v-model="formData.expectedTime" type="datetime" value-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择预计送达/自取时间" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="配送/出餐时间">
-          <el-date-picker v-model="formData.shippingTime" type="datetime" value-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择配送/出餐时间" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="完成时间">
-          <el-date-picker v-model="formData.finishTime" type="datetime" value-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择完成时间" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="取消时间">
-          <el-date-picker v-model="formData.cancelTime" type="datetime" value-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择取消时间" style="width:100%" />
-        </el-form-item>
-        <el-form-item label="取消原因">
-          <el-input v-model="formData.cancelReason" type="textarea" :rows="2" placeholder="请输入取消原因" />
-        </el-form-item>
-      </el-form>
+    <!-- 详情弹窗：订单信息 + 订单明细 + 状态日志 -->
+    <el-dialog v-model="detailDialogVisible" title="订单详情" width="800px" destroy-on-close>
+      <el-tabs v-model="activeTab">
+        <el-tab-pane label="订单信息" name="basic">
+          <el-descriptions :column="2" border>
+            <el-descriptions-item label="订单号">{{ currentOrder.orderNo }}</el-descriptions-item>
+            <el-descriptions-item label="订单类型">{{ getEnumLabel('orderType', currentOrder.orderType) }}</el-descriptions-item>
+            <el-descriptions-item label="订单状态">
+              <el-tag :type="getOrderStatusTagType(currentOrder.orderStatus)" size="small">
+                {{ getEnumLabel('orderStatus', currentOrder.orderStatus) }}
+              </el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="支付状态">
+              <el-tag :type="currentOrder.payStatus === 2 ? 'success' : 'warning'" size="small">
+                {{ getEnumLabel('payStatus', currentOrder.payStatus) }}
+              </el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="菜品合计">{{ currentOrder.dishAmount }}</el-descriptions-item>
+            <el-descriptions-item label="优惠折扣">{{ currentOrder.discountAmount }}</el-descriptions-item>
+            <el-descriptions-item label="优惠券抵扣">{{ currentOrder.couponAmount }}</el-descriptions-item>
+            <el-descriptions-item label="应付金额">{{ currentOrder.payableAmount }}</el-descriptions-item>
+            <el-descriptions-item label="实际支付">{{ currentOrder.actualAmount }}</el-descriptions-item>
+            <el-descriptions-item label="会员余额支付">{{ currentOrder.memberPayAmount }}</el-descriptions-item>
+            <el-descriptions-item label="用餐人数">{{ currentOrder.personCount }}</el-descriptions-item>
+            <el-descriptions-item label="下单时间">{{ formatTime(currentOrder.orderTime) }}</el-descriptions-item>
+            <el-descriptions-item v-if="currentOrder.payTime" label="支付时间">{{ formatTime(currentOrder.payTime) }}</el-descriptions-item>
+            <el-descriptions-item v-if="currentOrder.finishTime" label="完成时间">{{ formatTime(currentOrder.finishTime) }}</el-descriptions-item>
+            <el-descriptions-item v-if="currentOrder.cancelReason" label="取消原因" :span="2">
+              {{ currentOrder.cancelReason }}
+            </el-descriptions-item>
+            <el-descriptions-item v-if="currentOrder.remark" label="备注" :span="2">
+              {{ currentOrder.remark }}
+            </el-descriptions-item>
+          </el-descriptions>
+
+          <!-- 操作按钮 -->
+          <div class="detail-actions" style="margin-top: 20px">
+            <template v-if="currentOrder.orderStatus === 1 && currentOrder.payStatus === 1">
+              <el-button type="success" @click="handlePayCurrentOrder">支付</el-button>
+              <el-button type="danger" @click="handleCancelCurrentOrder">取消订单</el-button>
+            </template>
+            <template v-if="currentOrder.orderStatus === 2 || currentOrder.orderStatus === 3">
+              <el-button type="primary" @click="handleBatchMakeStatus(3)">全部上齐</el-button>
+            </template>
+          </div>
+        </el-tab-pane>
+
+        <el-tab-pane label="订单明细" name="details">
+          <el-table :data="currentDetails" border stripe>
+            <el-table-column prop="dishName" label="菜品名称" min-width="150" />
+            <el-table-column prop="specName" label="规格" width="100" />
+            <el-table-column prop="tasteName" label="口味" width="100" />
+            <el-table-column prop="dishPrice" label="单价" width="80" align="right" />
+            <el-table-column prop="quantity" label="数量" width="70" align="center" />
+            <el-table-column prop="subtotal" label="小计" width="80" align="right" />
+            <el-table-column prop="status" label="制作状态" width="100">
+              <template #default="{ row }">
+                <el-tag :type="row.status === 1 ? 'warning' : row.status === 2 ? 'primary' : row.status === 3 ? 'success' : 'danger'" size="small">
+                  {{ getMakeStatusLabel(row.status) }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="140" fixed="right">
+              <template #default="{ row }">
+                <template v-if="row.status === 1">
+                  <el-button type="primary" size="small" link @click="updateDetailStatus(row, 2)">开始制作</el-button>
+                </template>
+                <template v-if="row.status === 2">
+                  <el-button type="success" size="small" link @click="updateDetailStatus(row, 3)">制作完成</el-button>
+                </template>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+
+        <el-tab-pane label="状态日志" name="logs">
+          <el-timeline>
+            <el-timeline-item v-for="log in currentStatusLogs" :key="log.id" :timestamp="formatTime(log.createTime)">
+              <el-card>
+                <div><strong>状态变更：</strong>{{ getEnumLabel('orderStatus', log.fromStatus) }} → {{ getEnumLabel('orderStatus', log.toStatus) }}</div>
+                <div v-if="log.remark"><strong>备注：</strong>{{ log.remark }}</div>
+              </el-card>
+            </el-timeline-item>
+            <el-empty v-if="!currentStatusLogs.length" description="暂无状态日志" />
+          </el-timeline>
+        </el-tab-pane>
+      </el-tabs>
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSubmit">确定</el-button>
+        <el-button @click="detailDialogVisible = false">关闭</el-button>
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useOrdersStore } from '@/stores/orders'
 import ordersApi from '@/api/orders'
@@ -251,10 +208,35 @@ const ordersStore = useOrdersStore()
 
 const enumOptions = {
   orderType: [{ value: 1, label: '堂食' }, { value: 2, label: '外卖' }, { value: 3, label: '自取' }],
-  orderStatus: [{ value: 1, label: '待支付' }, { value: 2, label: '待制作' }, { value: 3, label: '制作中' }, { value: 4, label: '待配送' }, { value: 5, label: '配送中' }, { value: 6, label: '待自取' }, { value: 7, label: '已完成' }, { value: 8, label: '已取消' }, { value: 9, label: '已退款' }],
+  orderStatus: [
+    { value: 1, label: '待支付' },
+    { value: 2, label: '待制作' },
+    { value: 3, label: '制作中' },
+    { value: 4, label: '待配送' },
+    { value: 5, label: '配送中' },
+    { value: 6, label: '待自取' },
+    { value: 7, label: '已完成' },
+    { value: 8, label: '已取消' },
+    { value: 9, label: '已退款' }
+  ],
   payStatus: [{ value: 1, label: '待支付' }, { value: 2, label: '已支付' }, { value: 3, label: '已退款' }, { value: 4, label: '部分退款' }],
-  takeType: [{ value: 1, label: '外送' }, { value: 2, label: '自取' }]
+  takeType: [{ value: 1, label: '外送' }, { value: 2, label: '自取' }],
+  makeStatus: [{ value: 1, label: '待制作' }, { value: 2, label: '制作中' }, { value: 3, label: '已上齐' }, { value: 4, label: '退菜' }]
 }
+
+const getEnumLabel = (type, value) => {
+  return (enumOptions[type]?.find((i) => i.value === value) || {}).label || value
+}
+
+const getMakeStatusLabel = (status) => getEnumLabel('makeStatus', status)
+
+const getOrderStatusTagType = (status) => {
+  if (status === 7) return 'success'
+  if (status === 8 || status === 9) return 'danger'
+  if (status === 1) return 'warning'
+  return 'primary'
+}
+
 const searchOptions = reactive({
   stores: [],
   members: [],
@@ -272,7 +254,6 @@ const queryForm = reactive({
   orderType: null,
   orderStatus: null,
   payStatus: null,
-  takeType: null,
   storeId: null,
   memberId: null,
   tableId: null,
@@ -304,90 +285,76 @@ const handleReset = () => {
 const onPageChange = () => {
   ordersStore.fetchList(buildParams())
 }
+const handleRefresh = () => {
+  ordersStore.fetchList(buildParams())
+}
 
-const dialogVisible = ref(false)
-const dialogTitle = ref('新增订单')
-const formData = reactive({
-  orderNo: '',
-  storeId: null,
-  memberId: null,
-  orderType: null,
-  tableId: null,
-  tableTypeId: null,
-  queueId: null,
-  personCount: null,
-  orderStatus: null,
-  payStatus: null,
-  takeType: null,
-  addressId: null,
-  addressSnapshot: '',
-  dishAmount: null,
-  discountAmount: null,
-  freeAmount: null,
-  roundingAmount: null,
-  couponId: null,
-  couponAmount: null,
-  deliveryFee: null,
-  payableAmount: null,
-  actualAmount: null,
-  memberPayAmount: null,
-  source: null,
-  operatorId: null,
-  remark: '',
-  orderTime: '',
-  payTime: '',
-  expectedTime: '',
-  shippingTime: '',
-  finishTime: '',
-  cancelTime: '',
-  cancelReason: ''
-})
+const detailDialogVisible = ref(false)
+const activeTab = ref('basic')
+const currentOrder = ref({})
+const currentDetails = ref([])
+const currentStatusLogs = ref([])
 
-const resetForm = () => {
-  formData.orderNo = ''
-  formData.storeId = null
-  formData.memberId = null
-  formData.orderType = null
-  formData.tableId = null
-  formData.tableTypeId = null
-  formData.queueId = null
-  formData.personCount = null
-  formData.orderStatus = null
-  formData.payStatus = null
-  formData.takeType = null
-  formData.addressId = null
-  formData.addressSnapshot = ''
-  formData.dishAmount = null
-  formData.discountAmount = null
-  formData.freeAmount = null
-  formData.roundingAmount = null
-  formData.couponId = null
-  formData.couponAmount = null
-  formData.deliveryFee = null
-  formData.payableAmount = null
-  formData.actualAmount = null
-  formData.memberPayAmount = null
-  formData.source = null
-  formData.operatorId = null
-  formData.remark = ''
-  formData.orderTime = ''
-  formData.payTime = ''
-  formData.expectedTime = ''
-  formData.shippingTime = ''
-  formData.finishTime = ''
-  formData.cancelTime = ''
-  formData.cancelReason = ''
+const formatTime = (timeStr) => {
+  if (!timeStr) return '-'
+  return timeStr
 }
-const handleAdd = () => {
-  dialogTitle.value = '新增订单'
-  resetForm()
-  dialogVisible.value = true
+
+const handleViewDetail = async (row) => {
+  activeTab.value = 'basic'
+  const res = await ordersApi.getWithDetails(row.id)
+  if (res.code === 0 && res.data) {
+    currentOrder.value = res.data.order
+    currentDetails.value = res.data.details || []
+    currentStatusLogs.value = res.data.statusLogs || []
+    detailDialogVisible.value = true
+  } else {
+    ElMessage.error(res.message || '获取详情失败')
+  }
 }
-const handleEdit = (row) => {
-  dialogTitle.value = '编辑订单'
-  Object.assign(formData, row)
-  dialogVisible.value = true
+
+const updateDetailStatus = async (detail, status) => {
+  await ordersApi.updateMakeStatus(currentOrder.value.id, { detailId: detail.id, makeStatus: status })
+  ElMessage.success('更新成功')
+  detail.status = status
+  ordersStore.fetchList(buildParams())
 }
+
+const handleBatchMakeStatus = async (status) => {
+  await ordersApi.updateMakeStatus(currentOrder.value.id, { detailId: null, makeStatus: status })
+  ElMessage.success('更新成功')
+  detailDialogVisible.value = false
+  ordersStore.fetchList(buildParams())
+}
+
+const handlePayCurrentOrder = () => {
+  ElMessageBox.prompt('请选择支付方式', '支付订单', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    inputPattern: /^WECHAT|ALIPAY|MEMBER_BALANCE|CASH$/,
+    inputErrorMessage: '请输入 WECHAT/ALIPAY/MEMBER_BALANCE/CASH'
+  }).then(async ({ value }) => {
+    const actualAmount = currentOrder.value.payableAmount
+    const memberPayAmount = 0
+    await ordersApi.pay(currentOrder.value.id, { payType: value, actualAmount, memberPayAmount })
+    ElMessage.success('支付成功')
+    detailDialogVisible.value = false
+    ordersStore.fetchList(buildParams())
+  }).catch(() => {})
+}
+
+const handleCancelCurrentOrder = () => {
+  ElMessageBox.prompt('请输入取消原因', '取消订单', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消'
+  }).then(async ({ value }) => {
+    await ordersApi.cancel(currentOrder.value.id, { reason: value || '用户取消' })
+    ElMessage.success('取消成功')
+    detailDialogVisible.value = false
+    ordersStore.fetchList(buildParams())
+  }).catch(() => {})
+}
+
 const handleDelete = (row) => {
   ElMessageBox.confirm('确定要删除这条订单吗？', '提示', { type: 'warning' })
     .then(async () => {
@@ -396,19 +363,6 @@ const handleDelete = (row) => {
       ordersStore.fetchList(buildParams())
     })
     .catch(() => {})
-}
-const handleRefresh = () => {
-  ordersStore.fetchList(buildParams())
-}
-const handleSubmit = async () => {
-  if (formData.id) {
-    await ordersApi.update(formData.id, formData)
-  } else {
-    await ordersApi.create(formData)
-  }
-  ElMessage.success('操作成功')
-  dialogVisible.value = false
-  ordersStore.fetchList(buildParams())
 }
 
 onMounted(() => {
@@ -421,4 +375,5 @@ onMounted(() => {
 .search-card { margin-bottom: 16px; }
 .table-toolbar { margin-bottom: 16px; }
 .pagination { margin-top: 16px; display: flex; justify-content: flex-end; }
+.detail-actions { text-align: center; }
 </style>

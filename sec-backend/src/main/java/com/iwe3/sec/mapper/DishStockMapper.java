@@ -17,6 +17,13 @@ public interface DishStockMapper {
     /** 根据ID查询 */
     DishStockEntity selectById(@Param("id") Long id);
 
+    /** 根据门店和菜品查询 */
+    DishStockEntity selectByStoreAndDish(@Param("storeId") Long storeId, @Param("dishId") Long dishId);
+
+    /** 扣减库存 */
+    int decreaseStock(@Param("storeId") Long storeId, @Param("dishId") Long dishId,
+                      @Param("quantity") Integer quantity);
+
     /** 新增 */
     int insert(DishStockEntity entity);
 

@@ -283,6 +283,12 @@ const routes = [
       name: 'Feedback',
       component: () => import('@/views/feedbacks/index.vue'),
       meta: { title: '意见反馈', requiresAuth: true }
+    },
+    {
+      path: '/reports',
+      name: 'Report',
+      component: () => import('@/views/reports/index.vue'),
+      meta: { title: '营业报表', requiresAuth: true }
     }
     ]
   },

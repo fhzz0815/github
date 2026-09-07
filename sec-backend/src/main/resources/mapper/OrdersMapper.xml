@@ -223,4 +223,55 @@ order_no LIKE CONCAT('%', #{query.searchKeyword}, '%')
         UPDATE `orders` SET is_deleted = 1 WHERE id = #{id}
     </update>
 
+    <select id="selectByOrderNo" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `orders`
+        WHERE order_no = #{orderNo} AND is_deleted = 0
+    </select>
+
+    <update id="updateOrderStatus">
+        UPDATE `orders`
+        SET order_status = #{orderStatus}, version = version + 1
+        WHERE id = #{id} AND version = #{version}
+    </update>
+
+    <update id="updatePayStatus">
+        UPDATE `orders`
+        SET pay_status = #{payStatus}, order_status = #{orderStatus},
+            pay_time = #{payTime}, version = version + 1
+        WHERE id = #{id} AND version = #{version}
+    </update>
+
+    <select id="selectKitchenOrders" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `orders`
+        WHERE store_id = #{storeId} AND is_deleted = 0
+          AND order_status IN (2, 3, 4, 5, 6)
+        ORDER BY order_time ASC
+    </select>
+
+    <select id="selectTodaySummary" resultType="java.util.HashMap">
+        SELECT
+            COUNT(DISTINCT id) AS todayOrderCount,
+            COALESCE(SUM(actual_amount), 0) AS todayIncome
+        FROM `orders`
+        WHERE store_id = #{storeId} AND is_deleted = 0
+          AND pay_status = 2 AND DATE(pay_time) = CURDATE()
+        GROUP BY store_id
+    </select>
+
+    <select id="selectSalesReport" resultType="java.util.HashMap">
+        SELECT
+            DATE(pay_time) AS payDate,
+            COUNT(DISTINCT id) AS orderCount,
+            SUM(actual_amount) AS actualIncome,
+            SUM(dish_amount) AS dishIncome,
+            SUM(discount_amount + free_amount + rounding_amount + coupon_amount) AS discountTotal
+        FROM `orders`
+        WHERE store_id = #{storeId} AND is_deleted = 0
+          AND pay_status = 2 AND DATE(pay_time) BETWEEN #{beginDate} AND #{endDate}
+        GROUP BY DATE(pay_time)
+        ORDER BY DATE(pay_time) DESC
+    </select>
+
 </mapper>

@@ -1,6 +1,7 @@
 package com.iwe3.sec.controller;
 
 import com.iwe3.sec.common.PageResult;
+import com.iwe3.sec.common.PermissionChecker;
 import com.iwe3.sec.common.Result;
 import com.iwe3.sec.entity.OrdersEntity;
 import com.iwe3.sec.service.IOrdersService;
@@ -28,11 +29,14 @@ class OrdersControllerTest {
     @Mock
     private IOrdersService ordersService;
 
+    @Mock
+    private PermissionChecker permissionChecker;
+
     private OrdersController controller;
 
     @BeforeEach
     void setUp() {
-        controller = new OrdersController(ordersService);
+        controller = new OrdersController(ordersService, permissionChecker);
     }
 
     @Test

@@ -87,4 +87,11 @@ remark LIKE CONCAT('%', #{query.searchKeyword}, '%')
         DELETE FROM `order_status_log` WHERE id = #{id}
     </delete>
 
+    <select id="selectByOrderId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `order_status_log`
+        WHERE order_id = #{orderId}
+        ORDER BY id ASC
+    </select>
+
 </mapper>
