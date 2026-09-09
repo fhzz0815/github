@@ -1,5 +1,7 @@
 package com.iwe3.sec.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import com.iwe3.sec.service.IIngredientStockService;
 import com.iwe3.sec.entity.IngredientStockEntity;
@@ -9,6 +11,7 @@ import com.iwe3.sec.common.PageResult;
 /**
  * ingredient_stock 表的表现层控制器
  */
+@Tag(name = "原料库存", description = "原料库存的增删改查")
 @RestController
 @RequestMapping("/api/v1/ingredientStocks")
 public class IngredientStockController {
@@ -19,7 +22,7 @@ public class IngredientStockController {
         this.ingredientStockService = ingredientStockService;
     }
 
-    /** 分页查询列表 */
+    @Operation(summary = "分页查询食材库存管理列表")
     @GetMapping
     public Result<PageResult<IngredientStockEntity>> list(IngredientStockEntity query,
                                                    @RequestParam(defaultValue = "1") Integer page,
@@ -27,20 +30,20 @@ public class IngredientStockController {
         return Result.success(ingredientStockService.list(query, page, size));
     }
 
-    /** 根据ID查询详情 */
+    @Operation(summary = "根据ID查询食材库存管理详情")
     @GetMapping("/{id}")
     public Result<IngredientStockEntity> getById(@PathVariable Long id) {
         return Result.success(ingredientStockService.getById(id));
     }
 
-    /** 新增 */
+    @Operation(summary = "新增食材库存管理")
     @PostMapping
     public Result<Void> add(@RequestBody IngredientStockEntity entity) {
         ingredientStockService.add(entity);
         return Result.success();
     }
 
-    /** 修改 */
+    @Operation(summary = "修改食材库存管理")
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @RequestBody IngredientStockEntity entity) {
         entity.setId(id);
@@ -48,7 +51,7 @@ public class IngredientStockController {
         return Result.success();
     }
 
-    /** 删除 */
+    @Operation(summary = "删除食材库存管理")
     @DeleteMapping("/{id}")
     public Result<Void> remove(@PathVariable Long id) {
         ingredientStockService.remove(id);

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.iwe3.sec.entity.*;
 import com.iwe3.sec.mapper.*;
+import com.iwe3.sec.mq.OrderMessageProducer;
 import com.iwe3.sec.service.IOrdersService;
 import com.iwe3.sec.common.BusinessException;
 import com.iwe3.sec.common.PageResult;
@@ -15,6 +16,7 @@ import com.iwe3.sec.common.PermissionChecker;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 /**
@@ -31,19 +33,22 @@ public class OrdersServiceImpl implements IOrdersService {
     private final PaymentRecordMapper paymentRecordMapper;
     private final DishStockMapper dishStockMapper;
     private final PermissionChecker permissionChecker;
+    private final OrderMessageProducer orderMessageProducer;
 
     public OrdersServiceImpl(OrdersMapper ordersMapper,
                              OrderDetailMapper orderDetailMapper,
                              OrderStatusLogMapper orderStatusLogMapper,
                              PaymentRecordMapper paymentRecordMapper,
                              DishStockMapper dishStockMapper,
-                             PermissionChecker permissionChecker) {
+                             PermissionChecker permissionChecker,
+                             OrderMessageProducer orderMessageProducer) {
         this.ordersMapper = ordersMapper;
         this.orderDetailMapper = orderDetailMapper;
         this.orderStatusLogMapper = orderStatusLogMapper;
         this.paymentRecordMapper = paymentRecordMapper;
         this.dishStockMapper = dishStockMapper;
         this.permissionChecker = permissionChecker;
+        this.orderMessageProducer = orderMessageProducer;
     }
 
     @Override
@@ -69,16 +74,13 @@ public class OrdersServiceImpl implements IOrdersService {
         if (o == null) {
             return null;
         }
-        assertInOwnStore(o.getStoreId());
+        permissionChecker.assertInOwnStore(o.getStoreId());
         return o;
     }
 
     @Override
     public boolean add(OrdersEntity entity) {
-        Integer level = permissionChecker.currentRoleLevel();
-        if (level == null || level < PermissionChecker.LEVEL_GENERAL_MANAGER) {
-            entity.setStoreId(permissionChecker.currentStoreId());
-        }
+        permissionChecker.setStoreIdIfNeeded(entity::setStoreId);
         return ordersMapper.insert(entity) > 0;
     }
 
@@ -87,7 +89,7 @@ public class OrdersServiceImpl implements IOrdersService {
         if (entity.getId() != null) {
             OrdersEntity existing = ordersMapper.selectById(entity.getId());
             if (existing != null) {
-                assertInOwnStore(existing.getStoreId());
+                permissionChecker.assertInOwnStore(existing.getStoreId());
             }
         }
         return ordersMapper.update(entity) > 0;
@@ -97,7 +99,7 @@ public class OrdersServiceImpl implements IOrdersService {
     public boolean remove(Long id) {
         OrdersEntity existing = ordersMapper.selectById(id);
         if (existing != null) {
-            assertInOwnStore(existing.getStoreId());
+            permissionChecker.assertInOwnStore(existing.getStoreId());
         }
         return ordersMapper.deleteById(id) > 0;
     }
@@ -108,7 +110,7 @@ public class OrdersServiceImpl implements IOrdersService {
     @Transactional(rollbackFor = Exception.class)
     public Long submitOrder(OrdersEntity entity, List<OrderDetailEntity> details, Long operatorId) {
         // 1. 校验门店权限
-        Long storeId = getValidStoreId();
+        Long storeId = permissionChecker.getValidStoreId();
         entity.setStoreId(storeId);
         entity.setOperatorId(operatorId);
 
@@ -160,6 +162,10 @@ public class OrdersServiceImpl implements IOrdersService {
         }
 
         log.info("订单提交成功：orderId={}, orderNo={}", orderId, entity.getOrderNo());
+
+        // 发送异步消息：通知后厨、更新排队状态等
+        orderMessageProducer.sendOrderCreated(entity);
+
         return orderId;
     }
 
@@ -174,7 +180,7 @@ public class OrdersServiceImpl implements IOrdersService {
         if (order.getPayStatus() != 1) {
             throw new BusinessException(400, "订单已支付，请勿重复操作");
         }
-        assertInOwnStore(order.getStoreId());
+        permissionChecker.assertInOwnStore(order.getStoreId());
 
         // 更新订单支付状态
         Integer nextOrderStatus;
@@ -210,6 +216,10 @@ public class OrdersServiceImpl implements IOrdersService {
                 "订单支付成功，支付方式：" + payType);
 
         log.info("订单支付成功：orderId={}, payType={}, amount={}", orderId, payType, actualAmount);
+
+        // 发送异步消息：通知后厨开始制作
+        orderMessageProducer.sendOrderPaid(order);
+        orderMessageProducer.sendKitchenNotification(order);
     }
 
     @Override
@@ -222,7 +232,7 @@ public class OrdersServiceImpl implements IOrdersService {
         if (order.getOrderStatus() == 7 || order.getOrderStatus() == 8 || order.getOrderStatus() == 9) {
             throw new BusinessException(400, "订单已完成或已取消，无法重复操作");
         }
-        assertInOwnStore(order.getStoreId());
+        permissionChecker.assertInOwnStore(order.getStoreId());
 
         // 更新订单状态为已取消
         int affected = ordersMapper.updateOrderStatus(orderId, 8, order.getVersion());
@@ -244,7 +254,7 @@ public class OrdersServiceImpl implements IOrdersService {
         if (order == null) {
             throw new BusinessException(404, "订单不存在");
         }
-        assertInOwnStore(order.getStoreId());
+        permissionChecker.assertInOwnStore(order.getStoreId());
 
         if (detailId != null) {
             // 更新单个明细的制作状态
@@ -275,10 +285,9 @@ public class OrdersServiceImpl implements IOrdersService {
         if (order == null) {
             return null;
         }
-        assertInOwnStore(order.getStoreId());
-        List<OrderDetailEntity> details = orderDetailMapper.selectByOrderId(orderId);
-        // 通过扩展字段传递明细（借用addressSnapshot暂存，实际可创建VO）
-        // 这里简单处理，由调用方再查明细
+        permissionChecker.assertInOwnStore(order.getStoreId());
+        // 注意：该方法仅返回订单基本信息，不包含明细
+        // 明细和状态日志由 Controller 调用 getOrderDetailsByOrderId / getOrderStatusLogs 单独获取
         return order;
     }
 
@@ -307,7 +316,7 @@ public class OrdersServiceImpl implements IOrdersService {
     @Override
     public Map<String, Object> getSalesReport(Long storeId, String beginDate, String endDate) {
         if (storeId == null) {
-            storeId = getValidStoreId();
+            storeId = permissionChecker.getValidStoreId();
         }
         List<Map<String, Object>> dailyData = ordersMapper.selectSalesReport(storeId, beginDate, endDate);
 
@@ -332,7 +341,7 @@ public class OrdersServiceImpl implements IOrdersService {
     @Override
     public Map<String, Object> getTodaySummary(Long storeId) {
         if (storeId == null) {
-            storeId = getValidStoreId();
+            storeId = permissionChecker.getValidStoreId();
         }
         Map<String, Object> summary = ordersMapper.selectTodaySummary(storeId);
         if (summary == null) {
@@ -340,13 +349,9 @@ public class OrdersServiceImpl implements IOrdersService {
             summary.put("todayOrderCount", 0);
             summary.put("todayIncome", BigDecimal.ZERO);
         }
-        // 查询待处理订单数
-        OrdersEntity query = new OrdersEntity();
-        query.setStoreId(storeId);
-        query.setOrderStatus(1); // 待支付
-        PageHelper.startPage(1, 1);
-        List<OrdersEntity> pendingList = ordersMapper.selectList(query);
-        summary.put("pendingOrderCount", new PageInfo<>(pendingList).getTotal());
+        // 查询待处理订单数（使用专用计数查询，避免全量查一条记录再取总数）
+        int pendingCount = ordersMapper.countByStoreIdAndStatus(storeId, 1);
+        summary.put("pendingOrderCount", pendingCount);
         return summary;
     }
 
@@ -367,18 +372,19 @@ public class OrdersServiceImpl implements IOrdersService {
     }
 
     private String generateOrderNo(Long storeId) {
-        // 订单号：SO + 日期(8位) + 门店(3位) + 序号(4位)
-        String dateStr = DateUtil.format(new Date(), "yyyyMMdd");
+        // 订单号生成规则：SO + 日期(8位) + 时间(6位) + 门店(3位) + 随机数(5位)
+        // 使用 ThreadLocalRandom 替代 Math.random()，避免并发碰撞
+        String dateStr = DateUtil.format(new Date(), "yyyyMMddHHmmss");
         String storeStr = String.format("%03d", storeId % 1000);
-        String seq = String.format("%04d", (int) (Math.random() * 10000));
-        return "SO" + dateStr + storeStr + seq;
+        int random = ThreadLocalRandom.current().nextInt(10000, 99999);
+        return "SO" + dateStr + storeStr + random;
     }
 
     private String generatePayNo(Long storeId) {
         String dateStr = DateUtil.format(new Date(), "yyyyMMddHHmmss");
         String storeStr = String.format("%03d", storeId % 1000);
-        String seq = String.format("%04d", (int) (Math.random() * 10000));
-        return "PAY" + dateStr + storeStr + seq;
+        int random = ThreadLocalRandom.current().nextInt(10000, 99999);
+        return "PAY" + dateStr + storeStr + random;
     }
 
     private String getPayChannel(String payType) {
@@ -406,27 +412,6 @@ public class OrdersServiceImpl implements IOrdersService {
         return new BigDecimal(val.toString());
     }
 
-    private Long getValidStoreId() {
-        Integer level = permissionChecker.currentRoleLevel();
-        if (level != null && level >= PermissionChecker.LEVEL_GENERAL_MANAGER) {
-            return null; // 总店长不限制
-        }
-        Long myStoreId = permissionChecker.currentStoreId();
-        if (myStoreId == null) {
-            throw new BusinessException(403, "无门店归属");
-        }
-        return myStoreId;
-    }
-
-    /** 校验目标数据是否属于当前用户的门店（总店长跳过） */
-    private void assertInOwnStore(Long targetStoreId) {
-        Integer level = permissionChecker.currentRoleLevel();
-        if (level != null && level >= PermissionChecker.LEVEL_GENERAL_MANAGER) {
-            return;
-        }
-        Long myStoreId = permissionChecker.currentStoreId();
-        if (myStoreId == null || !myStoreId.equals(targetStoreId)) {
-            throw new BusinessException(403, "无权限，只能操作本门店数据");
-        }
-    }
+    // 注意：getValidStoreId() 和 assertInOwnStore() 已统一抽取到 PermissionChecker 中
+    // 不再在每个 Service 中重复定义，使用 permissionChecker.xxx() 调用即可
 }

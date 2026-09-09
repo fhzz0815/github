@@ -1,5 +1,7 @@
 package com.iwe3.sec.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import com.iwe3.sec.service.IRefundService;
 import com.iwe3.sec.entity.RefundEntity;
@@ -9,6 +11,7 @@ import com.iwe3.sec.common.PageResult;
 /**
  * refund 表的表现层控制器
  */
+@Tag(name = "退款管理", description = "退款管理的增删改查")
 @RestController
 @RequestMapping("/api/v1/refunds")
 public class RefundController {
@@ -19,7 +22,7 @@ public class RefundController {
         this.refundService = refundService;
     }
 
-    /** 分页查询列表 */
+    @Operation(summary = "分页查询退款管理列表")
     @GetMapping
     public Result<PageResult<RefundEntity>> list(RefundEntity query,
                                                    @RequestParam(defaultValue = "1") Integer page,
@@ -27,20 +30,20 @@ public class RefundController {
         return Result.success(refundService.list(query, page, size));
     }
 
-    /** 根据ID查询详情 */
+    @Operation(summary = "根据ID查询退款管理详情")
     @GetMapping("/{id}")
     public Result<RefundEntity> getById(@PathVariable Long id) {
         return Result.success(refundService.getById(id));
     }
 
-    /** 新增 */
+    @Operation(summary = "新增退款管理")
     @PostMapping
     public Result<Void> add(@RequestBody RefundEntity entity) {
         refundService.add(entity);
         return Result.success();
     }
 
-    /** 修改 */
+    @Operation(summary = "修改退款管理")
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @RequestBody RefundEntity entity) {
         entity.setId(id);
@@ -48,7 +51,7 @@ public class RefundController {
         return Result.success();
     }
 
-    /** 删除 */
+    @Operation(summary = "删除退款管理")
     @DeleteMapping("/{id}")
     public Result<Void> remove(@PathVariable Long id) {
         refundService.remove(id);

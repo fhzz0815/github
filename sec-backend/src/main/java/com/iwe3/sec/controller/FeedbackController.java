@@ -1,5 +1,7 @@
 package com.iwe3.sec.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import com.iwe3.sec.service.IFeedbackService;
 import com.iwe3.sec.entity.FeedbackEntity;
@@ -9,6 +11,7 @@ import com.iwe3.sec.common.PageResult;
 /**
  * feedback 表的表现层控制器
  */
+@Tag(name = "意见反馈", description = "意见反馈的增删改查")
 @RestController
 @RequestMapping("/api/v1/feedbacks")
 public class FeedbackController {
@@ -19,7 +22,7 @@ public class FeedbackController {
         this.feedbackService = feedbackService;
     }
 
-    /** 分页查询列表 */
+    @Operation(summary = "分页查询意见反馈管理列表")
     @GetMapping
     public Result<PageResult<FeedbackEntity>> list(FeedbackEntity query,
                                                    @RequestParam(defaultValue = "1") Integer page,
@@ -27,20 +30,20 @@ public class FeedbackController {
         return Result.success(feedbackService.list(query, page, size));
     }
 
-    /** 根据ID查询详情 */
+    @Operation(summary = "根据ID查询意见反馈管理详情")
     @GetMapping("/{id}")
     public Result<FeedbackEntity> getById(@PathVariable Long id) {
         return Result.success(feedbackService.getById(id));
     }
 
-    /** 新增 */
+    @Operation(summary = "新增意见反馈管理")
     @PostMapping
     public Result<Void> add(@RequestBody FeedbackEntity entity) {
         feedbackService.add(entity);
         return Result.success();
     }
 
-    /** 修改 */
+    @Operation(summary = "修改意见反馈管理")
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @RequestBody FeedbackEntity entity) {
         entity.setId(id);
@@ -48,7 +51,7 @@ public class FeedbackController {
         return Result.success();
     }
 
-    /** 删除 */
+    @Operation(summary = "删除意见反馈管理")
     @DeleteMapping("/{id}")
     public Result<Void> remove(@PathVariable Long id) {
         feedbackService.remove(id);

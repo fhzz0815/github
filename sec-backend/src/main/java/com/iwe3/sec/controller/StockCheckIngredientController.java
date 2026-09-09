@@ -1,5 +1,7 @@
 package com.iwe3.sec.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import com.iwe3.sec.service.IStockCheckIngredientService;
 import com.iwe3.sec.entity.StockCheckIngredientEntity;
@@ -9,6 +11,7 @@ import com.iwe3.sec.common.PageResult;
 /**
  * stock_check_ingredient 表的表现层控制器
  */
+@Tag(name = "原料盘点", description = "原料盘点的增删改查")
 @RestController
 @RequestMapping("/api/v1/stockCheckIngredients")
 public class StockCheckIngredientController {
@@ -19,7 +22,7 @@ public class StockCheckIngredientController {
         this.stockCheckIngredientService = stockCheckIngredientService;
     }
 
-    /** 分页查询列表 */
+    @Operation(summary = "分页查询食材盘点管理列表")
     @GetMapping
     public Result<PageResult<StockCheckIngredientEntity>> list(StockCheckIngredientEntity query,
                                                    @RequestParam(defaultValue = "1") Integer page,
@@ -27,20 +30,20 @@ public class StockCheckIngredientController {
         return Result.success(stockCheckIngredientService.list(query, page, size));
     }
 
-    /** 根据ID查询详情 */
+    @Operation(summary = "根据ID查询食材盘点管理详情")
     @GetMapping("/{id}")
     public Result<StockCheckIngredientEntity> getById(@PathVariable Long id) {
         return Result.success(stockCheckIngredientService.getById(id));
     }
 
-    /** 新增 */
+    @Operation(summary = "新增食材盘点管理")
     @PostMapping
     public Result<Void> add(@RequestBody StockCheckIngredientEntity entity) {
         stockCheckIngredientService.add(entity);
         return Result.success();
     }
 
-    /** 修改 */
+    @Operation(summary = "修改食材盘点管理")
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @RequestBody StockCheckIngredientEntity entity) {
         entity.setId(id);
@@ -48,7 +51,7 @@ public class StockCheckIngredientController {
         return Result.success();
     }
 
-    /** 删除 */
+    @Operation(summary = "删除食材盘点管理")
     @DeleteMapping("/{id}")
     public Result<Void> remove(@PathVariable Long id) {
         stockCheckIngredientService.remove(id);

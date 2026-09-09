@@ -67,7 +67,6 @@ class DiningTableServiceImplTest {
     @Test
     @DisplayName("Get by id when exists should return entity")
     void testGetById_WhenExists_ShouldReturnEntity() {
-        when(permissionChecker.currentRoleLevel()).thenReturn(99);
         DiningTableEntity mockEntity = DiningTableEntity.builder().id(1L).build();
         when(diningTableMapper.selectById(1L)).thenReturn(mockEntity);
 

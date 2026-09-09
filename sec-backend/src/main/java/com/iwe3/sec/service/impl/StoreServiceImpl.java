@@ -2,6 +2,8 @@ package com.iwe3.sec.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.iwe3.sec.entity.StoreEntity;
 import com.iwe3.sec.mapper.StoreMapper;
@@ -31,21 +33,25 @@ public class StoreServiceImpl implements IStoreService {
     }
 
     @Override
+    @Cacheable(value = "store", key = "#id")
     public StoreEntity getById(Long id) {
         return storeMapper.selectById(id);
     }
 
     @Override
+    @CacheEvict(value = "store", key = "#entity.id")
     public boolean add(StoreEntity entity) {
         return storeMapper.insert(entity) > 0;
     }
 
     @Override
+    @CacheEvict(value = "store", key = "#entity.id")
     public boolean update(StoreEntity entity) {
         return storeMapper.update(entity) > 0;
     }
 
     @Override
+    @CacheEvict(value = "store", key = "#id")
     public boolean remove(Long id) {
         return storeMapper.deleteById(id) > 0;
     }

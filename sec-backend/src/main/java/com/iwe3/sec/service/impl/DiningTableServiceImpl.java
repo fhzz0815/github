@@ -49,16 +49,13 @@ public class DiningTableServiceImpl implements IDiningTableService {
         if (d == null) {
             return null;
         }
-        assertInOwnStore(d.getStoreId());
+        permissionChecker.assertInOwnStore(d.getStoreId());
         return d;
     }
 
     @Override
     public boolean add(DiningTableEntity entity) {
-        Integer level = permissionChecker.currentRoleLevel();
-        if (level == null || level < PermissionChecker.LEVEL_GENERAL_MANAGER) {
-            entity.setStoreId(permissionChecker.currentStoreId());
-        }
+        permissionChecker.setStoreIdIfNeeded(entity::setStoreId);
         return diningTableMapper.insert(entity) > 0;
     }
 
@@ -67,7 +64,7 @@ public class DiningTableServiceImpl implements IDiningTableService {
         if (entity.getId() != null) {
             DiningTableEntity existing = diningTableMapper.selectById(entity.getId());
             if (existing != null) {
-                assertInOwnStore(existing.getStoreId());
+                permissionChecker.assertInOwnStore(existing.getStoreId());
             }
         }
         return diningTableMapper.update(entity) > 0;
@@ -77,19 +74,10 @@ public class DiningTableServiceImpl implements IDiningTableService {
     public boolean remove(Long id) {
         DiningTableEntity existing = diningTableMapper.selectById(id);
         if (existing != null) {
-            assertInOwnStore(existing.getStoreId());
+            permissionChecker.assertInOwnStore(existing.getStoreId());
         }
         return diningTableMapper.deleteById(id) > 0;
     }
 
-    private void assertInOwnStore(Long targetStoreId) {
-        Integer level = permissionChecker.currentRoleLevel();
-        if (level != null && level >= PermissionChecker.LEVEL_GENERAL_MANAGER) {
-            return;
-        }
-        Long myStoreId = permissionChecker.currentStoreId();
-        if (myStoreId == null || !myStoreId.equals(targetStoreId)) {
-            throw new BusinessException(403, "无权限，只能操作本门店数据");
-        }
-    }
+    // 注意：assertInOwnStore() 已统一抽取到 PermissionChecker 中
 }

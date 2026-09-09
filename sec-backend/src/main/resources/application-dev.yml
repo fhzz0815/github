@@ -4,3 +4,8 @@ logging:
   level:
     com.iwe3.sec: debug
     org.springframework: warn
+
+# 开发环境打印 MyBatis SQL 日志，方便调试
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

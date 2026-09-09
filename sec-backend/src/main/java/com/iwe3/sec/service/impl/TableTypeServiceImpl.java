@@ -2,6 +2,8 @@ package com.iwe3.sec.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.iwe3.sec.entity.TableTypeEntity;
 import com.iwe3.sec.mapper.TableTypeMapper;
@@ -31,21 +33,25 @@ public class TableTypeServiceImpl implements ITableTypeService {
     }
 
     @Override
+    @Cacheable(value = "entity", key = "#id")
     public TableTypeEntity getById(Long id) {
         return tableTypeMapper.selectById(id);
     }
 
     @Override
+    @CacheEvict(value = "entity", key = "#entity.id")
     public boolean add(TableTypeEntity entity) {
         return tableTypeMapper.insert(entity) > 0;
     }
 
     @Override
+    @CacheEvict(value = "entity", key = "#entity.id")
     public boolean update(TableTypeEntity entity) {
         return tableTypeMapper.update(entity) > 0;
     }
 
     @Override
+    @CacheEvict(value = "entity", key = "#id")
     public boolean remove(Long id) {
         return tableTypeMapper.deleteById(id) > 0;
     }

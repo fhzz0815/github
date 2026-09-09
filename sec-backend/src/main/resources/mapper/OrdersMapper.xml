@@ -250,6 +250,13 @@ order_no LIKE CONCAT('%', #{query.searchKeyword}, '%')
         ORDER BY order_time ASC
     </select>
 
+    <!-- 按门店和状态统计订单数，用于仪表盘，避免 PageHelper 全量查询 -->
+    <select id="countByStoreIdAndStatus" resultType="int">
+        SELECT COUNT(*)
+        FROM `orders`
+        WHERE store_id = #{storeId} AND is_deleted = 0 AND order_status = #{orderStatus}
+    </select>
+
     <select id="selectTodaySummary" resultType="java.util.HashMap">
         SELECT
             COUNT(DISTINCT id) AS todayOrderCount,

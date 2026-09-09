@@ -1,5 +1,7 @@
 package com.iwe3.sec.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import com.iwe3.sec.service.IOrderStatusLogService;
 import com.iwe3.sec.entity.OrderStatusLogEntity;
@@ -9,6 +11,7 @@ import com.iwe3.sec.common.PageResult;
 /**
  * order_status_log 表的表现层控制器
  */
+@Tag(name = "订单状态日志", description = "订单状态日志的增删改查")
 @RestController
 @RequestMapping("/api/v1/orderStatusLogs")
 public class OrderStatusLogController {
@@ -19,7 +22,7 @@ public class OrderStatusLogController {
         this.orderStatusLogService = orderStatusLogService;
     }
 
-    /** 分页查询列表 */
+    @Operation(summary = "分页查询订单状态日志管理列表")
     @GetMapping
     public Result<PageResult<OrderStatusLogEntity>> list(OrderStatusLogEntity query,
                                                    @RequestParam(defaultValue = "1") Integer page,
@@ -27,20 +30,20 @@ public class OrderStatusLogController {
         return Result.success(orderStatusLogService.list(query, page, size));
     }
 
-    /** 根据ID查询详情 */
+    @Operation(summary = "根据ID查询订单状态日志管理详情")
     @GetMapping("/{id}")
     public Result<OrderStatusLogEntity> getById(@PathVariable Long id) {
         return Result.success(orderStatusLogService.getById(id));
     }
 
-    /** 新增 */
+    @Operation(summary = "新增订单状态日志管理")
     @PostMapping
     public Result<Void> add(@RequestBody OrderStatusLogEntity entity) {
         orderStatusLogService.add(entity);
         return Result.success();
     }
 
-    /** 修改 */
+    @Operation(summary = "修改订单状态日志管理")
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @RequestBody OrderStatusLogEntity entity) {
         entity.setId(id);
@@ -48,7 +51,7 @@ public class OrderStatusLogController {
         return Result.success();
     }
 
-    /** 删除 */
+    @Operation(summary = "删除订单状态日志管理")
     @DeleteMapping("/{id}")
     public Result<Void> remove(@PathVariable Long id) {
         orderStatusLogService.remove(id);

@@ -8,6 +8,7 @@ import com.iwe3.sec.mapper.OrderStatusLogMapper;
 import com.iwe3.sec.mapper.OrdersMapper;
 import com.iwe3.sec.mapper.PaymentRecordMapper;
 import com.iwe3.sec.mapper.DishStockMapper;
+import com.iwe3.sec.mq.OrderMessageProducer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,12 +48,15 @@ class OrdersServiceImplTest {
     @Mock
     private PermissionChecker permissionChecker;
 
+    @Mock
+    private OrderMessageProducer orderMessageProducer;
+
     private OrdersServiceImpl ordersService;
 
     @BeforeEach
     void setUp() {
         ordersService = new OrdersServiceImpl(ordersMapper, orderDetailMapper, orderStatusLogMapper,
-                paymentRecordMapper, dishStockMapper, permissionChecker);
+                paymentRecordMapper, dishStockMapper, permissionChecker, orderMessageProducer);
     }
 
     @Test
@@ -83,7 +87,6 @@ class OrdersServiceImplTest {
     @Test
     @DisplayName("Get by id when exists should return entity")
     void testGetById_WhenExists_ShouldReturnEntity() {
-        when(permissionChecker.currentRoleLevel()).thenReturn(99);
         OrdersEntity mockEntity = OrdersEntity.builder().id(1L).build();
         when(ordersMapper.selectById(1L)).thenReturn(mockEntity);
 

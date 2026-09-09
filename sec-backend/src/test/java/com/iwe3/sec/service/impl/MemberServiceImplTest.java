@@ -66,7 +66,6 @@ class MemberServiceImplTest {
     @Test
     @DisplayName("Get by id when exists should return entity")
     void testGetById_WhenExists_ShouldReturnEntity() {
-        when(permissionChecker.currentRoleLevel()).thenReturn(99);
         MemberEntity mockEntity = MemberEntity.builder().id(1L).build();
         when(memberMapper.selectById(1L)).thenReturn(mockEntity);
 

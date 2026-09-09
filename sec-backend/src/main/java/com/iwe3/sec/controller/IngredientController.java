@@ -1,5 +1,7 @@
 package com.iwe3.sec.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import com.iwe3.sec.service.IIngredientService;
 import com.iwe3.sec.entity.IngredientEntity;
@@ -9,6 +11,7 @@ import com.iwe3.sec.common.PageResult;
 /**
  * ingredient 表的表现层控制器
  */
+@Tag(name = "原料管理", description = "原料管理的增删改查")
 @RestController
 @RequestMapping("/api/v1/ingredients")
 public class IngredientController {
@@ -19,7 +22,7 @@ public class IngredientController {
         this.ingredientService = ingredientService;
     }
 
-    /** 分页查询列表 */
+    @Operation(summary = "分页查询原料管理列表")
     @GetMapping
     public Result<PageResult<IngredientEntity>> list(IngredientEntity query,
                                                    @RequestParam(defaultValue = "1") Integer page,
@@ -27,20 +30,20 @@ public class IngredientController {
         return Result.success(ingredientService.list(query, page, size));
     }
 
-    /** 根据ID查询详情 */
+    @Operation(summary = "根据ID查询原料管理详情")
     @GetMapping("/{id}")
     public Result<IngredientEntity> getById(@PathVariable Long id) {
         return Result.success(ingredientService.getById(id));
     }
 
-    /** 新增 */
+    @Operation(summary = "新增原料管理")
     @PostMapping
     public Result<Void> add(@RequestBody IngredientEntity entity) {
         ingredientService.add(entity);
         return Result.success();
     }
 
-    /** 修改 */
+    @Operation(summary = "修改原料管理")
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @RequestBody IngredientEntity entity) {
         entity.setId(id);
@@ -48,7 +51,7 @@ public class IngredientController {
         return Result.success();
     }
 
-    /** 删除 */
+    @Operation(summary = "删除原料管理")
     @DeleteMapping("/{id}")
     public Result<Void> remove(@PathVariable Long id) {
         ingredientService.remove(id);

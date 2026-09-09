@@ -1,5 +1,7 @@
 package com.iwe3.sec.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import com.iwe3.sec.service.IStaffLoginLogService;
 import com.iwe3.sec.entity.StaffLoginLogEntity;
@@ -9,6 +11,7 @@ import com.iwe3.sec.common.PageResult;
 /**
  * staff_login_log 表的表现层控制器
  */
+@Tag(name = "员工登录日志", description = "员工登录日志的增删改查")
 @RestController
 @RequestMapping("/api/v1/staffLoginLogs")
 public class StaffLoginLogController {
@@ -19,7 +22,7 @@ public class StaffLoginLogController {
         this.staffLoginLogService = staffLoginLogService;
     }
 
-    /** 分页查询列表 */
+    @Operation(summary = "分页查询员工登录日志管理列表")
     @GetMapping
     public Result<PageResult<StaffLoginLogEntity>> list(StaffLoginLogEntity query,
                                                    @RequestParam(defaultValue = "1") Integer page,
@@ -27,20 +30,20 @@ public class StaffLoginLogController {
         return Result.success(staffLoginLogService.list(query, page, size));
     }
 
-    /** 根据ID查询详情 */
+    @Operation(summary = "根据ID查询员工登录日志管理详情")
     @GetMapping("/{id}")
     public Result<StaffLoginLogEntity> getById(@PathVariable Long id) {
         return Result.success(staffLoginLogService.getById(id));
     }
 
-    /** 新增 */
+    @Operation(summary = "新增员工登录日志管理")
     @PostMapping
     public Result<Void> add(@RequestBody StaffLoginLogEntity entity) {
         staffLoginLogService.add(entity);
         return Result.success();
     }
 
-    /** 修改 */
+    @Operation(summary = "修改员工登录日志管理")
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @RequestBody StaffLoginLogEntity entity) {
         entity.setId(id);
@@ -48,7 +51,7 @@ public class StaffLoginLogController {
         return Result.success();
     }
 
-    /** 删除 */
+    @Operation(summary = "删除员工登录日志管理")
     @DeleteMapping("/{id}")
     public Result<Void> remove(@PathVariable Long id) {
         staffLoginLogService.remove(id);

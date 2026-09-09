@@ -1,5 +1,7 @@
 package com.iwe3.sec.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import com.iwe3.sec.service.IMemberCategoryService;
 import com.iwe3.sec.entity.MemberCategoryEntity;
@@ -9,6 +11,7 @@ import com.iwe3.sec.common.PageResult;
 /**
  * member_category 表的表现层控制器
  */
+@Tag(name = "会员分类", description = "会员分类的增删改查")
 @RestController
 @RequestMapping("/api/v1/memberCategories")
 public class MemberCategoryController {
@@ -19,7 +22,7 @@ public class MemberCategoryController {
         this.memberCategoryService = memberCategoryService;
     }
 
-    /** 分页查询列表 */
+    @Operation(summary = "分页查询会员分类管理列表")
     @GetMapping
     public Result<PageResult<MemberCategoryEntity>> list(MemberCategoryEntity query,
                                                    @RequestParam(defaultValue = "1") Integer page,
@@ -27,20 +30,20 @@ public class MemberCategoryController {
         return Result.success(memberCategoryService.list(query, page, size));
     }
 
-    /** 根据ID查询详情 */
+    @Operation(summary = "根据ID查询会员分类管理详情")
     @GetMapping("/{id}")
     public Result<MemberCategoryEntity> getById(@PathVariable Long id) {
         return Result.success(memberCategoryService.getById(id));
     }
 
-    /** 新增 */
+    @Operation(summary = "新增会员分类管理")
     @PostMapping
     public Result<Void> add(@RequestBody MemberCategoryEntity entity) {
         memberCategoryService.add(entity);
         return Result.success();
     }
 
-    /** 修改 */
+    @Operation(summary = "修改会员分类管理")
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @RequestBody MemberCategoryEntity entity) {
         entity.setId(id);
@@ -48,7 +51,7 @@ public class MemberCategoryController {
         return Result.success();
     }
 
-    /** 删除 */
+    @Operation(summary = "删除会员分类管理")
     @DeleteMapping("/{id}")
     public Result<Void> remove(@PathVariable Long id) {
         memberCategoryService.remove(id);

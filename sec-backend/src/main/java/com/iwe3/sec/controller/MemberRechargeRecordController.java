@@ -1,5 +1,7 @@
 package com.iwe3.sec.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import com.iwe3.sec.service.IMemberRechargeRecordService;
 import com.iwe3.sec.entity.MemberRechargeRecordEntity;
@@ -9,6 +11,7 @@ import com.iwe3.sec.common.PageResult;
 /**
  * member_recharge_record 表的表现层控制器
  */
+@Tag(name = "会员充值记录", description = "会员充值记录的增删改查")
 @RestController
 @RequestMapping("/api/v1/memberRechargeRecords")
 public class MemberRechargeRecordController {
@@ -19,7 +22,7 @@ public class MemberRechargeRecordController {
         this.memberRechargeRecordService = memberRechargeRecordService;
     }
 
-    /** 分页查询列表 */
+    @Operation(summary = "分页查询会员充值记录管理列表")
     @GetMapping
     public Result<PageResult<MemberRechargeRecordEntity>> list(MemberRechargeRecordEntity query,
                                                    @RequestParam(defaultValue = "1") Integer page,
@@ -27,20 +30,20 @@ public class MemberRechargeRecordController {
         return Result.success(memberRechargeRecordService.list(query, page, size));
     }
 
-    /** 根据ID查询详情 */
+    @Operation(summary = "根据ID查询会员充值记录管理详情")
     @GetMapping("/{id}")
     public Result<MemberRechargeRecordEntity> getById(@PathVariable Long id) {
         return Result.success(memberRechargeRecordService.getById(id));
     }
 
-    /** 新增 */
+    @Operation(summary = "新增会员充值记录管理")
     @PostMapping
     public Result<Void> add(@RequestBody MemberRechargeRecordEntity entity) {
         memberRechargeRecordService.add(entity);
         return Result.success();
     }
 
-    /** 修改 */
+    @Operation(summary = "修改会员充值记录管理")
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @RequestBody MemberRechargeRecordEntity entity) {
         entity.setId(id);
@@ -48,7 +51,7 @@ public class MemberRechargeRecordController {
         return Result.success();
     }
 
-    /** 删除 */
+    @Operation(summary = "删除会员充值记录管理")
     @DeleteMapping("/{id}")
     public Result<Void> remove(@PathVariable Long id) {
         memberRechargeRecordService.remove(id);

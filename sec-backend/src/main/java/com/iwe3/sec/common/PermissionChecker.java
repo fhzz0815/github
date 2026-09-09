@@ -177,6 +177,48 @@ public class PermissionChecker {
         return true;
     }
 
+    /**
+     * 校验目标数据是否属于当前用户的门店
+     * 总店长可以跨门店操作，其他角色只能操作本门店数据
+     */
+    public void assertInOwnStore(Long targetStoreId) {
+        Integer level = currentRoleLevel();
+        if (level != null && level >= LEVEL_GENERAL_MANAGER) {
+            return;
+        }
+        Long myStoreId = currentStoreId();
+        if (myStoreId == null || !myStoreId.equals(targetStoreId)) {
+            throw new BusinessException(403, "无权限，只能操作本门店数据");
+        }
+    }
+
+    /**
+     * 获取当前用户的有效门店ID
+     * 总店长返回null（不限制），其他角色返回所属门店，无门店归属时抛异常
+     */
+    public Long getValidStoreId() {
+        Integer level = currentRoleLevel();
+        if (level != null && level >= LEVEL_GENERAL_MANAGER) {
+            return null;
+        }
+        Long myStoreId = currentStoreId();
+        if (myStoreId == null) {
+            throw new BusinessException(403, "无门店归属，无法操作");
+        }
+        return myStoreId;
+    }
+
+    /**
+     * 如果当前用户不是总店长，自动设置实体中的门店ID为当前门店
+     * 用于新增操作时自动填充门店归属
+     */
+    public void setStoreIdIfNeeded(java.util.function.Consumer<Long> storeIdSetter) {
+        Integer level = currentRoleLevel();
+        if (level == null || level < LEVEL_GENERAL_MANAGER) {
+            storeIdSetter.accept(currentStoreId());
+        }
+    }
+
     /** 通过 roleId 取等级（可后续加缓存） */
     private Integer getRoleLevel(Long roleId) {
         if (roleId == null) {

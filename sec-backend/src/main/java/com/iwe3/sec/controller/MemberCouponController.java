@@ -1,5 +1,7 @@
 package com.iwe3.sec.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import com.iwe3.sec.service.IMemberCouponService;
 import com.iwe3.sec.entity.MemberCouponEntity;
@@ -9,6 +11,7 @@ import com.iwe3.sec.common.PageResult;
 /**
  * member_coupon 表的表现层控制器
  */
+@Tag(name = "会员优惠券", description = "会员优惠券的增删改查")
 @RestController
 @RequestMapping("/api/v1/memberCoupons")
 public class MemberCouponController {
@@ -19,7 +22,7 @@ public class MemberCouponController {
         this.memberCouponService = memberCouponService;
     }
 
-    /** 分页查询列表 */
+    @Operation(summary = "分页查询会员优惠券管理列表")
     @GetMapping
     public Result<PageResult<MemberCouponEntity>> list(MemberCouponEntity query,
                                                    @RequestParam(defaultValue = "1") Integer page,
@@ -27,20 +30,20 @@ public class MemberCouponController {
         return Result.success(memberCouponService.list(query, page, size));
     }
 
-    /** 根据ID查询详情 */
+    @Operation(summary = "根据ID查询会员优惠券管理详情")
     @GetMapping("/{id}")
     public Result<MemberCouponEntity> getById(@PathVariable Long id) {
         return Result.success(memberCouponService.getById(id));
     }
 
-    /** 新增 */
+    @Operation(summary = "新增会员优惠券管理")
     @PostMapping
     public Result<Void> add(@RequestBody MemberCouponEntity entity) {
         memberCouponService.add(entity);
         return Result.success();
     }
 
-    /** 修改 */
+    @Operation(summary = "修改会员优惠券管理")
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @RequestBody MemberCouponEntity entity) {
         entity.setId(id);
@@ -48,7 +51,7 @@ public class MemberCouponController {
         return Result.success();
     }
 
-    /** 删除 */
+    @Operation(summary = "删除会员优惠券管理")
     @DeleteMapping("/{id}")
     public Result<Void> remove(@PathVariable Long id) {
         memberCouponService.remove(id);

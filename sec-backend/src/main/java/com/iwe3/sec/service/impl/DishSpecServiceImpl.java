@@ -2,6 +2,8 @@ package com.iwe3.sec.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.iwe3.sec.entity.DishSpecEntity;
 import com.iwe3.sec.mapper.DishSpecMapper;
@@ -31,21 +33,25 @@ public class DishSpecServiceImpl implements IDishSpecService {
     }
 
     @Override
+    @Cacheable(value = "entity", key = "#id")
     public DishSpecEntity getById(Long id) {
         return dishSpecMapper.selectById(id);
     }
 
     @Override
+    @CacheEvict(value = "entity", key = "#entity.id")
     public boolean add(DishSpecEntity entity) {
         return dishSpecMapper.insert(entity) > 0;
     }
 
     @Override
+    @CacheEvict(value = "entity", key = "#entity.id")
     public boolean update(DishSpecEntity entity) {
         return dishSpecMapper.update(entity) > 0;
     }
 
     @Override
+    @CacheEvict(value = "entity", key = "#id")
     public boolean remove(Long id) {
         return dishSpecMapper.deleteById(id) > 0;
     }

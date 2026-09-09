@@ -67,7 +67,6 @@ class DishServiceImplTest {
     @Test
     @DisplayName("Get by id when exists should return entity")
     void testGetById_WhenExists_ShouldReturnEntity() {
-        when(permissionChecker.currentRoleLevel()).thenReturn(99);
         DishEntity mockEntity = DishEntity.builder().id(1L).build();
         when(dishMapper.selectById(1L)).thenReturn(mockEntity);
 

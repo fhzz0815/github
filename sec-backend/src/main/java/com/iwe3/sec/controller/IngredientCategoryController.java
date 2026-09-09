@@ -1,5 +1,7 @@
 package com.iwe3.sec.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import com.iwe3.sec.service.IIngredientCategoryService;
 import com.iwe3.sec.entity.IngredientCategoryEntity;
@@ -9,6 +11,7 @@ import com.iwe3.sec.common.PageResult;
 /**
  * ingredient_category 表的表现层控制器
  */
+@Tag(name = "原料分类", description = "原料分类的增删改查")
 @RestController
 @RequestMapping("/api/v1/ingredientCategories")
 public class IngredientCategoryController {
@@ -19,7 +22,7 @@ public class IngredientCategoryController {
         this.ingredientCategoryService = ingredientCategoryService;
     }
 
-    /** 分页查询列表 */
+    @Operation(summary = "分页查询食材分类管理列表")
     @GetMapping
     public Result<PageResult<IngredientCategoryEntity>> list(IngredientCategoryEntity query,
                                                    @RequestParam(defaultValue = "1") Integer page,
@@ -27,20 +30,20 @@ public class IngredientCategoryController {
         return Result.success(ingredientCategoryService.list(query, page, size));
     }
 
-    /** 根据ID查询详情 */
+    @Operation(summary = "根据ID查询食材分类管理详情")
     @GetMapping("/{id}")
     public Result<IngredientCategoryEntity> getById(@PathVariable Long id) {
         return Result.success(ingredientCategoryService.getById(id));
     }
 
-    /** 新增 */
+    @Operation(summary = "新增食材分类管理")
     @PostMapping
     public Result<Void> add(@RequestBody IngredientCategoryEntity entity) {
         ingredientCategoryService.add(entity);
         return Result.success();
     }
 
-    /** 修改 */
+    @Operation(summary = "修改食材分类管理")
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @RequestBody IngredientCategoryEntity entity) {
         entity.setId(id);
@@ -48,7 +51,7 @@ public class IngredientCategoryController {
         return Result.success();
     }
 
-    /** 删除 */
+    @Operation(summary = "删除食材分类管理")
     @DeleteMapping("/{id}")
     public Result<Void> remove(@PathVariable Long id) {
         ingredientCategoryService.remove(id);

@@ -42,6 +42,9 @@ public interface OrdersMapper {
     /** 查询后厨看板 */
     List<OrdersEntity> selectKitchenOrders(@Param("storeId") Long storeId);
 
+    /** 按门店和状态统计订单数（用于仪表盘计数，避免全量查询） */
+    int countByStoreIdAndStatus(@Param("storeId") Long storeId, @Param("orderStatus") Integer orderStatus);
+
     /** 查询今日概况 */
     Map<String, Object> selectTodaySummary(@Param("storeId") Long storeId);
 

@@ -2,6 +2,8 @@ package com.iwe3.sec.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.iwe3.sec.entity.IngredientCategoryEntity;
 import com.iwe3.sec.mapper.IngredientCategoryMapper;
@@ -31,21 +33,25 @@ public class IngredientCategoryServiceImpl implements IIngredientCategoryService
     }
 
     @Override
+    @Cacheable(value = "entity", key = "#id")
     public IngredientCategoryEntity getById(Long id) {
         return ingredientCategoryMapper.selectById(id);
     }
 
     @Override
+    @CacheEvict(value = "entity", key = "#entity.id")
     public boolean add(IngredientCategoryEntity entity) {
         return ingredientCategoryMapper.insert(entity) > 0;
     }
 
     @Override
+    @CacheEvict(value = "entity", key = "#entity.id")
     public boolean update(IngredientCategoryEntity entity) {
         return ingredientCategoryMapper.update(entity) > 0;
     }
 
     @Override
+    @CacheEvict(value = "entity", key = "#id")
     public boolean remove(Long id) {
         return ingredientCategoryMapper.deleteById(id) > 0;
     }

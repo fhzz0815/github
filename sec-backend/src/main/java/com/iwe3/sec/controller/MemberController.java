@@ -1,5 +1,7 @@
 package com.iwe3.sec.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import com.iwe3.sec.service.IMemberService;
 import com.iwe3.sec.entity.MemberEntity;
@@ -9,6 +11,7 @@ import com.iwe3.sec.common.PageResult;
 /**
  * member 表的表现层控制器
  */
+@Tag(name = "会员管理", description = "会员管理的增删改查")
 @RestController
 @RequestMapping("/api/v1/members")
 public class MemberController {
@@ -19,7 +22,7 @@ public class MemberController {
         this.memberService = memberService;
     }
 
-    /** 分页查询列表 */
+    @Operation(summary = "分页查询会员管理列表")
     @GetMapping
     public Result<PageResult<MemberEntity>> list(MemberEntity query,
                                                    @RequestParam(defaultValue = "1") Integer page,
@@ -27,20 +30,20 @@ public class MemberController {
         return Result.success(memberService.list(query, page, size));
     }
 
-    /** 根据ID查询详情 */
+    @Operation(summary = "根据ID查询会员管理详情")
     @GetMapping("/{id}")
     public Result<MemberEntity> getById(@PathVariable Long id) {
         return Result.success(memberService.getById(id));
     }
 
-    /** 新增 */
+    @Operation(summary = "新增会员管理")
     @PostMapping
     public Result<Void> add(@RequestBody MemberEntity entity) {
         memberService.add(entity);
         return Result.success();
     }
 
-    /** 修改 */
+    @Operation(summary = "修改会员管理")
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @RequestBody MemberEntity entity) {
         entity.setId(id);
@@ -48,7 +51,7 @@ public class MemberController {
         return Result.success();
     }
 
-    /** 删除 */
+    @Operation(summary = "删除会员管理")
     @DeleteMapping("/{id}")
     public Result<Void> remove(@PathVariable Long id) {
         memberService.remove(id);

@@ -2,6 +2,8 @@ package com.iwe3.sec.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.iwe3.sec.entity.DishEntity;
 import com.iwe3.sec.mapper.DishMapper;
@@ -44,52 +46,42 @@ public class DishServiceImpl implements IDishService {
     }
 
     @Override
+    @Cacheable(value = "dish", key = "#id")
     public DishEntity getById(Long id) {
         DishEntity d = dishMapper.selectById(id);
         if (d == null) {
             return null;
         }
-        assertInOwnStore(d.getStoreId());
+        permissionChecker.assertInOwnStore(d.getStoreId());
         return d;
     }
 
     @Override
+    @CacheEvict(value = "dish", key = "#entity.id")
     public boolean add(DishEntity entity) {
-        Integer level = permissionChecker.currentRoleLevel();
-        if (level == null || level < PermissionChecker.LEVEL_GENERAL_MANAGER) {
-            entity.setStoreId(permissionChecker.currentStoreId());
-        }
+        permissionChecker.setStoreIdIfNeeded(entity::setStoreId);
         return dishMapper.insert(entity) > 0;
     }
 
     @Override
+    @CacheEvict(value = "dish", key = "#entity.id")
     public boolean update(DishEntity entity) {
         if (entity.getId() != null) {
             DishEntity existing = dishMapper.selectById(entity.getId());
             if (existing != null) {
-                assertInOwnStore(existing.getStoreId());
+                permissionChecker.assertInOwnStore(existing.getStoreId());
             }
         }
         return dishMapper.update(entity) > 0;
     }
 
     @Override
+    @CacheEvict(value = "dish", key = "#id")
     public boolean remove(Long id) {
         DishEntity existing = dishMapper.selectById(id);
         if (existing != null) {
-            assertInOwnStore(existing.getStoreId());
+            permissionChecker.assertInOwnStore(existing.getStoreId());
         }
         return dishMapper.deleteById(id) > 0;
-    }
-
-    private void assertInOwnStore(Long targetStoreId) {
-        Integer level = permissionChecker.currentRoleLevel();
-        if (level != null && level >= PermissionChecker.LEVEL_GENERAL_MANAGER) {
-            return;
-        }
-        Long myStoreId = permissionChecker.currentStoreId();
-        if (myStoreId == null || !myStoreId.equals(targetStoreId)) {
-            throw new BusinessException(403, "无权限，只能操作本门店数据");
-        }
     }
 }

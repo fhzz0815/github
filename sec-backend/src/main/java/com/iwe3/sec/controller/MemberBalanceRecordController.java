@@ -1,5 +1,7 @@
 package com.iwe3.sec.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import com.iwe3.sec.service.IMemberBalanceRecordService;
 import com.iwe3.sec.entity.MemberBalanceRecordEntity;
@@ -9,6 +11,7 @@ import com.iwe3.sec.common.PageResult;
 /**
  * member_balance_record 表的表现层控制器
  */
+@Tag(name = "会员余额记录", description = "会员余额记录的增删改查")
 @RestController
 @RequestMapping("/api/v1/memberBalanceRecords")
 public class MemberBalanceRecordController {
@@ -19,7 +22,7 @@ public class MemberBalanceRecordController {
         this.memberBalanceRecordService = memberBalanceRecordService;
     }
 
-    /** 分页查询列表 */
+    @Operation(summary = "分页查询会员余额记录管理列表")
     @GetMapping
     public Result<PageResult<MemberBalanceRecordEntity>> list(MemberBalanceRecordEntity query,
                                                    @RequestParam(defaultValue = "1") Integer page,
@@ -27,20 +30,20 @@ public class MemberBalanceRecordController {
         return Result.success(memberBalanceRecordService.list(query, page, size));
     }
 
-    /** 根据ID查询详情 */
+    @Operation(summary = "根据ID查询会员余额记录管理详情")
     @GetMapping("/{id}")
     public Result<MemberBalanceRecordEntity> getById(@PathVariable Long id) {
         return Result.success(memberBalanceRecordService.getById(id));
     }
 
-    /** 新增 */
+    @Operation(summary = "新增会员余额记录管理")
     @PostMapping
     public Result<Void> add(@RequestBody MemberBalanceRecordEntity entity) {
         memberBalanceRecordService.add(entity);
         return Result.success();
     }
 
-    /** 修改 */
+    @Operation(summary = "修改会员余额记录管理")
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @RequestBody MemberBalanceRecordEntity entity) {
         entity.setId(id);
@@ -48,7 +51,7 @@ public class MemberBalanceRecordController {
         return Result.success();
     }
 
-    /** 删除 */
+    @Operation(summary = "删除会员余额记录管理")
     @DeleteMapping("/{id}")
     public Result<Void> remove(@PathVariable Long id) {
         memberBalanceRecordService.remove(id);

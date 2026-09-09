@@ -1,25 +1,17 @@
-spring:
-  datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/smart_restaurant?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=Asia/Shanghai
-    username: ${MYSQL_USERNAME:root}
-    password: ${MYSQL_PASSWORD:root}
-    druid:
-      initial-size: 10
-      min-idle: 10
-      max-active: 50
-      max-wait: 60000
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:}
-      database: 0
-      timeout: 5000ms
+# ============================================================
+# 生产环境配置
+# 用于 Docker 部署，使用环境变量注入敏感信息
+# 注意：数据库、Redis、RabbitMQ 连接信息通过 docker-compose.yml
+# 中的 environment 注入，无需在此处重复配置
+# ============================================================
 
+# 日志配置：生产环境只输出 info 及以上级别，避免日志刷屏
 logging:
   level:
     com.iwe3.sec: info
-  file:
-    name: logs/sec-backend-prod.log
+    org.springframework: warn
+
+# 生产环境关闭 MyBatis SQL 日志打印
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl

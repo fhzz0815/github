@@ -1,5 +1,7 @@
 package com.iwe3.sec.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import com.iwe3.sec.service.IStaffScheduleService;
 import com.iwe3.sec.entity.StaffScheduleEntity;
@@ -9,6 +11,7 @@ import com.iwe3.sec.common.PageResult;
 /**
  * staff_schedule 表的表现层控制器
  */
+@Tag(name = "员工排班管理", description = "员工排班管理的增删改查")
 @RestController
 @RequestMapping("/api/v1/staffSchedules")
 public class StaffScheduleController {
@@ -19,7 +22,7 @@ public class StaffScheduleController {
         this.staffScheduleService = staffScheduleService;
     }
 
-    /** 分页查询列表 */
+    @Operation(summary = "分页查询员工排班管理列表")
     @GetMapping
     public Result<PageResult<StaffScheduleEntity>> list(StaffScheduleEntity query,
                                                    @RequestParam(defaultValue = "1") Integer page,
@@ -27,20 +30,20 @@ public class StaffScheduleController {
         return Result.success(staffScheduleService.list(query, page, size));
     }
 
-    /** 根据ID查询详情 */
+    @Operation(summary = "根据ID查询员工排班管理详情")
     @GetMapping("/{id}")
     public Result<StaffScheduleEntity> getById(@PathVariable Long id) {
         return Result.success(staffScheduleService.getById(id));
     }
 
-    /** 新增 */
+    @Operation(summary = "新增员工排班管理")
     @PostMapping
     public Result<Void> add(@RequestBody StaffScheduleEntity entity) {
         staffScheduleService.add(entity);
         return Result.success();
     }
 
-    /** 修改 */
+    @Operation(summary = "修改员工排班管理")
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @RequestBody StaffScheduleEntity entity) {
         entity.setId(id);
@@ -48,7 +51,7 @@ public class StaffScheduleController {
         return Result.success();
     }
 
-    /** 删除 */
+    @Operation(summary = "删除员工排班管理")
     @DeleteMapping("/{id}")
     public Result<Void> remove(@PathVariable Long id) {
         staffScheduleService.remove(id);

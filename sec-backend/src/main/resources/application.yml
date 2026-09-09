@@ -1,5 +1,6 @@
 server:
   port: 8080
+  shutdown: graceful
   servlet:
     context-path: /smart_restaurant
     encoding:
@@ -15,6 +16,8 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
 
   # Redis 单机配置（开发环境使用本地 Redis，未设置密码）
   data:
@@ -36,7 +39,7 @@ spring:
     druid:
       aop-patterns: com.iwe3.sec.controller.*Controller
       driver-class-name: com.mysql.cj.jdbc.Driver
-      filter: stat,wall,log4j
+      filter: stat,wall,slf4j
       filter.stat.enabled: true
       filter.stat.log-slow-sql: true
       filter.stat.slow-sql-millis: 2000
@@ -47,26 +50,42 @@ spring:
       max-wait: 60000
       min-evictable-idle-time-millis: 300000
       min-idle: 5
-      password: Flzx3qc_14yhl9t
+      password: ${DB_PASSWORD:Flzx3qc_14yhl9t}
       pool-prepared-statements: true
       stat-view-servlet:
         allow-ips: 127.0.0.1,localhost
         enabled: true
-        login-password:
+        login-password: ${DRUID_PASSWORD:admin123}
         login-username: admin
         reset-enable: false
         url-pattern: /druid/*
-      test-on-borrow: true
+      test-on-borrow: false
       test-on-return: false
-      test-while-idle: false
+      test-while-idle: true
       time-between-eviction-runs-millis: 60000
-      # 数据库连接 URL：显式声明 UTF-8 字符集，避免读取中文时出现乱码
-      # useUnicode=true         开启 Unicode 支持
-      # characterEncoding=UTF-8 指定连接字符集为 UTF-8（对应 MySQL utf8mb4）
-      # connectionCollation     指定连接 collation，保证排序与比较一致
-      url: "jdbc:mysql://192.168.153.138:3307/smart_restaurant?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_general_ci"
+      # 数据库连接 URL：使用环境变量覆盖，默认连接本地 MySQL 3306 端口
+      # 下载项目后，如果使用本地 MySQL，无需修改任何配置即可运行
+      # 如需修改，设置环境变量 DB_HOST、DB_PORT、DB_NAME 或直接修改这里的默认值
+      url: "jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:smart_restaurant}?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_general_ci"
       username: root
-      validation-query: select 1 from dual
+      validation-query: SELECT 1
+
+  # RabbitMQ 消息队列配置
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+    listener:
+      simple:
+        concurrency: 3
+        max-concurrency: 10
+        prefetch: 5
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 1000
 
 # MyBatis 配置
 mybatis:
@@ -74,7 +93,6 @@ mybatis:
   type-aliases-package: com.iwe3.sec.entity
   configuration:
     map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 # PageHelper 分页插件
 pagehelper:
@@ -92,7 +110,7 @@ springdoc:
 
 # JWT 配置
 jwt:
-  secret: smart-restaurant-secret-key-please-change-in-production-2026
+  secret: ${JWT_SECRET:smart-restaurant-secret-key-please-change-in-production-2026}
   access-token-expire: 7200000
   refresh-token-expire: 1209600000
 
@@ -100,7 +118,7 @@ jwt:
 logging:
   config: classpath:logback.xml
   level:
-    com.iwe3.sec: debug
+    com.iwe3.sec: info
     org.springframework: warn
   file:
     path: /logs/portal
@@ -114,3 +132,16 @@ redisson:
     timeout: 5000
     retry-attempts: 3
     retry-interval: 1000
+
+# Actuator 健康检查与监控
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true

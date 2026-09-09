@@ -1,35 +1,47 @@
-﻿# Java
+﻿# ============================================================
+# 智能餐厅系统 - Git 忽略规则
+# ============================================================
+
+# === Java / Maven ===
+sec-backend/target/
 *.class
 *.jar
 *.war
-target/
-!.mvn/wrapper/maven-wrapper.jar
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
 
-# Node
+# === Node / Vue ===
 node_modules/
-dist/
-build/
+sec-frontend/node_modules/
+sec-frontend/dist/
+sec-frontend/.vite/
+sec-frontend/*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# IDE
+# === IDE ===
 .idea/
 *.iml
+.vscode/
 *.swp
 *.swo
 *~
 .DS_Store
 
-# Logs
-logs/
-*.log
-
-# Environment
+# === 环境配置 ===
 .env
 .env.local
 .env.*.local
 
-# Database
-*.sql.gz
-*.sql.zip
+# === 日志 ===
+/logs/
+*.log
 
-# Maven
-.mvn/
+# === Docker ===
+docker-compose.override.yml
