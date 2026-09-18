@@ -1,0 +1,16 @@
+# ============================================================
+# 智慧社区AI系统 - AI 运行依赖
+# ============================================================
+langchain==0.3.*
+langchain-core==0.3.*
+langchain-community==0.3.*
+langgraph==0.2.*
+langgraph-checkpoint-sqlite==2.0.*
+langchain-openai==0.2.*
+tiktoken==0.8.*
+pgvector==0.3.*
+pypdf==5.1.*
+python-docx==1.1.*
+openpyxl==3.1.*
+jieba==0.42.*
+rank-bm25==0.2.*

@@ -1,0 +1,127 @@
+# ============================================================
+# 智慧社区AI系统 - 项目配置
+# Python 3.12 + FastAPI + LangChain/LangGraph
+# ============================================================
+[project]
+name = "smart-community"
+version = "0.1.0"
+description = "智慧社区AI系统 - 多租户SaaS物业管理平台"
+requires-python = ">=3.12"
+readme = "README.md"
+license = { text = "Proprietary" }
+
+[build-system]
+requires = ["setuptools>=75.0"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+# ============================================================
+# Ruff - 代码检查与格式化
+# ============================================================
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "SIM", "ARG"]
+ignore = [
+    "E501",   # 行长度由 formatter 保证
+    "B008",   # FastAPI Depends() 在参数默认值中的调用是标准用法
+    "N802",   # Config 类属性名如 DATABASE_URL 使用大写是惯例
+    "N818",   # AppException 命名合理，不需要强制 Error 后缀
+    "UP046",  # Generic[T] 在 Python 3.12 中仍广泛使用
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/*.py" = ["ARG"]
+"app/services/*.py" = ["ARG002"]
+"app/tasks/*.py" = ["ARG001", "ARG002"]
+"app/api/v1/*.py" = ["ARG"]
+"app/api/deps.py" = ["ARG001"]
+"app/main.py" = ["ARG001"]
+"app/rag/*.py" = ["ARG002"]
+"app/memory/*.py" = ["ARG002"]
+"app/agents/*.py" = ["ARG002"]
+"app/tools/*.py" = ["ARG002"]
+"app/llm/*.py" = ["ARG002"]
+"app/models/*.py" = ["ARG002"]
+"app/core/config.py" = ["N802"]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+line-ending = "auto"
+
+# ============================================================
+# Mypy - 类型检查
+# ============================================================
+[tool.mypy]
+python_version = "3.12"
+strict = false
+ignore_missing_imports = true
+disallow_untyped_defs = false
+check_untyped_defs = false
+warn_unused_ignores = true
+warn_redundant_casts = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
+# ============================================================
+# Pytest - 测试配置
+# ============================================================
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-q --tb=short"
+asyncio_mode = "auto"
+markers = [
+    "unit: 单元测试",
+    "integration: 集成测试（依赖真实数据库或外部服务）",
+    "ai: AI 集成测试（依赖模型服务）",
+    "slow: 慢测试（默认跳过）",
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["tests/*", "*/__init__.py"]
+
+[tool.coverage.report]
+fail_under = 30
+show_missing = true
+
+# ============================================================
+# Import Linter - 架构依赖检查
+# ============================================================
+[tool.import-linter]
+root_package = "app"
+
+[[tool.import-linter.containers]]
+layers = [
+    "app.api",
+    "app.agents",
+    "app.tools",
+    "app.services",
+    "app.rag",
+    "app.llm",
+    "app.memory",
+    "app.schemas",
+    "app.models",
+    "app.tasks",
+    "app.core",
+]
+
+[tool.import-linter.containers.layers_imports]
+"app.api" = ["app.schemas", "app.services", "app.agents", "app.core"]
+"app.agents" = ["app.llm", "app.tools", "app.rag", "app.memory", "app.schemas", "app.core"]
+"app.tools" = ["app.services", "app.schemas", "app.core"]
+"app.rag" = ["app.llm", "app.core", "app.schemas", "app.models"]
+"app.llm" = ["app.core", "app.schemas"]
+"app.memory" = ["app.models", "app.llm", "app.core"]
+"app.models" = ["app.core"]
+"app.schemas" = ["app.core"]
+"app.services" = ["app.models", "app.schemas", "app.core"]
+"app.tasks" = ["app.services", "app.rag", "app.agents", "app.core"]

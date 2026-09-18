@@ -1,0 +1,73 @@
+# ============================================================
+# 智慧社区AI系统 - Git 忽略规则
+# ============================================================
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+*.whl
+*.egg-info/
+
+# === 虚拟环境 ===
+.venv/
+venv/
+env/
+*.venv
+
+# === IDE ===
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# === 环境配置 ===
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# === 日志 ===
+/logs/
+*.log
+*.log.*
+
+# === Docker ===
+docker-compose.override.yml
+
+# === 测试与临时文件 ===
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.coverage.*
+*.trx
+
+# === 向量库与数据 ===
+data/
+vector_store/
+*.db
+*.sqlite
+*.sqlite3
+
+# === AI 相关 ===
+prompts/**/draft/
+evals/results/
+*.gguf
+*.safetensors
+
+# === 数据库迁移备份 ===
+migrations/versions/*.pyc
+
+# === 操作系统 ===
+Thumbs.db
+Desktop.ini

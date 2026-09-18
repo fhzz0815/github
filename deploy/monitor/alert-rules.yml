@@ -1,0 +1,27 @@
+# 告警规则
+groups:
+  - name: smart-community
+    rules:
+      - alert: APIHighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "API 错误率过高"
+
+      - alert: APIHighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "API 响应延迟过高"
+
+      - alert: AITokenQuotaExceeded
+        expr: ai_token_daily_usage > ai_token_daily_limit
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "AI Token 配额超限"

@@ -1,0 +1,122 @@
+# ============================================================
+# 智慧社区AI系统 - Docker Compose 开发环境
+# ============================================================
+version: '3.8'
+
+services:
+  # ===== MySQL 8 =====
+  mysql:
+    image: mysql:8.0
+    container_name: sc-mysql
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: Flzx3qc_14yhl9t
+      MYSQL_DATABASE: smart_community
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d
+    networks:
+      - sc-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===== Redis 7 =====
+  redis:
+    image: redis:7.2
+    container_name: sc-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - sc-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ===== RabbitMQ =====
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: sc-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - sc-network
+
+  # ===== 后端应用 =====
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sc-backend
+    environment:
+      APP_ENV: dev
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: Flzx3qc_14yhl9t
+      DB_NAME: smart_community
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      RABBITMQ_HOST: rabbitmq
+      LOG_LEVEL: DEBUG
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
+    networks:
+      - sc-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ===== Celery Worker =====
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sc-worker
+    command: celery -A app.tasks.celery_app worker -l info -Q index,eval,memory
+    environment:
+      APP_ENV: dev
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: Flzx3qc_14yhl9t
+      DB_NAME: smart_community
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+    volumes:
+      - ./app:/app/app
+    networks:
+      - sc-network
+    depends_on:
+      - redis
+      - backend
+
+volumes:
+  mysql-data:
+  redis-data:
+  rabbitmq-data:
+
+networks:
+  sc-network:
+    driver: bridge
