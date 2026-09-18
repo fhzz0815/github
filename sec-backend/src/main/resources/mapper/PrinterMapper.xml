@@ -46,6 +46,15 @@ printer_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
         WHERE id = #{id}
     </select>
 
+    <!-- 根据门店和用途查询已启用的打印机 -->
+    <select id="selectByStoreAndType" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `printer`
+        WHERE store_id = #{storeId}
+          AND printer_type = #{printerType}
+          AND status = 1
+    </select>
+
     <insert id="insert" parameterType="com.iwe3.sec.entity.PrinterEntity" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO `printer`
         <trim prefix="(" suffix=")" suffixOverrides=",">

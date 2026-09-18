@@ -8,10 +8,12 @@ import com.iwe3.sec.entity.StockCheckIngredientEntity;
 import com.iwe3.sec.common.Result;
 import com.iwe3.sec.common.PageResult;
 
+import java.util.Map;
+
 /**
  * stock_check_ingredient 表的表现层控制器
  */
-@Tag(name = "原料盘点", description = "原料盘点的增删改查")
+@Tag(name = "原料盘点", description = "原料盘点的增删改查与审核")
 @RestController
 @RequestMapping("/api/v1/stockCheckIngredients")
 public class StockCheckIngredientController {
@@ -55,6 +57,15 @@ public class StockCheckIngredientController {
     @DeleteMapping("/{id}")
     public Result<Void> remove(@PathVariable Long id) {
         stockCheckIngredientService.remove(id);
+        return Result.success();
+    }
+
+    @Operation(summary = "审核食材盘点单（总店长专用）")
+    @PutMapping("/{id}/approve")
+    public Result<Void> approve(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        boolean approved = Boolean.TRUE.equals(body.get("approved"));
+        String auditRemark = (String) body.get("auditRemark");
+        stockCheckIngredientService.approve(id, approved, auditRemark);
         return Result.success();
     }
 }

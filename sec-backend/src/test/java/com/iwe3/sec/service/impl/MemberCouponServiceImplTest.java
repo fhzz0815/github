@@ -1,7 +1,9 @@
 package com.iwe3.sec.service.impl;
 
 import com.iwe3.sec.common.PageResult;
+import com.iwe3.sec.common.lock.DistributedLockTemplate;
 import com.iwe3.sec.entity.MemberCouponEntity;
+import com.iwe3.sec.mapper.CouponMapper;
 import com.iwe3.sec.mapper.MemberCouponMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,11 +29,17 @@ class MemberCouponServiceImplTest {
     @Mock
     private MemberCouponMapper memberCouponMapper;
 
+    @Mock
+    private CouponMapper couponMapper;
+
+    @Mock
+    private DistributedLockTemplate distributedLockTemplate;
+
     private MemberCouponServiceImpl memberCouponService;
 
     @BeforeEach
     void setUp() {
-        memberCouponService = new MemberCouponServiceImpl(memberCouponMapper);
+        memberCouponService = new MemberCouponServiceImpl(memberCouponMapper, couponMapper, distributedLockTemplate);
     }
 
     @Test

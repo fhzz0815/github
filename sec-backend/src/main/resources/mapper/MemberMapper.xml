@@ -147,4 +147,47 @@ real_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
         UPDATE `member` SET is_deleted = 1 WHERE id = #{id}
     </update>
 
+    <!-- ========== 钱包原子操作 ========== -->
+
+    <!-- 原子增加余额（充值）：用 balance + #{amount} 而不是 set balance = #{newBalance}，避免并发覆盖 -->
+    <update id="increaseBalance">
+        UPDATE `member`
+        SET balance = balance + #{amount},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 原子减少余额（消费）：加上 balance >= #{amount} 条件防止余额扣成负数 -->
+    <update id="decreaseBalance">
+        UPDATE `member`
+        SET balance = balance - #{amount},
+            update_time = NOW()
+        WHERE id = #{id} AND balance >= #{amount}
+    </update>
+
+    <!-- 原子增加可用积分 -->
+    <update id="increasePoints">
+        UPDATE `member`
+        SET available_points = available_points + #{points},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 原子增加总积分和可用积分（签到/消费送积分时同时增加两者） -->
+    <update id="increaseTotalAndAvailablePoints">
+        UPDATE `member`
+        SET total_points = total_points + #{points},
+            available_points = available_points + #{points},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 原子减少可用积分（兑换/抵扣）：加上 available_points >= #{points} 条件防止扣成负数 -->
+    <update id="decreaseAvailablePoints">
+        UPDATE `member`
+        SET available_points = available_points - #{points},
+            update_time = NOW()
+        WHERE id = #{id} AND available_points >= #{points}
+    </update>
+
 </mapper>

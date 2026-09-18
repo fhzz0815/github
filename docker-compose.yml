@@ -1,53 +1,156 @@
-﻿# ============================================================
-# 智能餐厅系统 - Docker 一键部署
-# 使用方式：
-#   1. 先构建后端：cd sec-backend && mvn clean package -DskipTests
-#   2. 在项目根目录运行：docker-compose up -d
-# ============================================================
-version: "3.8"
+version: '3.8'
 
 services:
-  # ==================== MySQL 数据库 ====================
-  mysql:
+
+  # ===== MySQL 主从 =====
+  mysql-master:
     image: mysql:8.0
-    container_name: smart-restaurant-mysql
-    restart: unless-stopped
+    container_name: sr-mysql-master
+    command: --server-id=1 --log-bin=mysql-bin --gtid-mode=ON --enforce-gtid-consistency=ON --binlog-format=ROW
     environment:
       MYSQL_ROOT_PASSWORD: Flzx3qc_14yhl9t
       MYSQL_DATABASE: smart_restaurant
-      MYSQL_CHARACTER_SET_SERVER: utf8mb4
-      MYSQL_COLLATION_SERVER: utf8mb4_general_ci
     ports:
-      - "3307:3306"
+      - "3306:3306"
     volumes:
-      - mysql-data:/var/lib/mysql
-      - ./database/smart_restaurant.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - mysql-master-data:/var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d
+    networks:
+      - sr-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
-      timeout: 3s
+      timeout: 5s
       retries: 5
 
-  # ==================== Redis 缓存 ====================
-  redis:
-    image: redis:7-alpine
-    container_name: smart-restaurant-redis
-    restart: unless-stopped
+  mysql-slave1:
+    image: mysql:8.0
+    container_name: sr-mysql-slave1
+    command: --server-id=2 --gtid-mode=ON --enforce-gtid-consistency=ON --read-only=ON
+    environment:
+      MYSQL_ROOT_PASSWORD: Flzx3qc_14yhl9t
+      MYSQL_DATABASE: smart_restaurant
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-slave1-data:/var/lib/mysql
+    networks:
+      - sr-network
+    depends_on:
+      mysql-master:
+        condition: service_healthy
+
+  mysql-slave2:
+    image: mysql:8.0
+    container_name: sr-mysql-slave2
+    command: --server-id=3 --gtid-mode=ON --enforce-gtid-consistency=ON --read-only=ON
+    environment:
+      MYSQL_ROOT_PASSWORD: Flzx3qc_14yhl9t
+      MYSQL_DATABASE: smart_restaurant
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql-slave2-data:/var/lib/mysql
+    networks:
+      - sr-network
+    depends_on:
+      mysql-master:
+        condition: service_healthy
+
+  # ===== Redis 哨兵集群 =====
+  redis-master:
+    image: redis:7.2
+    container_name: sr-redis-master
+    command: redis-server --appendonly yes
     ports:
       - "6379:6379"
     volumes:
-      - redis-data:/data
+      - redis-master-data:/data
+    networks:
+      - sr-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 3s
       retries: 5
 
-  # ==================== RabbitMQ 消息队列 ====================
+  redis-slave1:
+    image: redis:7.2
+    container_name: sr-redis-slave1
+    command: redis-server --appendonly yes --replicaof redis-master 6379
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis-slave1-data:/data
+    networks:
+      - sr-network
+    depends_on:
+      redis-master:
+        condition: service_healthy
+
+  redis-slave2:
+    image: redis:7.2
+    container_name: sr-redis-slave2
+    command: redis-server --appendonly yes --replicaof redis-master 6379
+    ports:
+      - "6381:6379"
+    volumes:
+      - redis-slave2-data:/data
+    networks:
+      - sr-network
+    depends_on:
+      redis-master:
+        condition: service_healthy
+
+  sentinel1:
+    image: redis:7.2
+    container_name: sr-sentinel1
+    command: redis-sentinel /etc/sentinel.conf
+    volumes:
+      - ./sentinel/sentinel1.conf:/etc/sentinel.conf
+    ports:
+      - "26379:26379"
+    networks:
+      - sr-network
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2
+
+  sentinel2:
+    image: redis:7.2
+    container_name: sr-sentinel2
+    command: redis-sentinel /etc/sentinel.conf
+    volumes:
+      - ./sentinel/sentinel2.conf:/etc/sentinel.conf
+    ports:
+      - "26380:26379"
+    networks:
+      - sr-network
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2
+
+  sentinel3:
+    image: redis:7.2
+    container_name: sr-sentinel3
+    command: redis-sentinel /etc/sentinel.conf
+    volumes:
+      - ./sentinel/sentinel3.conf:/etc/sentinel.conf
+    ports:
+      - "26381:26379"
+    networks:
+      - sr-network
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2
+
+  # ===== RabbitMQ =====
   rabbitmq:
-    image: rabbitmq:3.13-management-alpine
-    container_name: smart-restaurant-rabbitmq
-    restart: unless-stopped
+    image: rabbitmq:3.13-management
+    container_name: sr-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
@@ -56,40 +159,138 @@ services:
       - "15672:15672"
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - sr-network
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
       interval: 15s
       timeout: 5s
       retries: 5
 
-  # ==================== 后端服务 ====================
-  backend:
+  # ===== 后端服务（双实例负载均衡）=====
+  backend1:
+    image: smart-restaurant/backend:latest
+    container_name: sr-backend1
     build:
       context: ./sec-backend
       dockerfile: Dockerfile
-    container_name: smart-restaurant-backend
-    restart: unless-stopped
-    depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
     environment:
-      SPRING_DATASOURCE_DRUID_URL: jdbc:mysql://mysql:3306/smart_restaurant?useSSL=false&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8
-      SPRING_DATASOURCE_DRUID_USERNAME: root
-      SPRING_DATASOURCE_DRUID_PASSWORD: Flzx3qc_14yhl9t
-      SPRING_DATA_REDIS_HOST: redis
+      DB_HOST: mysql-master
+      DB_PORT: 3306
+      DB_SLAVE_HOST: mysql-slave1
+      DB_NAME: smart_restaurant
+      DB_PASSWORD: Flzx3qc_14yhl9t
+      SPRING_PROFILES_ACTIVE: dev
       SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_REDIS_SENTINEL_MASTER: mymaster
+      SPRING_REDIS_SENTINEL_NODES: sentinel1:26379,sentinel2:26380,sentinel3:26381
     ports:
-      - "8080:8080"
+      - "8080"
+    networks:
+      - sr-network
+    depends_on:
+      - mysql-master
+      - redis-master
+      - rabbitmq
+
+  backend2:
+    image: smart-restaurant/backend:latest
+    container_name: sr-backend2
+    environment:
+      DB_HOST: mysql-master
+      DB_PORT: 3306
+      DB_SLAVE_HOST: mysql-slave2
+      DB_NAME: smart_restaurant
+      DB_PASSWORD: Flzx3qc_14yhl9t
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_REDIS_SENTINEL_MASTER: mymaster
+      SPRING_REDIS_SENTINEL_NODES: sentinel1:26379,sentinel2:26380,sentinel3:26381
+    ports:
+      - "8080"
+    networks:
+      - sr-network
+    depends_on:
+      - mysql-master
+      - redis-master
+      - rabbitmq
+
+  # ===== Nginx 反向代理 =====
+  nginx:
+    image: nginx:1.26
+    container_name: sr-nginx
     volumes:
-      - backend-logs:/logs/portal
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./sec-frontend/dist:/usr/share/nginx/html:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - sr-network
+    depends_on:
+      - backend1
+      - backend2
+
+  # ===== AI 服务 =====
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: sr-ai-service
+    environment:
+      REDIS_URL: redis://redis-master:6379
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_API_BASE: https://api.deepseek.com
+      MODEL_NAME: deepseek-chat
+    ports:
+      - "8000:8000"
+    networks:
+      - sr-network
+    depends_on:
+      - redis-master
+    profiles:
+      - ai
+
+  # ===== Prometheus + Grafana（可选）=====
+  prometheus:
+    image: prom/prometheus:v2.53
+    container_name: sr-prometheus
+    volumes:
+      - ./sec-backend/monitor/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - sr-network
+    profiles:
+      - monitor
+
+  grafana:
+    image: grafana/grafana:11.1
+    container_name: sr-grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - sr-network
+    depends_on:
+      - prometheus
+    profiles:
+      - monitor
 
 volumes:
-  mysql-data:
-  redis-data:
+  mysql-master-data:
+  mysql-slave1-data:
+  mysql-slave2-data:
+  redis-master-data:
+  redis-slave1-data:
+  redis-slave2-data:
   rabbitmq-data:
-  backend-logs:
+  grafana-data:
+
+networks:
+  sr-network:
+    driver: bridge

@@ -2,13 +2,13 @@ package com.iwe3.sec.service.impl;
 
 import com.iwe3.sec.common.PageResult;
 import com.iwe3.sec.common.PermissionChecker;
+import com.iwe3.sec.common.lock.DistributedLockTemplate;
 import com.iwe3.sec.entity.OrdersEntity;
 import com.iwe3.sec.mapper.OrderDetailMapper;
 import com.iwe3.sec.mapper.OrderStatusLogMapper;
 import com.iwe3.sec.mapper.OrdersMapper;
 import com.iwe3.sec.mapper.PaymentRecordMapper;
 import com.iwe3.sec.mapper.DishStockMapper;
-import com.iwe3.sec.mq.OrderMessageProducer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,14 +49,14 @@ class OrdersServiceImplTest {
     private PermissionChecker permissionChecker;
 
     @Mock
-    private OrderMessageProducer orderMessageProducer;
+    private DistributedLockTemplate distributedLockTemplate;
 
     private OrdersServiceImpl ordersService;
 
     @BeforeEach
     void setUp() {
         ordersService = new OrdersServiceImpl(ordersMapper, orderDetailMapper, orderStatusLogMapper,
-                paymentRecordMapper, dishStockMapper, permissionChecker, orderMessageProducer);
+                paymentRecordMapper, dishStockMapper, permissionChecker, distributedLockTemplate);
     }
 
     @Test

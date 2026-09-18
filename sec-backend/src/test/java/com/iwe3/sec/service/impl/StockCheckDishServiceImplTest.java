@@ -1,7 +1,9 @@
 package com.iwe3.sec.service.impl;
 
 import com.iwe3.sec.common.PageResult;
+import com.iwe3.sec.common.PermissionChecker;
 import com.iwe3.sec.entity.StockCheckDishEntity;
+import com.iwe3.sec.mapper.DishStockMapper;
 import com.iwe3.sec.mapper.StockCheckDishMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,11 +29,17 @@ class StockCheckDishServiceImplTest {
     @Mock
     private StockCheckDishMapper stockCheckDishMapper;
 
+    @Mock
+    private DishStockMapper dishStockMapper;
+
+    @Mock
+    private PermissionChecker permissionChecker;
+
     private StockCheckDishServiceImpl stockCheckDishService;
 
     @BeforeEach
     void setUp() {
-        stockCheckDishService = new StockCheckDishServiceImpl(stockCheckDishMapper);
+        stockCheckDishService = new StockCheckDishServiceImpl(stockCheckDishMapper, dishStockMapper, permissionChecker);
     }
 
     @Test

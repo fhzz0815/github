@@ -58,6 +58,13 @@ pay_no LIKE CONCAT('%', #{query.searchKeyword}, '%')
         WHERE id = #{id}
     </select>
 
+    <select id="selectByIdempotencyKey" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `payment_record`
+        WHERE idempotency_key = #{idempotencyKey}
+        LIMIT 1
+    </select>
+
     <insert id="insert" parameterType="com.iwe3.sec.entity.PaymentRecordEntity" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO `payment_record`
         <trim prefix="(" suffix=")" suffixOverrides=",">

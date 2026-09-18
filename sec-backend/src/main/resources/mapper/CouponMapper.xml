@@ -141,4 +141,14 @@ coupon_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
         UPDATE `coupon` SET is_deleted = 1 WHERE id = #{id}
     </update>
 
+    <!-- 原子递增已发放数量（带库存校验，用于领券场景） -->
+    <update id="incrementIssuedCount">
+        UPDATE `coupon`
+        SET issued_count = issued_count + 1
+        WHERE id = #{id}
+          AND (total_count = 0 OR issued_count <![CDATA[ < ]]> total_count)
+          AND status = 1
+          AND is_deleted = 0
+    </update>
+
 </mapper>

@@ -1,6 +1,8 @@
 package com.iwe3.sec.service.impl;
 
 import com.iwe3.sec.common.PageResult;
+import com.iwe3.sec.common.PermissionChecker;
+import com.iwe3.sec.common.cache.CacheHelper;
 import com.iwe3.sec.entity.StoreEntity;
 import com.iwe3.sec.mapper.StoreMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -27,11 +30,17 @@ class StoreServiceImplTest {
     @Mock
     private StoreMapper storeMapper;
 
+    @Mock
+    private PermissionChecker permissionChecker;
+
+    @Mock
+    private CacheHelper cacheHelper;
+
     private StoreServiceImpl storeService;
 
     @BeforeEach
     void setUp() {
-        storeService = new StoreServiceImpl(storeMapper);
+        storeService = new StoreServiceImpl(storeMapper, permissionChecker, cacheHelper);
     }
 
     @Test
@@ -61,9 +70,15 @@ class StoreServiceImplTest {
 
     @Test
     @DisplayName("Get by id when exists should return entity")
-    void testGetById_WhenExists_ShouldReturnEntity() {
+    void testGetById_WhenExists_ShouldReturnEntity() throws Exception {
         StoreEntity mockEntity = StoreEntity.builder().id(1L).build();
         when(storeMapper.selectById(1L)).thenReturn(mockEntity);
+        // 让 cacheHelper 执行加载器（实际调用 storeMapper.selectById）
+        when(cacheHelper.getOrLoad(anyString(), anyLong(), eq(StoreEntity.class), any()))
+                .thenAnswer(invocation -> {
+                    Callable<StoreEntity> loader = invocation.getArgument(3);
+                    return loader.call();
+                });
 
         StoreEntity result = storeService.getById(1L);
 
@@ -73,8 +88,10 @@ class StoreServiceImplTest {
 
     @Test
     @DisplayName("Get by id when not exists should return null")
-    void testGetById_WhenNotExists_ShouldReturnNull() {
-        when(storeMapper.selectById(999L)).thenReturn(null);
+    void testGetById_WhenNotExists_ShouldReturnNull() throws Exception {
+        // cacheHelper 返回 null 模拟缓存未命中且数据库无数据
+        when(cacheHelper.getOrLoad(anyString(), anyLong(), eq(StoreEntity.class), any()))
+                .thenReturn(null);
 
         StoreEntity result = storeService.getById(999L);
 

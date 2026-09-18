@@ -23,6 +23,10 @@ public interface PrinterMapper {
     /** 修改 */
     int update(PrinterEntity entity);
 
+    /** 根据门店和用途查找已启用的打印机 */
+    List<PrinterEntity> selectByStoreAndType(@Param("storeId") Long storeId,
+                                              @Param("printerType") String printerType);
+
     /** 根据ID删除 */
     int deleteById(@Param("id") Long id);
 }

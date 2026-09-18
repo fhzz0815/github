@@ -22,4 +22,13 @@ public interface IStockCheckDishService {
 
     /** 删除 */
     boolean remove(Long id);
+
+    /**
+     * 审核盘点单（只有总店长可以操作）
+     *
+     * @param id          盘点单ID
+     * @param approved    是否通过：true=通过，false=驳回
+     * @param auditRemark 审核意见
+     */
+    void approve(Long id, boolean approved, String auditRemark);
 }

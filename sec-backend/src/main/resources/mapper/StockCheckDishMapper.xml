@@ -118,4 +118,15 @@ check_no LIKE CONCAT('%', #{query.searchKeyword}, '%')
         DELETE FROM `stock_check_dish` WHERE id = #{id}
     </delete>
 
+    <!-- 审核盘点单：只更新状态为 1=待审核 的记录，避免并发重复审核 -->
+    <update id="updateStatus">
+        UPDATE `stock_check_dish`
+        SET status      = #{status},
+            auditor_id  = #{auditorId},
+            audit_time  = #{auditTime},
+            audit_remark = #{auditRemark}
+        WHERE id = #{id}
+          AND status = 1
+    </update>
+
 </mapper>

@@ -17,6 +17,9 @@ public interface PaymentRecordMapper {
     /** 根据ID查询 */
     PaymentRecordEntity selectById(@Param("id") Long id);
 
+    /** 根据幂等键查询（用于防重复支付） */
+    PaymentRecordEntity selectByIdempotencyKey(@Param("idempotencyKey") String idempotencyKey);
+
     /** 新增 */
     int insert(PaymentRecordEntity entity);
 

@@ -1,7 +1,10 @@
 package com.iwe3.sec.service.impl;
 
 import com.iwe3.sec.common.PageResult;
+import com.iwe3.sec.common.PermissionChecker;
 import com.iwe3.sec.entity.RefundEntity;
+import com.iwe3.sec.mapper.OrderDetailMapper;
+import com.iwe3.sec.mapper.OrdersMapper;
 import com.iwe3.sec.mapper.RefundMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,11 +30,20 @@ class RefundServiceImplTest {
     @Mock
     private RefundMapper refundMapper;
 
+    @Mock
+    private OrdersMapper ordersMapper;
+
+    @Mock
+    private OrderDetailMapper orderDetailMapper;
+
+    @Mock
+    private PermissionChecker permissionChecker;
+
     private RefundServiceImpl refundService;
 
     @BeforeEach
     void setUp() {
-        refundService = new RefundServiceImpl(refundMapper);
+        refundService = new RefundServiceImpl(refundMapper, ordersMapper, orderDetailMapper, permissionChecker);
     }
 
     @Test

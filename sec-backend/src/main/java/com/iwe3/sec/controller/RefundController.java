@@ -8,10 +8,12 @@ import com.iwe3.sec.entity.RefundEntity;
 import com.iwe3.sec.common.Result;
 import com.iwe3.sec.common.PageResult;
 
+import java.util.Map;
+
 /**
  * refund 表的表现层控制器
  */
-@Tag(name = "退款管理", description = "退款管理的增删改查")
+@Tag(name = "退款管理", description = "退款管理的增删改查与审核处理")
 @RestController
 @RequestMapping("/api/v1/refunds")
 public class RefundController {
@@ -55,6 +57,22 @@ public class RefundController {
     @DeleteMapping("/{id}")
     public Result<Void> remove(@PathVariable Long id) {
         refundService.remove(id);
+        return Result.success();
+    }
+
+    @Operation(summary = "提交退款申请（退菜/整单退）")
+    @PostMapping("/submit")
+    public Result<Long> submitRefund(@RequestBody RefundEntity entity) {
+        Long refundId = refundService.submitRefund(entity);
+        return Result.success(refundId);
+    }
+
+    @Operation(summary = "处理退款申请（审核通过或驳回）")
+    @PutMapping("/{id}/process")
+    public Result<Void> processRefund(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        boolean approved = Boolean.TRUE.equals(body.get("approved"));
+        String auditRemark = (String) body.get("auditRemark");
+        refundService.processRefund(id, approved, auditRemark);
         return Result.success();
     }
 }

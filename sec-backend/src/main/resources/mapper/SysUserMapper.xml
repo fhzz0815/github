@@ -198,10 +198,18 @@ real_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
         UPDATE `sys_user` SET is_deleted = 1 WHERE id = #{id}
     </update>
 
-    <!-- 更新最后登录时间，精确到秒；用 NOW() 写入数据库服务器时间保证一致性 -->
+    <!-- 更新最后登录时间，精确到秒 -->
     <update id="updateLastLoginTime">
         UPDATE `sys_user`
         SET last_login_time = #{lastLoginTime}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 更新用户密码（MD5 升级为 bcrypt 时调用） -->
+    <update id="updatePassword">
+        UPDATE `sys_user`
+        SET password = #{password},
+            update_time = NOW()
         WHERE id = #{id}
     </update>
 

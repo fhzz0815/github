@@ -39,6 +39,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         WHERE id = #{id}
     </select>
 
+    <select id="selectByStoreAndIngredient" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `ingredient_stock`
+        WHERE store_id = #{storeId} AND ingredient_id = #{ingredientId}
+    </select>
+
     <insert id="insert" parameterType="com.iwe3.sec.entity.IngredientStockEntity" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO `ingredient_stock`
         <trim prefix="(" suffix=")" suffixOverrides=",">

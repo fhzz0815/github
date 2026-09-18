@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.ReportMapper">
+
+    <!-- 1. 菜品流水 -->
+    <select id="selectDishFlow" resultType="java.util.LinkedHashMap">
+        SELECT flow_id, order_id, order_no, store_id, store_name,
+               dish_id, dish_name, spec_name, quantity,
+               unit_price, subtotal, order_status,
+               pay_type, order_time, pay_time
+        FROM v_dish_flow
+        <where>
+            <if test="storeId != null">AND store_id = #{storeId}</if>
+            <if test="startDate != null">AND order_time &gt;= #{startDate}</if>
+            <if test="endDate != null">AND order_time &lt;= #{endDate}</if>
+        </where>
+        ORDER BY order_time DESC
+    </select>
+
+    <!-- 2. 收款报表 -->
+    <select id="selectReceiptReport" resultType="java.util.LinkedHashMap">
+        SELECT receipt_date, store_id, store_name,
+               order_count, total_amount,
+               wechat_amount, alipay_amount, cash_amount, member_amount,
+               avg_amount
+        FROM v_receipt_report
+        <where>
+            <if test="storeId != null">AND store_id = #{storeId}</if>
+            <if test="date != null and date != ''">AND receipt_date = #{date}</if>
+        </where>
+        ORDER BY receipt_date DESC
+    </select>
+
+    <!-- 3. 菜品销售排行 -->
+    <select id="selectDishSalesRanking" resultType="java.util.LinkedHashMap">
+        SELECT dish_id, dish_name, store_id, store_name,
+               price, dish_category_id, category_name,
+               sale_count, total_quantity, total_amount
+        FROM v_dish_sales_ranking
+        <where>
+            <if test="storeId != null">AND store_id = #{storeId}</if>
+        </where>
+        ORDER BY total_amount DESC
+        <if test="topN != null">LIMIT #{topN}</if>
+    </select>
+
+    <!-- 4. 门店销售排行 -->
+    <select id="selectStoreSalesRanking" resultType="java.util.LinkedHashMap">
+        SELECT store_id, store_name, province, city, district,
+               order_count, total_amount, avg_amount, member_count
+        FROM v_store_sales_ranking
+        ORDER BY total_amount DESC
+    </select>
+
+    <!-- 5. 今日收入概况 -->
+    <select id="selectTodayIncome" resultType="java.util.LinkedHashMap">
+        SELECT store_id, store_name, order_count, total_income,
+               avg_amount, wechat_income, alipay_income,
+               cash_income, member_income
+        FROM v_today_income
+        <where>
+            <if test="storeId != null">AND store_id = #{storeId}</if>
+        </where>
+    </select>
+
+    <!-- 6. 退款记录 -->
+    <select id="selectRefundRecord" resultType="java.util.LinkedHashMap">
+        SELECT refund_id, refund_no, order_id, order_no,
+               store_id, store_name, member_id,
+               refund_amount, refund_reason, refund_type,
+               refund_status, refund_time, approve_time,
+               operator_id, operator_name
+        FROM v_refund_record
+        <where>
+            <if test="storeId != null">AND store_id = #{storeId}</if>
+            <if test="startDate != null">AND refund_time &gt;= #{startDate}</if>
+            <if test="endDate != null">AND refund_time &lt;= #{endDate}</if>
+        </where>
+        ORDER BY refund_time DESC
+    </select>
+
+    <!-- 7. 菜品流水（延迟关联优化版） -->
+    <select id="selectDishFlowOptimized" resultType="java.util.LinkedHashMap">
+        SELECT t.*
+        FROM v_dish_flow t
+        INNER JOIN (
+            SELECT flow_id
+            FROM v_dish_flow
+            <where>
+                <if test="storeId != null">AND store_id = #{storeId}</if>
+                <if test="startDate != null">AND order_time &gt;= #{startDate}</if>
+                <if test="endDate != null">AND order_time &lt;= #{endDate}</if>
+            </where>
+            ORDER BY order_time DESC
+            LIMIT #{limit} OFFSET #{offset}
+        ) tmp ON t.flow_id = tmp.flow_id
+        ORDER BY t.order_time DESC
+    </select>
+
+</mapper>

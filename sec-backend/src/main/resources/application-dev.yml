@@ -1,5 +1,18 @@
 # 开发环境配置
 # 连接信息统一在 application.yml 中配置，此处仅保留开发环境差异项
+
+# Windows 控制台编码：设为 GBK 避免中文乱码
+# 如果启动后控制台还有乱码，在 PowerShell 先执行下面这行再启动：
+#   [Console]::OutputEncoding = [Text.Encoding]::UTF8
+CONSOLE_CHARSET: GBK
+
+# 开发环境禁用 RabbitMQ（没有安装的话就关闭，不影响正常运行）
+rabbitmq:
+  enabled: false
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+
 logging:
   level:
     com.iwe3.sec: debug

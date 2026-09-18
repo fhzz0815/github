@@ -46,9 +46,11 @@ public interface IOrdersService {
      * @param payType 支付类型 WECHAT/ALIPAY/MEMBER_BALANCE/CASH
      * @param actualAmount 实际支付金额
      * @param memberPayAmount 会员余额支付金额
+     * @param idempotencyKey 幂等键（防止重复支付）
      * @param operatorId 操作员工ID
      */
-    void payOrder(Long orderId, String payType, BigDecimal actualAmount, BigDecimal memberPayAmount, Long operatorId);
+    void payOrder(Long orderId, String payType, BigDecimal actualAmount,
+                  BigDecimal memberPayAmount, String idempotencyKey, Long operatorId);
 
     /**
      * 取消订单
@@ -66,6 +68,21 @@ public interface IOrdersService {
      * @param operatorId 操作员工ID
      */
     void updateMakeStatus(Long orderId, Long detailId, Integer makeStatus, Long operatorId);
+
+    /**
+     * 完成订单（制作中/配送中/待自取 → 已完成）
+     * @param orderId 订单ID
+     * @param operatorId 操作员工ID
+     */
+    void completeOrder(Long orderId, Long operatorId);
+
+    /**
+     * 退款订单（已支付的订单 → 已退款）
+     * @param orderId 订单ID
+     * @param reason 退款原因
+     * @param operatorId 操作员工ID
+     */
+    void refundOrder(Long orderId, String reason, Long operatorId);
 
     /**
      * 获取订单详情（含明细列表）

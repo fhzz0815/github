@@ -1334,6 +1334,25 @@ INSERT INTO `cart` (`member_id`,`store_id`,`dish_id`,`dish_name`,`spec_name`,`ta
 (5,1,3,'宫保鸡丁','标准份','微辣',32.00,1),
 (5,1,13,'米饭',NULL,NULL,3.00,2);
 
+-- =====================================================================
+-- 消息队列消费日志表：用于消息幂等消费，防止重复处理
+-- 每次消费前先 INSERT，唯一键冲突则跳过（已消费过）
+-- =====================================================================
+DROP TABLE IF EXISTS `mq_consume_log`;
+CREATE TABLE `mq_consume_log` (
+    `id`              BIGINT UNSIGNED AUTO_INCREMENT COMMENT '主键ID',
+    `message_id`      VARCHAR(128)    NOT NULL COMMENT '消息唯一ID（业务层生成，如 orderId + 事件类型）',
+    `queue_name`      VARCHAR(64)     NOT NULL COMMENT '队列名称',
+    `status`          TINYINT         NOT NULL DEFAULT 1 COMMENT '消费状态 1成功 2失败',
+    `error_message`   VARCHAR(1000)   DEFAULT NULL COMMENT '错误信息',
+    `consumed_at`     DATETIME        NOT NULL COMMENT '消费时间',
+    `create_time`     DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_message_id` (`message_id`) USING BTREE COMMENT '消息ID唯一键，保证幂等消费',
+    KEY `idx_queue_name` (`queue_name`) USING BTREE,
+    KEY `idx_consumed_at` (`consumed_at`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='消息队列消费日志表';
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ---------------------------------------------------------------------

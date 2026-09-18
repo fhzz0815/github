@@ -20,8 +20,12 @@ public interface DishStockMapper {
     /** 根据门店和菜品查询 */
     DishStockEntity selectByStoreAndDish(@Param("storeId") Long storeId, @Param("dishId") Long dishId);
 
-    /** 扣减库存 */
+    /** 扣减库存（带乐观锁，防止超卖） */
     int decreaseStock(@Param("storeId") Long storeId, @Param("dishId") Long dishId,
+                      @Param("quantity") Integer quantity);
+
+    /** 回滚库存（取消订单时恢复已扣减的库存） */
+    int increaseStock(@Param("storeId") Long storeId, @Param("dishId") Long dishId,
                       @Param("quantity") Integer quantity);
 
     /** 新增 */

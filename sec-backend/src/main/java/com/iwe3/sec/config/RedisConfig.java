@@ -6,42 +6,59 @@ import org.redisson.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.time.Duration;
 
 /**
  * Redis 配置类
  * 序列化key与value，便于缓存对象
- * 同时配置 Redisson 单机客户端
+ * 同时配置 Redisson 客户端（优先哨兵模式，fallback 单机模式）
  */
 @Configuration
 public class RedisConfig {
 
     private static final Logger log = LoggerFactory.getLogger(RedisConfig.class);
 
+    // ===== 单机模式配置（开发/测试环境兜底） =====
     @Value("${spring.data.redis.host:127.0.0.1}")
     private String redisHost;
 
     @Value("${spring.data.redis.port:6379}")
     private int redisPort;
 
+    // ===== 哨兵模式配置（生产环境） =====
+    @Value("${redis.sentinel.master:mymaster}")
+    private String sentinelMaster;
+
+    @Value("${redis.sentinel.nodes:}")
+    private String sentinelNodes;
+
+    // ===== 通用配置 =====
     @Value("${spring.data.redis.password:}")
     private String redisPassword;
 
     @Value("${spring.data.redis.database:0}")
     private int redisDatabase;
 
-    @Value("${redisson.single-server-config.timeout:5000}")
+    @Value("${redisson.connection.timeout:5000}")
     private int timeout;
 
-    @Value("${redisson.single-server-config.retry-attempts:3}")
+    @Value("${redisson.connection.retry-attempts:3}")
     private int retryAttempts;
 
-    @Value("${redisson.single-server-config.retry-interval:1000}")
+    @Value("${redisson.connection.retry-interval:1000}")
     private int retryInterval;
 
     @Bean
@@ -49,12 +66,9 @@ public class RedisConfig {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(factory);
 
-        // 使用 RedisSerializer.json() 替代已过时的 Jackson2JsonRedisSerializer
-        // 它会在序列化时自动带上 @class 类型信息，确保反序列化时能正确还原对象类型
         RedisSerializer<?> jsonSerializer = RedisSerializer.json();
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
 
-        // key 采用 String 序列化，value 采用 JSON 序列化（带类型信息）
         template.setKeySerializer(stringRedisSerializer);
         template.setHashKeySerializer(stringRedisSerializer);
         template.setValueSerializer(jsonSerializer);
@@ -64,27 +78,80 @@ public class RedisConfig {
     }
 
     /**
-     * Redisson 单机客户端
-     * 读取 spring.data.redis 配置，连接本地 Redis 单机
+     * Redisson 客户端（哨兵模式优先，单机模式兜底）
+     *
+     * 生产环境：
+     *   配置 redis.sentinel.nodes=sentinel1:26379,sentinel2:26380,sentinel3:26381
+     *   自动启用哨兵模式，故障转移时自动切换 master
+     *
+     * 开发环境：
+     *   不配 sentinel.nodes，回退到 useSingleServer 连接本地 Redis
      */
     @Bean
     public RedissonClient redissonClient() {
         try {
             Config config = new Config();
-            // 本机开发环境 Redis 通常未设密码：配置为空时必须传 null，否则 Redisson 会发送 AUTH 报错
-            config.useSingleServer()
-                    .setAddress("redis://" + redisHost + ":" + redisPort)
-                    .setPassword(redisPassword == null || redisPassword.isEmpty() ? null : redisPassword)
-                    .setDatabase(redisDatabase)
-                    .setTimeout(timeout)
-                    .setRetryAttempts(retryAttempts)
-                    .setRetryInterval(retryInterval);
+            String password = (redisPassword == null || redisPassword.isEmpty()) ? null : redisPassword;
+
+            if (sentinelNodes != null && !sentinelNodes.isBlank()) {
+                // 哨兵模式：读取 sentinel.nodes 列表，动态分配哨兵地址
+                String[] nodes = sentinelNodes.split(",");
+                for (int i = 0; i < nodes.length; i++) {
+                    nodes[i] = nodes[i].startsWith("redis://") ? nodes[i] : "redis://" + nodes[i].trim();
+                    nodes[i] = nodes[i].replace("redis://redis://", "redis://");
+                }
+                config.useSentinelServers()
+                        .setMasterName(sentinelMaster)
+                        .addSentinelAddress(nodes)
+                        .setPassword(password)
+                        .setDatabase(redisDatabase)
+                        .setTimeout(timeout)
+                        .setRetryAttempts(retryAttempts)
+                        .setRetryInterval(retryInterval)
+                        .setCheckSentinelsList(false);
+                log.info("Redisson 哨兵模式初始化：master={}, nodes={}", sentinelMaster, sentinelNodes);
+            } else {
+                // 单机模式（开发环境兜底）
+                config.useSingleServer()
+                        .setAddress("redis://" + redisHost + ":" + redisPort)
+                        .setPassword(password)
+                        .setDatabase(redisDatabase)
+                        .setTimeout(timeout)
+                        .setRetryAttempts(retryAttempts)
+                        .setRetryInterval(retryInterval);
+                log.info("Redisson 单机模式初始化：{}:{}", redisHost, redisPort);
+            }
 
             return Redisson.create(config);
         } catch (Exception e) {
-            // Redis 不可用时降级处理，不影响主程序启动
             log.warn("Redisson 连接失败，Redis 相关功能将降级运行", e);
             return null;
         }
+    }
+
+    /**
+     * StringRedisTemplate 用于 CacheHelper 的字符串存取操作
+     * 与 RedisTemplate<String, Object> 共用同一个连接工厂
+     */
+    @Bean
+    public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory factory) {
+        return new StringRedisTemplate(factory);
+    }
+
+    /**
+     * 缓存管理器（用于 @Cacheable、@CacheEvict 等注解）
+     * 使用 JSON 序列化缓存值，默认过期 30 分钟
+     */
+    @Bean
+    public CacheManager cacheManager(RedisConnectionFactory factory) {
+        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(30))
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(RedisSerializer.json()))
+                .disableCachingNullValues();
+
+        return RedisCacheManager.builder(factory)
+                .cacheDefaults(config)
+                .build();
     }
 }

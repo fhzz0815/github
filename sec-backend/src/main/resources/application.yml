@@ -18,6 +18,11 @@ spring:
     time-zone: GMT+8
   lifecycle:
     timeout-per-shutdown-phase: 30s
+  # Windows 控制台编码设置（解决中文乱码）：
+  # 如果控制台出现中文乱码，运行以下命令后再启动项目：
+  #   [Console]::OutputEncoding = [Text.Encoding]::UTF8
+  # 或者在启动时加 JVM 参数：-Dfile.encoding=UTF-8 -Dconsole.charset=GBK
+  mandatory-file-encoding: UTF-8
 
   # Redis 单机配置（开发环境使用本地 Redis，未设置密码）
   data:
@@ -50,7 +55,7 @@ spring:
       max-wait: 60000
       min-evictable-idle-time-millis: 300000
       min-idle: 5
-      password: ${DB_PASSWORD:Flzx3qc_14yhl9t}
+      password: ${DB_PASSWORD:123456}
       pool-prepared-statements: true
       stat-view-servlet:
         allow-ips: 127.0.0.1,localhost
@@ -71,6 +76,7 @@ spring:
       validation-query: SELECT 1
 
   # RabbitMQ 消息队列配置
+  # 开发环境没有 RabbitMQ 也能正常启动，只需要在 yml 里显示设置为 false 即可跳过连接
   rabbitmq:
     host: 127.0.0.1
     port: 5672
@@ -82,6 +88,7 @@ spring:
         concurrency: 3
         max-concurrency: 10
         prefetch: 5
+        acknowledge-mode: manual
         retry:
           enabled: true
           max-attempts: 3
@@ -113,6 +120,10 @@ jwt:
   secret: ${JWT_SECRET:smart-restaurant-secret-key-please-change-in-production-2026}
   access-token-expire: 7200000
   refresh-token-expire: 1209600000
+
+# 订单超时自动取消配置（默认 30 分钟）
+order:
+  timeout-minutes: 30
 
 # 日志配置
 logging:

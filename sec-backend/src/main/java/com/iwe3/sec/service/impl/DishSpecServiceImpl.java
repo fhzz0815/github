@@ -2,13 +2,13 @@ package com.iwe3.sec.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.iwe3.sec.entity.DishSpecEntity;
 import com.iwe3.sec.mapper.DishSpecMapper;
 import com.iwe3.sec.service.IDishSpecService;
 import com.iwe3.sec.common.PageResult;
+import com.iwe3.sec.common.cache.CacheHelper;
+import com.iwe3.sec.common.cache.CacheKey;
 
 import java.util.List;
 
@@ -19,9 +19,12 @@ import java.util.List;
 public class DishSpecServiceImpl implements IDishSpecService {
 
     private final DishSpecMapper dishSpecMapper;
+    private final CacheHelper cacheHelper;
 
-    public DishSpecServiceImpl(DishSpecMapper dishSpecMapper) {
+    public DishSpecServiceImpl(DishSpecMapper dishSpecMapper,
+                               CacheHelper cacheHelper) {
         this.dishSpecMapper = dishSpecMapper;
+        this.cacheHelper = cacheHelper;
     }
 
     @Override
@@ -33,26 +36,36 @@ public class DishSpecServiceImpl implements IDishSpecService {
     }
 
     @Override
-    @Cacheable(value = "entity", key = "#id")
     public DishSpecEntity getById(Long id) {
-        return dishSpecMapper.selectById(id);
+        return cacheHelper.getOrLoad(CacheKey.PREFIX_DISH_SPEC + id, CacheKey.TTL_CATEGORY, DishSpecEntity.class, () -> {
+            return dishSpecMapper.selectById(id);
+        });
     }
 
     @Override
-    @CacheEvict(value = "entity", key = "#entity.id")
     public boolean add(DishSpecEntity entity) {
-        return dishSpecMapper.insert(entity) > 0;
+        boolean result = dishSpecMapper.insert(entity) > 0;
+        if (result && entity.getId() != null) {
+            cacheHelper.delete(CacheKey.PREFIX_DISH_SPEC + entity.getId());
+        }
+        return result;
     }
 
     @Override
-    @CacheEvict(value = "entity", key = "#entity.id")
     public boolean update(DishSpecEntity entity) {
-        return dishSpecMapper.update(entity) > 0;
+        boolean result = dishSpecMapper.update(entity) > 0;
+        if (result && entity.getId() != null) {
+            cacheHelper.delete(CacheKey.PREFIX_DISH_SPEC + entity.getId());
+        }
+        return result;
     }
 
     @Override
-    @CacheEvict(value = "entity", key = "#id")
     public boolean remove(Long id) {
-        return dishSpecMapper.deleteById(id) > 0;
+        boolean result = dishSpecMapper.deleteById(id) > 0;
+        if (result) {
+            cacheHelper.delete(CacheKey.PREFIX_DISH_SPEC + id);
+        }
+        return result;
     }
 }

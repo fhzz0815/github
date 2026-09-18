@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwe3.sec.mapper.MqConsumeLogMapper">
+
+    <resultMap id="BaseResultMap" type="com.iwe3.sec.entity.MqConsumeLogEntity">
+        <id column="id" property="id"/>
+        <result column="message_id" property="messageId"/>
+        <result column="queue_name" property="queueName"/>
+        <result column="status" property="status"/>
+        <result column="error_message" property="errorMessage"/>
+        <result column="consumed_at" property="consumedAt"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, message_id, queue_name, status, error_message, consumed_at, create_time
+    </sql>
+
+    <select id="selectByMessageId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM mq_consume_log
+        WHERE message_id = #{messageId}
+    </select>
+
+    <insert id="insert" parameterType="com.iwe3.sec.entity.MqConsumeLogEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO mq_consume_log (message_id, queue_name, status, error_message, consumed_at, create_time)
+        VALUES (#{messageId}, #{queueName}, #{status}, #{errorMessage}, #{consumedAt}, NOW())
+    </insert>
+
+</mapper>

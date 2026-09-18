@@ -156,6 +156,12 @@
             <version>${springdoc-openapi.version}</version>
         </dependency>
 
+        <!-- Micrometer Prometheus 注册表（集成 Prometheus 监控） -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+
         <!-- 测试 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -194,6 +200,11 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                    <!-- 设置 JVM 编码为 UTF-8，避免 Windows 控制台中文乱码 -->
+                    <jvmArguments>
+                        -Dfile.encoding=UTF-8
+                        -DCONSOLE_CHARSET=GBK
+                    </jvmArguments>
                 </configuration>
             </plugin>
             <!-- 单元测试配置：排除集成测试（需要外部服务） -->

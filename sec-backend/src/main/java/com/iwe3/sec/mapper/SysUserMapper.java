@@ -36,4 +36,7 @@ public interface SysUserMapper {
 
     /** 更新用户最后登录时间（登录成功后调用，精确到秒） */
     int updateLastLoginTime(@Param("id") Long id, @Param("lastLoginTime") java.util.Date lastLoginTime);
+
+    /** 更新用户密码（MD5 升级 bcrypt 时调用） */
+    int updatePassword(@Param("id") Long id, @Param("password") String password);
 }

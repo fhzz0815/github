@@ -94,4 +94,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
           AND stock_quantity >= #{quantity}
     </update>
 
+    <update id="increaseStock">
+        UPDATE `dish_stock`
+        SET stock_quantity = stock_quantity + #{quantity}
+        WHERE store_id = #{storeId} AND dish_id = #{dishId}
+    </update>
+
 </mapper>

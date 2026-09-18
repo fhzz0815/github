@@ -1,6 +1,7 @@
 package com.iwe3.sec.service.impl;
 
 import com.iwe3.sec.common.PageResult;
+import com.iwe3.sec.common.cache.CacheHelper;
 import com.iwe3.sec.entity.DishCategoryEntity;
 import com.iwe3.sec.mapper.DishCategoryMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -27,11 +29,14 @@ class DishCategoryServiceImplTest {
     @Mock
     private DishCategoryMapper dishCategoryMapper;
 
+    @Mock
+    private CacheHelper cacheHelper;
+
     private DishCategoryServiceImpl dishCategoryService;
 
     @BeforeEach
     void setUp() {
-        dishCategoryService = new DishCategoryServiceImpl(dishCategoryMapper);
+        dishCategoryService = new DishCategoryServiceImpl(dishCategoryMapper, cacheHelper);
     }
 
     @Test
@@ -61,9 +66,15 @@ class DishCategoryServiceImplTest {
 
     @Test
     @DisplayName("Get by id when exists should return entity")
-    void testGetById_WhenExists_ShouldReturnEntity() {
+    void testGetById_WhenExists_ShouldReturnEntity() throws Exception {
         DishCategoryEntity mockEntity = DishCategoryEntity.builder().id(1L).build();
         when(dishCategoryMapper.selectById(1L)).thenReturn(mockEntity);
+        // 让 cacheHelper 执行加载器（实际调用 dishCategoryMapper.selectById）
+        when(cacheHelper.getOrLoad(anyString(), anyLong(), eq(DishCategoryEntity.class), any()))
+                .thenAnswer(invocation -> {
+                    Callable<DishCategoryEntity> loader = invocation.getArgument(3);
+                    return loader.call();
+                });
 
         DishCategoryEntity result = dishCategoryService.getById(1L);
 
@@ -73,8 +84,10 @@ class DishCategoryServiceImplTest {
 
     @Test
     @DisplayName("Get by id when not exists should return null")
-    void testGetById_WhenNotExists_ShouldReturnNull() {
-        when(dishCategoryMapper.selectById(999L)).thenReturn(null);
+    void testGetById_WhenNotExists_ShouldReturnNull() throws Exception {
+        // cacheHelper 返回 null 模拟缓存未命中且数据库无数据
+        when(cacheHelper.getOrLoad(anyString(), anyLong(), eq(DishCategoryEntity.class), any()))
+                .thenReturn(null);
 
         DishCategoryEntity result = dishCategoryService.getById(999L);
 

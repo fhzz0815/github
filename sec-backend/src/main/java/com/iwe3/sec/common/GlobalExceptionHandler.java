@@ -81,7 +81,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result<Void> handleDuplicate(DuplicateKeyException e) {
         log.warn("数据重复: {}", e.getMessage());
-        return Result.error(1003, "数据已存在，请勿重复提交");
+        return Result.error(ErrorCode.DUPLICATE_KEY, "数据已存在，请勿重复提交");
     }
 
     /** 数据不完整或违反约束，比如必填项没填 */

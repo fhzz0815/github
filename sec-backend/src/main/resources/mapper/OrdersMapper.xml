@@ -242,6 +242,42 @@ order_no LIKE CONCAT('%', #{query.searchKeyword}, '%')
         WHERE id = #{id} AND version = #{version}
     </update>
 
+    <!-- 通用订单状态流转（原状态 + 版本号 + 逻辑删除三重校验） -->
+    <update id="transitionStatus">
+        UPDATE `orders`
+        <set>
+            order_status = #{toStatus},
+            version = version + 1,
+            update_time = NOW(),
+            <if test="newPayStatus != null">pay_status = #{newPayStatus},</if>
+            <if test="payTime != null">pay_time = #{payTime},</if>
+            <if test="finishTime != null">finish_time = #{finishTime},</if>
+            <if test="cancelTime != null">cancel_time = #{cancelTime},</if>
+            <if test="cancelReason != null">cancel_reason = #{cancelReason},</if>
+        </set>
+        WHERE id = #{id} AND order_status = #{fromStatus}
+          AND version = #{version} AND is_deleted = 0
+    </update>
+
+    <select id="selectTimeoutOrders" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `orders`
+        WHERE order_status = 1 AND pay_status = 1 AND is_deleted = 0
+          AND order_time &lt;= #{deadline}
+        ORDER BY order_time ASC
+        LIMIT 50
+    </select>
+
+    <!-- 分页查询超时未支付订单，每页 BATCH_SIZE 条，用于逐笔独立事务处理 -->
+    <select id="selectTimeoutOrdersPage" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `orders`
+        WHERE order_status = 1 AND pay_status = 1 AND is_deleted = 0
+          AND order_time &lt;= #{deadline}
+        ORDER BY order_time ASC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
     <select id="selectKitchenOrders" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM `orders`

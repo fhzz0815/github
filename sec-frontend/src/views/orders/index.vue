@@ -57,23 +57,23 @@
         <el-table-column prop="orderNo" label="订单号" width="160" show-overflow-tooltip />
         <el-table-column prop="orderType" label="订单类型" width="100">
           <template #default="{ row }">
-            <el-tag :type="row.orderType === 1 ? 'primary' : row.orderType === 2 ? 'warning' : 'info'" size="small">
-              {{ (enumOptions.orderType.find((i) => i.value === row.orderType) || {}).label || row.orderType }}
+            <el-tag :type="getEnumType('orderType', row.orderType)" size="small">
+              {{ getEnumLabel('orderType', row.orderType) }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="personCount" label="人数" width="70" align="center" />
         <el-table-column prop="orderStatus" label="订单状态" width="100">
           <template #default="{ row }">
-            <el-tag :type="getOrderStatusTagType(row.orderStatus)" size="small">
-              {{ (enumOptions.orderStatus.find((i) => i.value === row.orderStatus) || {}).label || row.orderStatus }}
+            <el-tag :type="getEnumType('orderStatus', row.orderStatus)" size="small">
+              {{ getEnumLabel('orderStatus', row.orderStatus) }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="payStatus" label="支付状态" width="90">
           <template #default="{ row }">
-            <el-tag :type="row.payStatus === 2 ? 'success' : 'warning'" size="small">
-              {{ (enumOptions.payStatus.find((i) => i.value === row.payStatus) || {}).label || row.payStatus }}
+            <el-tag :type="getEnumType('payStatus', row.payStatus)" size="small">
+              {{ getEnumLabel('payStatus', row.payStatus) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -196,45 +196,30 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useOrdersStore } from '@/stores/orders'
 import ordersApi from '@/api/orders'
 import storeApi from '@/api/store'
 import memberApi from '@/api/member'
 import diningTableApi from '@/api/diningTable'
+import { ORDER_TYPE, ORDER_STATUS, PAY_STATUS, MAKE_STATUS, getEnumLabel, getEnumType } from '@/constants/enums'
+import { buildSearchParams, formatTime, findLabel } from '@/utils/helpers'
 
 const ordersStore = useOrdersStore()
 
+// 枚举直接从共享常量取，保持和项目其他页面一致
 const enumOptions = {
-  orderType: [{ value: 1, label: '堂食' }, { value: 2, label: '外卖' }, { value: 3, label: '自取' }],
-  orderStatus: [
-    { value: 1, label: '待支付' },
-    { value: 2, label: '待制作' },
-    { value: 3, label: '制作中' },
-    { value: 4, label: '待配送' },
-    { value: 5, label: '配送中' },
-    { value: 6, label: '待自取' },
-    { value: 7, label: '已完成' },
-    { value: 8, label: '已取消' },
-    { value: 9, label: '已退款' }
-  ],
-  payStatus: [{ value: 1, label: '待支付' }, { value: 2, label: '已支付' }, { value: 3, label: '已退款' }, { value: 4, label: '部分退款' }],
-  takeType: [{ value: 1, label: '外送' }, { value: 2, label: '自取' }],
-  makeStatus: [{ value: 1, label: '待制作' }, { value: 2, label: '制作中' }, { value: 3, label: '已上齐' }, { value: 4, label: '退菜' }]
-}
-
-const getEnumLabel = (type, value) => {
-  return (enumOptions[type]?.find((i) => i.value === value) || {}).label || value
+  orderType: ORDER_TYPE,
+  orderStatus: ORDER_STATUS,
+  payStatus: PAY_STATUS,
+  makeStatus: MAKE_STATUS
 }
 
 const getMakeStatusLabel = (status) => getEnumLabel('makeStatus', status)
 
 const getOrderStatusTagType = (status) => {
-  if (status === 7) return 'success'
-  if (status === 8 || status === 9) return 'danger'
-  if (status === 1) return 'warning'
-  return 'primary'
+  return getEnumType('orderStatus', status)
 }
 
 const searchOptions = reactive({
@@ -259,20 +244,7 @@ const queryForm = reactive({
   tableId: null,
   dateRange: null
 })
-const buildParams = () => {
-  const params = { ...queryForm }
-  params.searchKeyword = queryForm.keyword
-  delete params.keyword
-  if (queryForm.dateRange && queryForm.dateRange.length === 2) {
-    params.searchBeginTime = queryForm.dateRange[0]
-    params.searchEndTime = queryForm.dateRange[1]
-  }
-  delete params.dateRange
-  Object.keys(params).forEach((k) => {
-    if (params[k] === '' || params[k] === null || params[k] === undefined) delete params[k]
-  })
-  return params
-}
+const buildParams = () => buildSearchParams(queryForm)
 const handleSearch = () => {
   ordersStore.page = 1
   ordersStore.fetchList(buildParams())
@@ -294,11 +266,6 @@ const activeTab = ref('basic')
 const currentOrder = ref({})
 const currentDetails = ref([])
 const currentStatusLogs = ref([])
-
-const formatTime = (timeStr) => {
-  if (!timeStr) return '-'
-  return timeStr
-}
 
 const handleViewDetail = async (row) => {
   activeTab.value = 'basic'

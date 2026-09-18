@@ -23,8 +23,24 @@ public class PageResult<T> implements Serializable {
     // 总页数
     private Integer pages;
 
+    // 当前页码
+    private Integer page;
+
+    // 每页条数
+    private Integer size;
+
     // 当前页数据
     private List<T> list;
+
+    public static <T> PageResult<T> of(Long total, Integer pages, List<T> list, Integer page, Integer size) {
+        return PageResult.<T>builder()
+                .total(total)
+                .pages(pages)
+                .page(page)
+                .size(size)
+                .list(list)
+                .build();
+    }
 
     public static <T> PageResult<T> of(Long total, Integer pages, List<T> list) {
         return PageResult.<T>builder()

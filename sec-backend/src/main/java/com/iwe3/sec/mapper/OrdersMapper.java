@@ -27,17 +27,49 @@ public interface OrdersMapper {
     /** 修改 */
     int update(OrdersEntity entity);
 
-    /** 更新订单状态 */
+    /** 更新订单状态（带版本号和逻辑删除校验，乐观锁） */
     int updateOrderStatus(@Param("id") Long id, @Param("orderStatus") Integer orderStatus,
                           @Param("version") Integer version);
 
-    /** 更新支付状态 */
+    /** 更新支付状态（带版本号乐观锁） */
     int updatePayStatus(@Param("id") Long id, @Param("payStatus") Integer payStatus,
                         @Param("orderStatus") Integer orderStatus, @Param("payTime") java.util.Date payTime,
                         @Param("version") Integer version);
 
+    /**
+     * 通用订单状态流转（带版本号乐观锁 + 原状态校验）
+     * 只有当前状态等于 fromStatus 且 version 匹配时才会更新
+     * @param id 订单ID
+     * @param fromStatus 当前状态（用于校验，防止状态已变）
+     * @param toStatus 目标状态
+     * @param newPayStatus 新的支付状态（不更新则传 null）
+     * @param payTime 支付时间（不更新则传 null）
+     * @param finishTime 完成时间（不更新则传 null）
+     * @param cancelTime 取消时间（不更新则传 null）
+     * @param cancelReason 取消原因（不更新则传 null）
+     * @param version 乐观锁版本号
+     * @return 影响行数（0表示状态已变更）
+     */
+    int transitionStatus(@Param("id") Long id,
+                         @Param("fromStatus") Integer fromStatus,
+                         @Param("toStatus") Integer toStatus,
+                         @Param("newPayStatus") Integer newPayStatus,
+                         @Param("payTime") java.util.Date payTime,
+                         @Param("finishTime") java.util.Date finishTime,
+                         @Param("cancelTime") java.util.Date cancelTime,
+                         @Param("cancelReason") String cancelReason,
+                         @Param("version") Integer version);
+
     /** 根据ID删除 */
     int deleteById(@Param("id") Long id);
+
+    /** 查询超时未支付的订单（用于自动取消，带分页） */
+    List<OrdersEntity> selectTimeoutOrders(@Param("deadline") java.util.Date deadline);
+
+    /** 分页查询超时未支付的订单（每笔独立事务，分页处理避免大事务） */
+    List<OrdersEntity> selectTimeoutOrdersPage(@Param("deadline") java.util.Date deadline,
+                                                @Param("offset") int offset,
+                                                @Param("limit") int limit);
 
     /** 查询后厨看板 */
     List<OrdersEntity> selectKitchenOrders(@Param("storeId") Long storeId);

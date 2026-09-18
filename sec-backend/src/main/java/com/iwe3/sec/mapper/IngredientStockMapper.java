@@ -17,6 +17,10 @@ public interface IngredientStockMapper {
     /** 根据ID查询 */
     IngredientStockEntity selectById(@Param("id") Long id);
 
+    /** 根据门店和原料查找库存 */
+    IngredientStockEntity selectByStoreAndIngredient(@Param("storeId") Long storeId,
+                                                     @Param("ingredientId") Long ingredientId);
+
     /** 新增 */
     int insert(IngredientStockEntity entity);
 

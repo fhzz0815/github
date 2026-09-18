@@ -89,4 +89,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         DELETE FROM `member_coupon` WHERE id = #{id}
     </delete>
 
+    <!-- 释放优惠券（取消订单时将已使用的优惠券状态回退为未使用） -->
+    <update id="releaseCoupon">
+        UPDATE `member_coupon`
+        SET status = 1, use_time = NULL, order_id = NULL
+        WHERE id = #{id} AND order_id = #{orderId} AND status = 2
+    </update>
+
+    <!-- 按订单号释放优惠券（当不确定 member_coupon.id 时使用） -->
+    <update id="releaseCouponByOrder">
+        UPDATE `member_coupon`
+        SET status = 1, use_time = NULL, order_id = NULL
+        WHERE order_id = #{orderId} AND status = 2
+    </update>
+
 </mapper>

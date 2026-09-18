@@ -159,6 +159,7 @@ class OrdersControllerTest {
         request.setPayType("WECHAT");
         request.setActualAmount(new BigDecimal("59.80"));
         request.setMemberPayAmount(BigDecimal.ZERO);
+        request.setIdempotencyKey("TEST_IDEMPOTENCY_KEY_001");
 
         when(permissionChecker.currentUserId()).thenReturn(100L);
 
@@ -168,7 +169,7 @@ class OrdersControllerTest {
         // 验证
         assertEquals(0, result.getCode());
         assertEquals("支付成功", result.getMessage());
-        verify(ordersService).payOrder(1L, "WECHAT", new BigDecimal("59.80"), BigDecimal.ZERO, 100L);
+        verify(ordersService).payOrder(1L, "WECHAT", new BigDecimal("59.80"), BigDecimal.ZERO, "TEST_IDEMPOTENCY_KEY_001", 100L);
     }
 
     @Test

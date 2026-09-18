@@ -107,7 +107,7 @@ public class OrdersController {
                                  @Valid @RequestBody PayOrderRequest request) {
         Long operatorId = permissionChecker.currentUserId();
         ordersService.payOrder(id, request.getPayType(), request.getActualAmount(),
-                request.getMemberPayAmount(), operatorId);
+                request.getMemberPayAmount(), request.getIdempotencyKey(), operatorId);
         return Result.<Void>success("支付成功", null);
     }
 
@@ -137,6 +137,32 @@ public class OrdersController {
         Long operatorId = permissionChecker.currentUserId();
         ordersService.updateMakeStatus(id, request.getDetailId(), request.getMakeStatus(), operatorId);
         return Result.<Void>success("制作状态已更新", null);
+    }
+
+    /**
+     * 完成订单（制作中/配送中/待自取 → 已完成）
+     * @param id 订单ID
+     */
+    @Operation(summary = "完成订单", description = "将订单标记为已完成状态（制作中/配送中/待自取 → 已完成）")
+    @PostMapping("/{id}/complete")
+    public Result<Void> completeOrder(@Parameter(description = "订单ID") @PathVariable Long id) {
+        Long operatorId = permissionChecker.currentUserId();
+        ordersService.completeOrder(id, operatorId);
+        return Result.<Void>success("订单已完成", null);
+    }
+
+    /**
+     * 退款订单（已支付的订单 → 已退款）
+     * @param id 订单ID
+     * @param request 退款原因
+     */
+    @Operation(summary = "退款订单", description = "将已支付的订单退为已退款状态")
+    @PostMapping("/{id}/refund")
+    public Result<Void> refundOrder(@Parameter(description = "订单ID") @PathVariable Long id,
+                                    @Valid @RequestBody CancelOrderRequest request) {
+        Long operatorId = permissionChecker.currentUserId();
+        ordersService.refundOrder(id, request.getReason(), operatorId);
+        return Result.<Void>success("订单已退款", null);
     }
 
     /**

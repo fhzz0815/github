@@ -2,6 +2,7 @@ package com.iwe3.sec.service.impl;
 
 import com.iwe3.sec.common.PageResult;
 import com.iwe3.sec.common.PermissionChecker;
+import com.iwe3.sec.common.cache.CacheHelper;
 import com.iwe3.sec.entity.MemberEntity;
 import com.iwe3.sec.mapper.MemberMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -31,11 +33,14 @@ class MemberServiceImplTest {
     @Mock
     private PermissionChecker permissionChecker;
 
+    @Mock
+    private CacheHelper cacheHelper;
+
     private MemberServiceImpl memberService;
 
     @BeforeEach
     void setUp() {
-        memberService = new MemberServiceImpl(memberMapper, permissionChecker);
+        memberService = new MemberServiceImpl(memberMapper, permissionChecker, cacheHelper);
     }
 
     @Test
@@ -65,9 +70,15 @@ class MemberServiceImplTest {
 
     @Test
     @DisplayName("Get by id when exists should return entity")
-    void testGetById_WhenExists_ShouldReturnEntity() {
+    void testGetById_WhenExists_ShouldReturnEntity() throws Exception {
         MemberEntity mockEntity = MemberEntity.builder().id(1L).build();
         when(memberMapper.selectById(1L)).thenReturn(mockEntity);
+        // 让 cacheHelper 执行加载器（实际调用 memberMapper.selectById）
+        when(cacheHelper.getOrLoad(anyString(), anyLong(), eq(MemberEntity.class), any()))
+                .thenAnswer(invocation -> {
+                    Callable<MemberEntity> loader = invocation.getArgument(3);
+                    return loader.call();
+                });
 
         MemberEntity result = memberService.getById(1L);
 
@@ -77,8 +88,10 @@ class MemberServiceImplTest {
 
     @Test
     @DisplayName("Get by id when not exists should return null")
-    void testGetById_WhenNotExists_ShouldReturnNull() {
-        when(memberMapper.selectById(999L)).thenReturn(null);
+    void testGetById_WhenNotExists_ShouldReturnNull() throws Exception {
+        // cacheHelper 返回 null 模拟缓存未命中且数据库无数据
+        when(cacheHelper.getOrLoad(anyString(), anyLong(), eq(MemberEntity.class), any()))
+                .thenReturn(null);
 
         MemberEntity result = memberService.getById(999L);
 

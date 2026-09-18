@@ -118,6 +118,15 @@ dish_name LIKE CONCAT('%', #{query.searchKeyword}, '%')
         WHERE id = #{id}
     </update>
 
+    <!-- 更新退款状态（仅当状态=1待审核时生效，防止并发重复处理） -->
+    <update id="updateStatus">
+        UPDATE `refund`
+        SET status = #{status},
+            refund_time = #{refundTime}
+        WHERE id = #{id}
+          AND status = 1
+    </update>
+
     <delete id="deleteById">
         DELETE FROM `refund` WHERE id = #{id}
     </delete>

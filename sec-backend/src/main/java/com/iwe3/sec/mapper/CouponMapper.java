@@ -23,6 +23,9 @@ public interface CouponMapper {
     /** 修改 */
     int update(CouponEntity entity);
 
+    /** 原子递增已发放数量（带库存校验，用于领券场景） */
+    int incrementIssuedCount(@Param("id") Long id);
+
     /** 根据ID删除 */
     int deleteById(@Param("id") Long id);
 }

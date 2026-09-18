@@ -32,6 +32,15 @@ public interface OrderDetailMapper {
     /** 更新制作状态 */
     int updateMakeStatus(@Param("id") Long id, @Param("status") Integer status);
 
+    /**
+     * 累加退菜金额（将 refund_amount 增加指定金额）
+     *
+     * @param id    明细ID
+     * @param amount 本次退款的金额
+     * @return 影响行数
+     */
+    int increaseRefundAmount(@Param("id") Long id, @Param("amount") java.math.BigDecimal amount);
+
     /** 根据ID删除 */
     int deleteById(@Param("id") Long id);
 

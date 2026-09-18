@@ -354,7 +354,7 @@ class SysUserServiceImplTest {
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> sysUserService.login("nonexistent", "123456"));
 
-        assertEquals(1002, exception.getCode());
+        assertEquals(1010, exception.getCode());
         assertEquals("账号不存在", exception.getMessage());
     }
 
@@ -368,7 +368,7 @@ class SysUserServiceImplTest {
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> sysUserService.login("disabled", "123456"));
 
-        assertEquals(1003, exception.getCode());
+        assertEquals(1011, exception.getCode());
         assertEquals("账号已被禁用", exception.getMessage());
     }
 
@@ -382,7 +382,7 @@ class SysUserServiceImplTest {
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> sysUserService.login("zhangsan", "wrongpwd"));
 
-        assertEquals(1004, exception.getCode());
+        assertEquals(1013, exception.getCode());
         assertEquals("密码错误", exception.getMessage());
     }
 

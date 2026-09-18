@@ -23,6 +23,12 @@ public interface MemberCouponMapper {
     /** 修改 */
     int update(MemberCouponEntity entity);
 
+    /** 释放优惠券（取消订单时将优惠券状态回退为未使用） */
+    int releaseCoupon(@Param("id") Long id, @Param("orderId") Long orderId);
+
+    /** 按订单号释放优惠券（当不确定 member_coupon.id 时使用） */
+    int releaseCouponByOrder(@Param("orderId") Long orderId);
+
     /** 根据ID删除 */
     int deleteById(@Param("id") Long id);
 }

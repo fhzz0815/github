@@ -22,4 +22,14 @@ public interface IMemberCouponService {
 
     /** 删除 */
     boolean remove(Long id);
+
+    /**
+     * 会员领取优惠券（带分布式锁防超发）
+     *
+     * @param couponId  优惠券 ID
+     * @param memberId  会员 ID
+     * @param storeId   门店 ID
+     * @return 会员优惠券记录 ID
+     */
+    Long claimCoupon(Long couponId, Long memberId, Long storeId);
 }

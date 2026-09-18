@@ -4,6 +4,7 @@ import com.iwe3.sec.common.BusinessException;
 import com.iwe3.sec.common.JwtUtil;
 import com.iwe3.sec.entity.SysUserEntity;
 import com.iwe3.sec.mapper.SysUserMapper;
+import com.iwe3.sec.mapper.StaffLoginLogMapper;
 import cn.hutool.crypto.SecureUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,11 +30,14 @@ class AuthServiceImplTest {
     @Mock
     private JwtUtil jwtUtil;
 
+    @Mock
+    private StaffLoginLogMapper staffLoginLogMapper;
+
     private AuthServiceImpl authService;
 
     @BeforeEach
     void setUp() {
-        authService = new AuthServiceImpl(sysUserMapper, jwtUtil);
+        authService = new AuthServiceImpl(sysUserMapper, jwtUtil, staffLoginLogMapper);
     }
 
     @Test
@@ -44,7 +48,7 @@ class AuthServiceImplTest {
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> authService.login("nonexistent", "123456"));
 
-        assertEquals(1002, exception.getCode());
+        assertEquals(1010, exception.getCode());
         assertEquals("账号不存在", exception.getMessage());
     }
 
@@ -58,7 +62,7 @@ class AuthServiceImplTest {
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> authService.login("deleted", "123456"));
 
-        assertEquals(1003, exception.getCode());
+        assertEquals(1011, exception.getCode());
         assertEquals("账号已被禁用", exception.getMessage());
     }
 
@@ -72,7 +76,7 @@ class AuthServiceImplTest {
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> authService.login("deactivated", "123456"));
 
-        assertEquals(1005, exception.getCode());
+        assertEquals(1012, exception.getCode());
         assertEquals("账号已被停用", exception.getMessage());
     }
 
@@ -87,7 +91,7 @@ class AuthServiceImplTest {
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> authService.login("zhangsan", "wrongpwd"));
 
-        assertEquals(1004, exception.getCode());
+        assertEquals(1013, exception.getCode());
         assertEquals("密码错误", exception.getMessage());
     }
 

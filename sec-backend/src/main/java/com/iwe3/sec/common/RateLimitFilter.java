@@ -30,6 +30,12 @@ public class RateLimitFilter implements Filter {
     /** 每个 IP 最大突发请求数 */
     private static final int MAX_BURST = 50;
 
+    private final RateLimiter rateLimiter;
+
+    public RateLimitFilter(RateLimiter rateLimiter) {
+        this.rateLimiter = rateLimiter;
+    }
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
@@ -38,8 +44,8 @@ public class RateLimitFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) response;
         String clientIp = getClientIp(req);
 
-        // 检查是否被限流
-        if (!RateLimiter.tryAcquire(clientIp, MAX_BURST, MAX_REQUESTS_PER_SECOND)) {
+        // 检查是否被限流（通过注入的 RateLimiter 实例调用，而非静态调用）
+        if (!rateLimiter.tryAcquire(clientIp, MAX_BURST, MAX_REQUESTS_PER_SECOND)) {
             log.warn("API 被限流，IP: {}, 路径: {}", clientIp, req.getRequestURI());
             resp.setStatus(429);
             resp.setContentType("application/json;charset=UTF-8");

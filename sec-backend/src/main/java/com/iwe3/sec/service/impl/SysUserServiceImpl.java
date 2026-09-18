@@ -12,6 +12,7 @@ import com.iwe3.sec.common.PermissionChecker;
 import com.iwe3.sec.common.UserDataScope;
 import com.iwe3.sec.common.BusinessException;
 import com.iwe3.sec.common.JwtUtil;
+import com.iwe3.sec.common.ErrorCode;
 import cn.hutool.crypto.SecureUtil;
 
 import java.util.List;
@@ -130,14 +131,14 @@ public class SysUserServiceImpl implements ISysUserService {
     public String login(String username, String password) {
         SysUserEntity user = sysUserMapper.selectByUsername(username);
         if (user == null) {
-            throw new BusinessException(1002, "账号不存在");
+            throw new BusinessException(ErrorCode.ACCOUNT_NOT_FOUND, "账号不存在");
         }
         if (user.getIsDeleted() != null && user.getIsDeleted() == 1) {
-            throw new BusinessException(1003, "账号已被禁用");
+            throw new BusinessException(ErrorCode.ACCOUNT_DISABLED, "账号已被禁用");
         }
         // 数据库密码用MD5存储，把传入的明文密码做MD5后比对
         if (!SecureUtil.md5(password).equalsIgnoreCase(user.getPassword())) {
-            throw new BusinessException(1004, "密码错误");
+            throw new BusinessException(ErrorCode.PASSWORD_ERROR, "密码错误");
         }
         return jwtUtil.generateAccessToken(user.getId(), user.getUsername());
     }

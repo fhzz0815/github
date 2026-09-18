@@ -25,4 +25,21 @@ public interface MemberMapper {
 
     /** 根据ID删除 */
     int deleteById(@Param("id") Long id);
+
+    // ========== 钱包相关：原子增减（避免并发读写导致数据不一致） ==========
+
+    /** 原子增加余额（充值）：balance = balance + #{amount} */
+    int increaseBalance(@Param("id") Long id, @Param("amount") java.math.BigDecimal amount);
+
+    /** 原子减少余额（消费）：balance = balance - #{amount}，同时校验余额足够 */
+    int decreaseBalance(@Param("id") Long id, @Param("amount") java.math.BigDecimal amount);
+
+    /** 原子增加可用积分 */
+    int increasePoints(@Param("id") Long id, @Param("points") Integer points);
+
+    /** 原子减少可用积分，同时增加总积分 */
+    int increaseTotalAndAvailablePoints(@Param("id") Long id, @Param("points") Integer points);
+
+    /** 原子减少可用积分（消费/兑换） */
+    int decreaseAvailablePoints(@Param("id") Long id, @Param("points") Integer points);
 }

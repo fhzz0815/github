@@ -9,6 +9,8 @@ import com.iwe3.sec.service.IMemberService;
 import com.iwe3.sec.common.BusinessException;
 import com.iwe3.sec.common.PageResult;
 import com.iwe3.sec.common.PermissionChecker;
+import com.iwe3.sec.common.cache.CacheHelper;
+import com.iwe3.sec.common.cache.CacheKey;
 
 import java.util.List;
 
@@ -21,10 +23,14 @@ public class MemberServiceImpl implements IMemberService {
 
     private final MemberMapper memberMapper;
     private final PermissionChecker permissionChecker;
+    private final CacheHelper cacheHelper;
 
-    public MemberServiceImpl(MemberMapper memberMapper, PermissionChecker permissionChecker) {
+    public MemberServiceImpl(MemberMapper memberMapper,
+                             PermissionChecker permissionChecker,
+                             CacheHelper cacheHelper) {
         this.memberMapper = memberMapper;
         this.permissionChecker = permissionChecker;
+        this.cacheHelper = cacheHelper;
     }
 
     @Override
@@ -45,18 +51,24 @@ public class MemberServiceImpl implements IMemberService {
 
     @Override
     public MemberEntity getById(Long id) {
-        MemberEntity m = memberMapper.selectById(id);
-        if (m == null) {
-            return null;
-        }
-        permissionChecker.assertInOwnStore(m.getRegisterStoreId());
-        return m;
+        // 用缓存查会员信息，缓存没命中再查数据库
+        return cacheHelper.getOrLoad(CacheKey.PREFIX_MEMBER + id, CacheKey.TTL_MEMBER, MemberEntity.class, () -> {
+            MemberEntity m = memberMapper.selectById(id);
+            if (m != null) {
+                permissionChecker.assertInOwnStore(m.getRegisterStoreId());
+            }
+            return m;
+        });
     }
 
     @Override
     public boolean add(MemberEntity entity) {
         permissionChecker.setStoreIdIfNeeded(entity::setRegisterStoreId);
-        return memberMapper.insert(entity) > 0;
+        boolean result = memberMapper.insert(entity) > 0;
+        if (result && entity.getId() != null) {
+            cacheHelper.delete(CacheKey.PREFIX_MEMBER + entity.getId());
+        }
+        return result;
     }
 
     @Override
@@ -67,7 +79,11 @@ public class MemberServiceImpl implements IMemberService {
                 permissionChecker.assertInOwnStore(existing.getRegisterStoreId());
             }
         }
-        return memberMapper.update(entity) > 0;
+        boolean result = memberMapper.update(entity) > 0;
+        if (result && entity.getId() != null) {
+            cacheHelper.delete(CacheKey.PREFIX_MEMBER + entity.getId());
+        }
+        return result;
     }
 
     @Override
@@ -76,7 +92,11 @@ public class MemberServiceImpl implements IMemberService {
         if (existing != null) {
             permissionChecker.assertInOwnStore(existing.getRegisterStoreId());
         }
-        return memberMapper.deleteById(id) > 0;
+        boolean result = memberMapper.deleteById(id) > 0;
+        if (result) {
+            cacheHelper.delete(CacheKey.PREFIX_MEMBER + id);
+        }
+        return result;
     }
 
     // 注意：assertInOwnStore() 已统一抽取到 PermissionChecker 中
